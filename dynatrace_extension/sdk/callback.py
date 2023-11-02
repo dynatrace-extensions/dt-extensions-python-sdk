@@ -96,7 +96,7 @@ class WrappedCallback:
         if not self.running_in_sim:
             """
             Here we chose a random second between 1 and 59 to start the callback
-            This is to distribute load for extensions running on this host
+            This is to distribute load for extension running on this host
             When running from the simulator, this is not done
             """
 

@@ -1,4 +1,4 @@
-# Dynatrace Extensions SDK
+# Dynatrace Extensions Python SDK
 
 [![PyPI - Version](https://img.shields.io/pypi/v/dynatrace-extensions-sdk.svg)](https://pypi.org/project/dynatrace-extensions-sdk)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dynatrace-extensions-sdk.svg)](https://pypi.org/project/dynatrace-extensions-sdk)
@@ -9,6 +9,7 @@
 
 - [Installation](#installation)
 - [License](#license)
+- [Developing](#developing)
 
 ## Installation
 

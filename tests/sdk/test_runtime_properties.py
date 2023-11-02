@@ -3,7 +3,7 @@ import unittest
 from typing import Any, Dict
 
 from dynatrace_extension import Extension
-from dynatrace_extension.extensions.runtime import RuntimeProperties
+from dynatrace_extension.sdk.runtime import RuntimeProperties
 
 
 class TestRuntimeProperties(unittest.TestCase):

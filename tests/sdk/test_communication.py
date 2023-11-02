@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
-from dynatrace_extension.extensions.communication import HttpClient, divide_into_chunks
+from dynatrace_extension.sdk.communication import HttpClient, divide_into_chunks
 
 
 class TestCommunication(unittest.TestCase):

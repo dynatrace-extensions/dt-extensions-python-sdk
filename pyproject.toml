@@ -134,7 +134,7 @@ unfixable = [
 ]
 
 extend-exclude = [
-    "dynatrace_extension/extensions/vendor",
+    "dynatrace_extension/sdk/vendor",
 ]
 
 [tool.ruff.isort]
