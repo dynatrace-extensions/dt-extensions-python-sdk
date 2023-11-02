@@ -148,11 +148,12 @@ ban-relative-imports = "all"
 "tests/**/*" = ["PLR2004", "S101", "TID252", "ARG002"]
 
 [tool.coverage.run]
-source_pkgs = ["dynatrace_extensions_sdk", "tests"]
+source_pkgs = ["dynatrace_extension", "tests"]
 branch = true
 parallel = true
 omit = [
     "dynatrace_extension/__about__.py",
+    "dynatrace_extension/sdk/vendor/**/*",
 ]
 
 [tool.coverage.paths]
