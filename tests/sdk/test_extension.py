@@ -5,14 +5,14 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 from dynatrace_extension import Status, StatusValue, get_helper_extension
-from dynatrace_extension.extensions.activation import ActivationConfig
-from dynatrace_extension.extensions.communication import HttpClient, MintResponse
-from dynatrace_extension.extensions.extension import (
+from dynatrace_extension.sdk.activation import ActivationConfig
+from dynatrace_extension.sdk.communication import HttpClient, MintResponse
+from dynatrace_extension.sdk.extension import (
     CountMetricRegistrationEntry,
     DtEventType,
     Extension,
 )
-from dynatrace_extension.extensions.helper import _HelperExtension, dt_fastcheck, schedule_function, schedule_method
+from dynatrace_extension.sdk.helper import _HelperExtension, dt_fastcheck, schedule_function, schedule_method
 
 
 class TestExtension(unittest.TestCase):

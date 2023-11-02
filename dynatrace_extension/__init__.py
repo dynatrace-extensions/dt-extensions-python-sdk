@@ -5,11 +5,11 @@
 # Ignore F401 because these are not used here, but are used by extension developers
 # ruff: noqa: F401
 
-from .extensions.activation import ActivationConfig, ActivationType
-from .extensions.communication import Status, StatusValue
-from .extensions.event import Severity
-from .extensions.extension import DtEventType, Extension
-from .extensions.helper import (
+from .sdk.activation import ActivationConfig, ActivationType
+from .sdk.communication import Status, StatusValue
+from .sdk.event import Severity
+from .sdk.extension import DtEventType, Extension
+from .sdk.helper import (
     get_activation_config,
     get_helper_extension,
     report_dt_event,
@@ -24,4 +24,4 @@ from .extensions.helper import (
     schedule,
     schedule_function,
 )
-from .extensions.metric import Metric, MetricType, SummaryStat
+from .sdk.metric import Metric, MetricType, SummaryStat

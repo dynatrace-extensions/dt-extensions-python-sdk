@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from dynatrace_extension.extensions.callback import WrappedCallback
+from dynatrace_extension.sdk.callback import WrappedCallback
 
 
 class TestCallBack(unittest.TestCase):

@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from dynatrace_extension import Metric, MetricType
-from dynatrace_extension.extensions.metric import SfmMetric
+from dynatrace_extension.sdk.metric import SfmMetric
 
 
 class TestMetric(unittest.TestCase):
