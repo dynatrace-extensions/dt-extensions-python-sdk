@@ -1,7 +1,7 @@
 # Dynatrace Extensions Python SDK
 
-[![PyPI - Version](https://img.shields.io/pypi/v/dynatrace-extensions-sdk.svg)](https://pypi.org/project/dynatrace-extensions-sdk)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dynatrace-extensions-sdk.svg)](https://pypi.org/project/dynatrace-extensions-sdk)
+[![PyPI - Version](https://img.shields.io/pypi/v/dt-extensions-sdk.svg)](https://pypi.org/project/dt-extensions-sdk)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dt-extensions-sdk.svg)](https://pypi.org/project/dt-extensions-sdk)
 
 -----
 
