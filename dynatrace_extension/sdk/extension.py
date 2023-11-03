@@ -150,8 +150,6 @@ class Extension:
         # TODO - Add sfm logging
         self.logger = extension_logger
 
-        # Dictionaries containing the activation, extension configs and feature sets
-        self.activation_config: ActivationConfig = ActivationConfig({})  # Received as JSON, parsed to dict
         self.extension_config: str = ""
         self._feature_sets: dict[str, list[str]] = {}
 
@@ -640,7 +638,7 @@ class Extension:
             self._monitoring_config_id = args.monitoring_config_id
             api_logger.info(f"DSID = {self.task_id}, monitoring config id = {self._monitoring_config_id}")
 
-        self.activation_config: ActivationConfig = ActivationConfig(self._client.get_activation_config())
+        self.activation_config = ActivationConfig(self._client.get_activation_config())
         self.extension_config = self._client.get_extension_config()
         self._feature_sets = self._client.get_feature_sets()
 
