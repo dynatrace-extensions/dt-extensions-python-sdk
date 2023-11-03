@@ -36,6 +36,11 @@ Source = "https://github.com/unknown/dynatrace-extensions-sdk"
 [tool.hatch.version]
 path = "dynatrace_extension/__about__.py"
 
+[tool.hatch.build]
+artifacts  = [
+  "dynatrace_extension/cli/create/extension_template/**/*",
+]
+
 [tool.hatch.envs.default]
 dependencies = [
     "coverage[toml]>=6.5",
