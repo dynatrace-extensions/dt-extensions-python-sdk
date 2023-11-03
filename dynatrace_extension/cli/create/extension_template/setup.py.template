@@ -1,10 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name="%extension_name%",
       version="0.0.1",
       description="%Extension_Name% python EF2 extension",
       author="Dynatrace",
-      packages=["%extension_name%"],
+      packages=find_packages(),
       python_requires=">=3.10",
       include_package_data=True,
       install_requires=["dt-extensions-sdk"],
