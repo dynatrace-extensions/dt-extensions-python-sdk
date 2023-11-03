@@ -14,7 +14,6 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, Iterable, List, TypeVar
 
-from .. import ActivationConfig
 from .vendor.mureq.mureq import HTTPException, Response, request
 
 CONTENT_TYPE_JSON = "application/json;charset=utf-8"

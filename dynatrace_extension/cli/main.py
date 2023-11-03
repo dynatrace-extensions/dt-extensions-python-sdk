@@ -70,7 +70,7 @@ def build(
         "-k",
         help="Path to the dev fused key-certificate",
     ),
-    target_directory: Path = typer.Option(None, "--target-directory", "-t"),
+    target_directory: Optional[Path] = typer.Option(None, "--target-directory", "-t"),
     extra_platforms: Optional[list[str]] = typer.Option(
         None, "--extra-platform", "-e", help="Download wheels for an extra platform"
     ),
@@ -178,7 +178,7 @@ def wheel(
 
     # Downloads the dependencies and places them in the lib folder
     command = [sys.executable, "-m", "pip", "wheel", "-w", relative_lib_folder_dir]
-    if extra_index_url:
+    if extra_index_url is not None:
         command.extend(["--extra-index-url", extra_index_url])
     command.append(".")
     run_process(command, cwd=extension_dir)

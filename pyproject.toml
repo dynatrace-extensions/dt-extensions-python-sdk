@@ -40,6 +40,7 @@ path = "dynatrace_extension/__about__.py"
 dependencies = [
     "coverage[toml]>=6.5",
     "pytest",
+    "typer[all]",
     "pyyaml"
 ]
 [tool.hatch.envs.default.scripts]
@@ -149,7 +150,7 @@ ban-relative-imports = "all"
 
 [tool.ruff.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
-"tests/**/*" = ["PLR2004", "S101", "TID252", "ARG002"]
+"tests/**/*" = ["PLR2004", "S101", "TID252", "ARG002", "ARG001"]
 
 # typer needs to have method calls in arguments sometimes
 "dynatrace_extension/cli/*" = ["B008"]
