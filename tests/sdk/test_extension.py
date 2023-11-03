@@ -305,7 +305,7 @@ class TestExtension(unittest.TestCase):
         extension.extension_config = "extension_config"
 
         @dt_fastcheck()
-        def test(activation_config: ActivationConfig, extension_config: str) -> StatusValue:  # noqa: ARG001
+        def test(activation_config: ActivationConfig, extension_config: str) -> StatusValue:
             return StatusValue.UNKNOWN_ERROR
 
         extension._run_fastcheck()
@@ -354,7 +354,7 @@ class TestExtension(unittest.TestCase):
         extension.logger = MagicMock()
         extension._client = MagicMock()
 
-        def custom_fastcheck(activation_config) -> Status:  # noqa: ARG001
+        def custom_fastcheck(activation_config) -> Status:
             return Status(StatusValue.OK)
 
         extension.register_fastcheck(custom_fastcheck)
@@ -374,11 +374,11 @@ class TestExtension(unittest.TestCase):
         extension._client = MagicMock()
 
         @dt_fastcheck()
-        def fastcheck1(activation_config: ActivationConfig, extension_config: str) -> StatusValue:  # noqa: ARG001
+        def fastcheck1(activation_config: ActivationConfig, extension_config: str) -> StatusValue:
             return StatusValue.OK
 
         @dt_fastcheck()
-        def fastcheck2(activation_config: ActivationConfig, extension_config: str) -> StatusValue:  # noqa: ARG001
+        def fastcheck2(activation_config: ActivationConfig, extension_config: str) -> StatusValue:
             return StatusValue.UNKNOWN_ERROR
 
         extension._run_fastcheck()
@@ -746,7 +746,7 @@ class TestExtension(unittest.TestCase):
         extension.extension_config = extension_yaml
         extension.activation_config = ActivationConfig(activation)
         extension._client.extension_config = extension.extension_config
-        extension._client.activation_config = extension.activation_config
+        extension._client.activation_config = activation
         extension._feature_sets = extension._client.get_feature_sets()
 
         assert extension.enabled_feature_sets_names == ["basic", "advanced"]

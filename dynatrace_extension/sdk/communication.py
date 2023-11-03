@@ -14,7 +14,6 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, Iterable, List, TypeVar
 
-from .. import ActivationConfig
 from .vendor.mureq.mureq import HTTPException, Response, request
 
 CONTENT_TYPE_JSON = "application/json;charset=utf-8"
@@ -315,12 +314,10 @@ class DebugClient(CommunicationClient):
         local_ingest: bool = False,
         local_ingest_port: int = 14499,
     ):
-        activation_config = {}
+        self.activation_config = {}
         if activation_config_path and Path(activation_config_path).exists():
             with open(activation_config_path) as f:
-                activation_config = json.load(f)
-
-        self.activation_config = ActivationConfig(activation_config)
+                self.activation_config = json.load(f)
 
         self.extension_config = ""
         if not extension_config_path:
@@ -356,7 +353,7 @@ class DebugClient(CommunicationClient):
         feature_sets = {}
         for feature_set in yaml_feature_sets:
             feature_set_name = feature_set["featureSet"]
-            if feature_set_name in self.activation_config.feature_sets:
+            if feature_set_name in self.activation_config.get("featureSets", []):
                 feature_sets[feature_set_name] = [metric["key"] for metric in feature_set["metrics"]]
 
         return feature_sets

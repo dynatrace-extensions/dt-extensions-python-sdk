@@ -1,0 +1,15 @@
+{
+	"enabled": true,
+	"description": "%extension_name% activation",
+	"version": "0.0.1",
+	"activationContext": "REMOTE",
+	"pythonRemote": {
+		"endpoints": [
+			{
+				"url": "http://127.0.0.1:15672",
+				"user": "guest",
+				"password": "guest"
+			}
+		]
+	}
+}
