@@ -1,0 +1,17 @@
+name: %extension-prefix%%extension-name%
+version: 0.0.1
+minDynatraceVersion: "1.253"
+author:
+  name: "Dynatrace"
+
+python:
+  runtime:
+    module: %extension_name%
+    version:
+      min: "3.9"
+
+  activation:
+    remote:
+      path: activationSchema.json
+    local:
+      path: activationSchema.json

@@ -25,6 +25,8 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = []
+[project.optional-dependencies]
+cli = [ "dt-cli==1.6.13", "typer[all]", "pyyaml"]
 
 [project.urls]
 Documentation = "https://github.com/unknown/dynatrace-extensions-sdk#readme"
@@ -61,6 +63,8 @@ dependencies = [
     "black>=23.1.0",
     "mypy>=1.0.0",
     "ruff>=0.0.243",
+    "typer[all]",
+    "pyyaml"
 ]
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:dynatrace_extension tests}"
@@ -147,6 +151,9 @@ ban-relative-imports = "all"
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252", "ARG002"]
 
+# typer needs to have method calls in arguments sometimes
+"dynatrace_extension/cli/*" = ["B008"]
+
 [tool.coverage.run]
 source_pkgs = ["dynatrace_extension", "tests"]
 branch = true
@@ -168,4 +175,4 @@ exclude_lines = [
 ]
 
 [project.scripts]
-dt-sdk = "dynatrace_extension.cli:main"
+dt-sdk = "dynatrace_extension.cli:app"

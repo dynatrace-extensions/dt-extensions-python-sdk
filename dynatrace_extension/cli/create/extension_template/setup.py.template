@@ -1,0 +1,12 @@
+from setuptools import setup
+
+setup(name="%extension_name%",
+      version="0.0.1",
+      description="%extension_name%",
+      author="Dynatrace",
+      packages=["%Extension_Name% python EF2 extension"],
+      python_requires=">=3.10",
+      include_package_data=True,
+      install_requires=["dt-extensions-sdk"],
+      extras_require={"dev": ["dt-extensions-sdk[cli]"]},
+      )
