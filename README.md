@@ -11,10 +11,46 @@
 - [License](#license)
 - [Developing](#developing)
 
-## Installation
+## Quick Start
 
-```console
-pip install dt-extensions-sdk
+### Install the SDK
+
+```bash
+pip install dt-extensions-sdk[cli]
+# Note, on some shells like zsh you may need to escape the brackets - pip install dt-extensions-sdk\[cli\]
+```
+
+### Create signing certificates
+
+```bash
+dt-sdk gencerts
+```
+
+### Create a new extension
+
+```bash
+dt-sdk create my_first_extension
+```
+
+### Simulate
+
+```bash
+cd my_first_extension
+dt-sdk run
+```
+
+### Build
+    
+```bash
+dt-sdk build
+```
+
+
+### Upload
+    
+```bash
+# Note, you need to either set environment variables DT_API_URL and DT_API_TOKEN or pass them as arguments
+dt-sdk upload
 ```
 
 ## License
