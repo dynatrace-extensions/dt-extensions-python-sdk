@@ -651,10 +651,10 @@ class Extension:
                 if not self.is_helper:
                     self.schedule(self.query, timedelta(minutes=1))
             except Exception as e:
-                api_logger.exception(f"Error running initialize {self}: {e!r}")
-                status_message = "Python datasource initialization error: " + repr(e)
-                self._client.send_status(Status(StatusValue.GENERIC_ERROR, status_message))
-                self._initialization_error = status_message
+                msg = f"Error running self.initialize {self}: {e!r}"
+                api_logger.exception(msg)
+                self._client.send_status(Status(StatusValue.GENERIC_ERROR, msg))
+                self._initialization_error = msg
 
     @property
     def _metadata(self) -> dict:
