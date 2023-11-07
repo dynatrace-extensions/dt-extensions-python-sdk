@@ -655,6 +655,7 @@ class Extension:
                 api_logger.exception(msg)
                 self._client.send_status(Status(StatusValue.GENERIC_ERROR, msg))
                 self._initialization_error = msg
+                raise e
 
     @property
     def _metadata(self) -> dict:
