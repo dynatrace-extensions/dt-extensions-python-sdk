@@ -1,6 +1,6 @@
 Extension
 =========
 
-.. automodule:: dynatrace_extension.sdk.extension
+.. autoclass:: dynatrace_extension.Extension
    :members:
    :undoc-members:

@@ -72,6 +72,14 @@ class AggregationMode(Enum):
 
 
 class DtEventType(str, Enum):
+    """Event type.
+    
+    Note:
+        Official API v2 documentation:
+
+        https://docs.dynatrace.com/docs/dynatrace-api/environment-api/events-v2/post-event
+    """
+
     CUSTOM_INFO = "CUSTOM_INFO"
     CUSTOM_ALERT = "CUSTOM_ALERT"
     CUSTOM_ANNOTATION = "CUSTOM_ANNOTATION"
@@ -233,20 +241,33 @@ class Extension:
 
     @property
     def is_helper(self) -> bool:
+        """Internal property used by the EEC."""
+
         return False
 
     @property
     def task_id(self) -> str:
+        """Internal property used by the EEC."""
+
         return self._task_id
 
     @property
     def monitoring_config_id(self) -> str:
+        """Internal property used by the EEC.
+        
+        Represents a unique identifier of the monitoring configuration.
+        that is assigned to this particular extension instance.
+        """
+
         return self._monitoring_config_id
 
     def run(self):
-        """Start main loop of the extension.
+        """Launch the extension instance.
+        
+        Calling this method starts the main loop of the extension.
 
         This method must be invoked once to start the extension,
+
         if `--fastcheck` is set, the extension will run in fastcheck mode,
         otherwise the main loop is started, which periodically runs:
 
@@ -254,6 +275,7 @@ class Extension:
         * The heartbeat method
         * The metrics publisher method
         """
+
         self._setup_signal_handlers()
         if self._is_fastcheck:
             return self._run_fastcheck()
@@ -374,7 +396,7 @@ class Extension:
     def _register_count_metrics(self, *count_metric_entries: CountMetricRegistrationEntry) -> None:
         """Send a count metric registration request to EEC.
 
-        Arguments:
+        Args:
             count_metric_entries: CountMetricRegistrationEntry objects for each count metric to register
         """
         json_pattern = {
@@ -385,7 +407,7 @@ class Extension:
     def _send_count_delta_signal(self, metric_keys: set[str], force: bool = True) -> None:
         """Send calculate-delta signal to EEC monotonic converter.
 
-        Arguments:
+        Args:
             metric_keys: List with metrics for which we want to calculate deltas
             force: If true, it forces the metrics from cache to be pushed into EEC and then delta signal request is
                 sent. Otherwise, it puts delta signal request in cache and request is sent after nearest (in time) sending
@@ -978,16 +1000,28 @@ class Extension:
     def _send_dt_event(self, event: dict[str, str | int | dict[str, str]]):
         self._client.send_dt_event(event)
 
-    def get_version(self):
+    def get_version(self) -> str:
+        """Return the version of extensions sdk library."""
+
         return __version__
 
     @property
     def techrule(self) -> str:
+        """Internal property used by the EEC."""
+
         return self._techrule
 
     @techrule.setter
     def techrule(self, value):
         self._techrule = value
 
-    def get_activation_config(self):
+    def get_activation_config(self) -> ActivationConfig:
+        """Retrieve the activation config.
+
+        Represents activation configuration assigned to this particular
+        extension instance.
+
+        Returns:
+            ActivationConfig object.
+        """
         return self.activation_config

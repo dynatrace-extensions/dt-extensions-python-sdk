@@ -6,9 +6,7 @@ from enum import Enum
 
 
 class Severity(Enum):
-    """
-    Severity of an event.
-    """
+    """Severity of an event ingested through log ingest."""
 
     EMERGENCY = "EMERGENCY"
     ERROR = "ERROR"

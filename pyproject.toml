@@ -48,10 +48,6 @@ dependencies = [
     "pytest",
     "typer[all]",
     "pyyaml",
-    "Sphinx",
-    "sphinx-wagtail-theme",
-    "sphinxcontrib-programoutput",
-    "wutch",
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -93,6 +89,25 @@ fmt = [
 all = [
     "style",
     "typing",
+]
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "Sphinx",
+    "sphinx-wagtail-theme",
+    "sphinxcontrib-programoutput",
+    "wutch",
+    "dt-cli",
+    "typer[all]",
+    "pyyaml",
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -b html docs docs/_build"
+clean = "rm -rf docs/_build"
+rebuild = [
+    "clean",
+    "build",
 ]
 
 [tool.black]

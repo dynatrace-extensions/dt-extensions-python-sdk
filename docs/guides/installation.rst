@@ -4,39 +4,35 @@ Installation
 .. _installation requirements:
 
 Requirements
-------------
+^^^^^^^^^^^^
 
-``db-extensions-sdk`` requires only the following dependencies to be
+``dt-extensions-sdk`` requires only the following dependencies to be
 present in the environment.
 
 - Python >= 3.7, < 4.0
 
 Installing from PyPI
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
-``db-extensions-sdk`` can both be installed as a system wide package and as
+``dt-extensions-sdk`` can both be installed as a system wide package and as
 a dependency in a python project.
 
 .. code:: bash
 
-   pip install db-extensions-sdk
+   pip install dt-extensions-sdk[cli]
 
 Once installed, the ``dt-sdk`` binary will become available in the ``PATH``.
 
-Other formats
--------------
+.. admonition:: Core package
+   :class: warning
 
-Currently only installation from PyPI is supported but the following options
-will be added soon:
+   When installing ``dt-extensions-sdk[cli]`` with the optional set of
+   dependecies called ``[cli]``, multiple additional packages which are required
+   to make command line tools work will be installed.
+   For example, such packages as ``typer[all]``, ``pyyaml``, and ``dt-cli``.
 
-+--------------------+------------------+
-| OS                 | Format           |
-+====================+==================+
-| MacOS              | Homebrew formula |
-+--------------------+------------------+
-| Windows            | MSI installer    |
-+--------------------+------------------+
-| Debian/Ubuntu      | DEB package      |
-+--------------------+------------------+
-| Fedora/Centos/RHEL | RPM package      |
-+--------------------+------------------+
+   When extension is being built, these additional packages are ignored,
+   because the core dependecy of every extension is just the ``dt-extensions-sdk``
+   itself. When the optioncal ``[cli]`` part is omitted, only the core package
+   that is required to make any Python extension work on ActiveGate and OneAgent
+   will be installed.
