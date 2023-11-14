@@ -24,6 +24,7 @@ from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 
+
 HEARTBEAT_INTERVAL = timedelta(seconds=30)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
 SFM_METRIC_SENDING_INTERVAL = timedelta(seconds=60)
@@ -89,40 +90,39 @@ class CountMetricRegistrationEntry(NamedTuple):
 
     @staticmethod
     def make_list(metric_key: str, dimensions_list: List[str]):
-        """
-        Get count metric entry for registration that for aggregation uses defined list of dimensions
+        """Build an entry that uses defined list of dimensions for aggregation.
 
-        :param metric_key: metric key in string
-        :param dimensions_list: list of dimensions ids in string
-
+        Args:
+            metric_key: Metric key in string.
+            dimensions_list: List of dimensions.
         """
         return CountMetricRegistrationEntry(metric_key, AggregationMode.LIST, dimensions_list)
 
     @staticmethod
     def make_all(metric_key: str):
-        """
-        Get count metric entry for registration that for aggregation uses all mint dimensions
+        """Build an entry that uses all mint dimensions for aggregation.
 
-        :param metric_key: metric key in string
-
+        Args:
+            metric_key: Metric key in string.
         """
         return CountMetricRegistrationEntry(metric_key, AggregationMode.ALL, [])
 
     @staticmethod
     def make_none(metric_key: str):
-        """
-        Get count metric entry for registration that for aggregation uses none of mint dimensions
+        """Build an entry that uses none of mint dimensions for aggregation.
 
-        :param metric_key: metric key in string
-
+        Args:
+            metric_key: Metric key in string.
         """
         return CountMetricRegistrationEntry(metric_key, AggregationMode.NONE, [])
 
     def registration_items_dict(self):
+        result = { "aggregation_mode": self.aggregation_mode.value }
         if self.aggregation_mode == AggregationMode.LIST:
-            return {"aggregation_mode": self.aggregation_mode.value, "dimensions_list": self.dimensions_list}
+            result["dimensions_list"] = self.dimensions_list
+            return result
         else:
-            return {"aggregation_mode": self.aggregation_mode.value}
+            return result
 
 
 def _add_sfm_metric(metric: Metric, sfm_metrics: Optional[List[Metric]] = None):
@@ -133,6 +133,12 @@ def _add_sfm_metric(metric: Metric, sfm_metrics: Optional[List[Metric]] = None):
 
 
 class Extension:
+    """Base class for Python extensions.
+    
+    Attributes:
+        logger: Embedded logger object for the extension.
+    """
+
     _instance: ClassVar = None
     schedule_decorators: ClassVar = []
 
@@ -238,8 +244,8 @@ class Extension:
         return self._monitoring_config_id
 
     def run(self):
-        """
-        Extension main loop.
+        """Start main loop of the extension.
+
         This method must be invoked once to start the extension,
         if `--fastcheck` is set, the extension will run in fastcheck mode,
         otherwise the main loop is started, which periodically runs:
@@ -266,7 +272,8 @@ class Extension:
         sys.exit(0)
 
     def on_shutdown(self):
-        """
+        """Callback method to be invoked when the extension is shutting down.
+
         Called when extension exits after it has received shutdown signal from EEC
         This is executed before metrics are flushed to EEC
         """
@@ -295,15 +302,18 @@ class Extension:
         args: Optional[tuple] = None,
         activation_type: Optional[ActivationType] = None,
     ) -> None:
-        """
-        Schedules a method to be executed periodically,
-        the callback method will be periodically invoked in a separate thread.
+        """Schedule a method to be executed periodically.
+
+        The callback method will be periodically invoked in a separate thread.
         The callback method is always immediately scheduled for execution.
 
-        :param callback: The callback method to be invoked
-        :param interval: The time interval between invocations, can be a timedelta object, or an int representing the number of seconds
-        :param args: Arguments to the callback, if any
-        :param activation_type: Optional activation type when this callback should run, can be 'ActivationType.LOCAL' or 'ActivationType.REMOTE'
+        Args:
+            callback: The callback method to be invoked
+            interval: The time interval between invocations, can be a timedelta object,
+                or an int representing the number of seconds
+            args: Arguments to the callback, if any
+            activation_type: Optional activation type when this callback should run,
+                can be 'ActivationType.LOCAL' or 'ActivationType.REMOTE'
         """
 
         if isinstance(interval, int):
@@ -316,14 +326,16 @@ class Extension:
             self._schedule_callback(callback)
 
     def query(self):
-        """
+        """Callback to be executed every minute by default.
+
         Optional method that can be implemented by subclasses.
         The query method is always scheduled to run every minute.
         """
         pass
 
     def initialize(self):
-        """
+        """Callback to be executed when the extension starts.
+
         Called once after the extension starts and the processes arguments are parsed.
         Sometimes there are tasks the user needs to do that must happen before runtime,
         but after the activation config has been received, example: Setting the schedule frequency
@@ -332,23 +344,27 @@ class Extension:
         pass
 
     def fastcheck(self) -> Status:
-        """
-        Called if the extension is run in the `fastcheck` mode
+        """Callback executed when extension is launched.
 
-        This method is not called if fastcheck callback was already registered with Extension.register_fastcheck()
+        Called if the extension is run in the `fastcheck` mode. Only invoked for remote
+        extensions.
+        This method is not called if fastcheck callback was already registered with
+        Extension.register_fastcheck().
 
-        :return: status with optional message whether the fastcheck succeed or failed
+        Returns:
+            Status with optional message whether the fastcheck succeed or failed.
         """
         return Status(StatusValue.OK)
 
     def register_fastcheck(self, fast_check_callback: Callable[[ActivationConfig, str], Status]):
-        """
-        Registers fastcheck callback that is executed in the `fastcheck` mode
+        """Registers fastcheck callback that is executed in the `fastcheck` mode.
 
         Extension.fastcheck() is not called if fastcheck callback is registered with this method
 
-        :param fast_check_callback: callable called with activation_config: ActivationConfig and extension_config: str arguments
-        must return the Status with optional message whether the fastcheck succeed or failed
+        Args:
+            fast_check_callback: callable called with ActivationConfig and
+            extension_config arguments. Must return the Status with optional message
+            whether the fastcheck succeed or failed.
         """
         if self._fast_check_callback:
             api_logger.error("More than one function assigned to fastcheck, last registered one was kept.")
@@ -356,10 +372,10 @@ class Extension:
         self._fast_check_callback = fast_check_callback
 
     def _register_count_metrics(self, *count_metric_entries: CountMetricRegistrationEntry) -> None:
-        """
-        Sends request to EEC for count metric registration
+        """Send a count metric registration request to EEC.
 
-        :param count_metric_entries: CountMetricRegistrationEntry objects for each count metric to register
+        Arguments:
+            count_metric_entries: CountMetricRegistrationEntry objects for each count metric to register
         """
         json_pattern = {
             metric_entry.metric_key: metric_entry.registration_items_dict() for metric_entry in count_metric_entries
@@ -367,13 +383,13 @@ class Extension:
         self._client.register_count_metrics(json_pattern)
 
     def _send_count_delta_signal(self, metric_keys: set[str], force: bool = True) -> None:
-        """
-        Sends calculate-delta signal to EEC monotonic converter.
+        """Send calculate-delta signal to EEC monotonic converter.
 
-        :param metric_keys: List with metrics for which we want to calculate deltas
-        :param force: If true, it forces the metrics from cache to be pushed into EEC and then delta signal request is
-        sent. Otherwise, it puts delta signal request in cache and request is sent after nearest (in time) sending
-        metrics to EEC event
+        Arguments:
+            metric_keys: List with metrics for which we want to calculate deltas
+            force: If true, it forces the metrics from cache to be pushed into EEC and then delta signal request is
+                sent. Otherwise, it puts delta signal request in cache and request is sent after nearest (in time) sending
+                metrics to EEC event
         """
 
         with self._metrics_lock:
@@ -397,16 +413,20 @@ class Extension:
         timestamp: Optional[datetime] = None,
         metric_type: MetricType = MetricType.GAUGE,
     ) -> None:
-        """Reports a metric using the MINT protocol
-        By default, it reports a gauge metric
+        """Report a metric.
 
+        Metric is sent to EEC using an HTTP request and MINT protocol. EEC then
+        sends the metrics to the tenant.
 
-        :param key: The metric key, must follow the MINT specification
-        :param value: The metric value, can be a simple value or a SummaryStat
-        :param dimensions: A dictionary of dimensions
-        :param techrule: The technology rule string set by self.techrule setter.
-        :param timestamp: The timestamp of the metric, defaults to the current time
-        :param metric_type: The type of the metric, defaults to MetricType.GAUGE
+        By default, it reports a gauge metric.
+
+        Args:
+            key: The metric key, must follow the MINT specification
+            value: The metric value, can be a simple value or a SummaryStat
+            dimensions: A dictionary of dimensions
+            techrule: The technology rule string set by self.techrule setter.
+            timestamp: The timestamp of the metric, defaults to the current time
+            metric_type: The type of the metric, defaults to MetricType.GAUGE
         """
 
         if techrule:
@@ -419,9 +439,15 @@ class Extension:
         self._add_metric(metric)
 
     def report_mint_lines(self, lines: List[str]) -> None:
-        """Reports mint lines using the MINT protocol
+        """Report mint lines using the MINT protocol
 
-        :param lines: A list of mint lines, example: ["my_metric 1", "my_other_metric 2"]
+        Examples:
+            Metric lines must comply with the MINT format.
+            
+            >>> self.report_mint_lines(["my_metric 1", "my_other_metric 2"])
+
+        Args:
+            lines: A list of mint lines
         """
         self._add_mint_lines(lines)
 
@@ -433,13 +459,14 @@ class Extension:
         timestamp: Optional[datetime] = None,
         severity: Union[Severity, str] = Severity.INFO,
     ) -> None:
-        """Reports an event using log ingest
+        """Report an event using log ingest.
 
-        :param title: The title of the event
-        :param description: The description of the event
-        :param properties: A dictionary of extra event properties
-        :param timestamp: The timestamp of the event, defaults to the current time
-        :param severity: The severity of the event, defaults to Severity.INFO
+        Args:
+            title: The title of the event
+            description: The description of the event
+            properties: A dictionary of extra event properties
+            timestamp: The timestamp of the event, defaults to the current time
+            severity: The severity of the event, defaults to Severity.INFO
         """
         if timestamp is None:
             timestamp = datetime.now(tz=timezone.utc)
@@ -469,17 +496,22 @@ class Extension:
         properties: Optional[dict[str, str]] = None,
     ) -> None:
         """
-        Reports an event v2 using event ingest
+        Reports an event using the v2 event ingest API.
 
-        For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event
+        Unlike ``report_event``, this directly raises an event or even a problem
+        based on the specified ``event_type``.
 
-        :param event_type: The event type chosen from type Enum (required)
-        :param title: The title of the event (required)
-        :param start_time: The start time of event in UTC ms, if not set, current timestamp (optional)
-        :param end_time: The end time of event in UTC ms, if not set, current timestamp + timeout (optional)
-        :param timeout: The timeout of event in minutes, if not set, 15 (optional)
-        :param entity_selector: The entity selector, if not set, the event is associated with environment entity (optional)
-        :param properties: A map of event properties (optional)
+        Note:
+            For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event
+
+        Args:
+            event_type: The event type chosen from type Enum (required)
+            title: The title of the event (required)
+            start_time: The start time of event in UTC ms, if not set, current timestamp (optional)
+            end_time: The end time of event in UTC ms, if not set, current timestamp + timeout (optional)
+            timeout: The timeout of event in minutes, if not set, 15 (optional)
+            entity_selector: The entity selector, if not set, the event is associated with environment entity (optional)
+            properties: A map of event properties (optional)
         """
         event: Dict[str, Any] = {"eventType": event_type, "title": title}
         if start_time:
@@ -496,46 +528,50 @@ class Extension:
         self._send_dt_event(event)
 
     def report_dt_event_dict(self, event: dict):
-        """
-        Reports an event v2 using event ingest using provided dictionary resembling required json
-        For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event
-        (see schema)
-        {
-            "type": "object",
-            "required": ["eventType", "title"],
-            "properties": {
-                "eventType": {
-                    "type": "string",
-                    "enum": [
-                        "CUSTOM_INFO",
-                        "CUSTOM_ANNOTATION",
-                        "CUSTOM_CONFIGURATION",
-                        "CUSTOM_DEPLOYMENT",
-                        "MARKED_FOR_TERMINATION",
-                        "ERROR_EVENT",
-                        "AVAILABILITY_EVENT",
-                        "PERFORMANCE_EVENT",
-                        "RESOURCE_CONTENTION_EVENT",
-                        "CUSTOM_ALERT"
-                    ]
-                },
-                "title": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "startTime": {"type": "integer"},
-                "endTime": {"type": "integer"},
-                "timeout": {"type": "integer"},
-                "entitySelector": {"type": "string"},
+        """Report an event using event ingest API with provided dictionary.
+
+        Note:
+            For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event
+
+        Format of the event dictionary::
+
+            {
+                "type": "object",
+                "required": ["eventType", "title"],
                 "properties": {
-                    "type": "object",
-                    "patternProperties": {
-                        "^.*$": {"type": "string"}
+                    "eventType": {
+                        "type": "string",
+                        "enum": [
+                            "CUSTOM_INFO",
+                            "CUSTOM_ANNOTATION",
+                            "CUSTOM_CONFIGURATION",
+                            "CUSTOM_DEPLOYMENT",
+                            "MARKED_FOR_TERMINATION",
+                            "ERROR_EVENT",
+                            "AVAILABILITY_EVENT",
+                            "PERFORMANCE_EVENT",
+                            "RESOURCE_CONTENTION_EVENT",
+                            "CUSTOM_ALERT"
+                        ]
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "startTime": {"type": "integer"},
+                    "endTime": {"type": "integer"},
+                    "timeout": {"type": "integer"},
+                    "entitySelector": {"type": "string"},
+                    "properties": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^.*$": {"type": "string"}
+                        }
                     }
                 }
             }
-        }
         """
+
         if "eventType" not in event or "title" not in event:
             raise ValueError('"eventType" not present' if "eventType" not in event else '"title" not present in event')
         for key, value in event.items():
@@ -553,31 +589,40 @@ class Extension:
         self._send_dt_event(event)
 
     def report_log_event(self, log_event: dict):
-        """Reports a custom log event using log ingest
+        """Report a custom log event using log ingest.
 
-        :param log_event: The log event dictionary, reference: https://www.dynatrace.com/support/help/shortlink/log-monitoring-log-data-ingestion
+        Note:
+            See reference: https://www.dynatrace.com/support/help/shortlink/log-monitoring-log-data-ingestion
+
+        Args:
+            log_event: The log event dictionary.
         """
         self._send_events(log_event)
 
     def report_log_events(self, log_events: List[dict]):
-        """Reports a list of custom log events using log ingest
+        """Report a list of custom log events using log ingest.
 
-        :param log_events: The list of log events
+        Args:
+            log_events: The list of log events
         """
         self._send_events(log_events)
 
     def report_log_lines(self, log_lines: List[Union[str, bytes]]):
-        """Reports a list of log lines using log ingest
+        """Report a list of log lines using log ingest
 
-        :param log_lines: The list of log lines
+        Args:
+            log_lines: The list of log lines
         """
         events = [{"content": line} for line in log_lines]
         self._send_events(events)
 
     @property
     def enabled_feature_sets(self) -> dict[str, list[str]]:
-        """
-        Dictionary containing enabled feature sets with corresponding metrics defined in `extension.yaml`
+        """Map of enabled feautre sets and corresponding metrics.
+
+        Returns:
+            Dictionary containing enabled feature sets with corresponding
+            metrics defined in ``extension.yaml``.
         """
         return {
             feature_set_name: metric_keys
@@ -587,15 +632,19 @@ class Extension:
 
     @property
     def enabled_feature_sets_names(self) -> list[str]:
-        """
-        List containing names of enabled feature sets
+        """Names of enabled feature sets.
+
+        Returns:
+            List containing names of enabled feature sets.
         """
         return self.activation_config.feature_sets
 
     @property
     def enabled_feature_sets_metrics(self) -> list[str]:
-        """
-        List of all metric keys from enabled feature sets
+        """Enabled metrics.
+
+        Returns:
+            List of all metric keys from enabled feature sets
         """
         return list(chain(*self.enabled_feature_sets.values()))
 
@@ -751,9 +800,11 @@ class Extension:
                 self._metrics = []
 
     def _prepare_sfm_metrics(self) -> List[str]:
+        """Prepare self monitoring metrics.
+        
+        Builds the list of mint metric lines to send as self monitoring metrics.
         """
-        Build the list of mint metric lines to send as self monitoring metrics
-        """
+        
         sfm_metrics: List[Metric] = []
         sfm_dimensions = {"dt.extension.config.id": self.monitoring_config_id}
         _add_sfm_metric(
