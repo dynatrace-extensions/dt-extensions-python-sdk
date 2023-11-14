@@ -93,7 +93,8 @@ In order to launch the extension locally, we can use the :doc:`/cli/run` command
 
 .. code:: bash
    
-   $ dt-sdk run my_extension
+   $ cd my_extension
+   $ dt-sdk run
    Running: .venv/dt-extensions-sdk/bin/python -m my_extension --activationconfig activation.json
    [INFO] api (MainThread): -----------------------------------------------------
    [INFO] api (MainThread): Starting <class '__main__.ExtensionImpl'> my_extension, version: 1.1.0
@@ -208,7 +209,7 @@ steps:
 
 .. code:: bash
    
-   $ dt-sdk build my_extension
+   $ dt-sdk build
    Building and signing extension from my_extension to None
    Stage 1 - Download and build dependencies
    Cleaning my_extension/extension/lib
@@ -254,11 +255,11 @@ Upload extension
 
 Finally, we can upload the extension to the tenant using the :doc:`/cli/upload`
 command. It requires us to provide the tenant URL and an API token with the permission
-to upload extensions.
+to upload extensions. This can be done via environment variables or command line arguments
 
 .. code:: bash
 
-   $ dt-sdk dist/custom_my-extension-0.0.1.zip --tenant-url https://<your_tenant_url_here>/ --api-token dt0c01.XXXXXXXXXXXX
+   $ dt-sdk upload
    Uploading extension dist/custom_my-extension-0.0.1.zip to https://<your_tenant_url_here>/
    Extension upload successful!
    Extension dist/custom_my-extension-0.0.1.zip uploaded to https://<your_tenant_url_here>/
