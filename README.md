@@ -76,3 +76,9 @@ hatch run lint:all
 ```console
 hatch build
 ```
+
+### Building docs
+
+```console
+hatch run docs:build
+```

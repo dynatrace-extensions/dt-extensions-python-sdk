@@ -106,16 +106,16 @@ In order to launch the extension locally, we can use the :doc:`/cli/run` command
 .. admonition:: Query method and scheduling
    :class: note
 
-   By default, the ``query()`` method within the generated ``__main__.py`` file is
-   scheduled to run every 60 seconds. This can be changed by modifying the
-   :meth:`dynatrace_extension.Extension.initialize` method and choosing a different
+   The ``query()`` method in ``__main__.py`` file is scheduled to run every 60 seconds.
+   You can also schedule other methods to run at different intervals by overriding
+   :meth:`dynatrace_extension.Extension.initialize` method:
    schedule:
 
    .. code:: python
 
       def initialize(self):
-          # Schedule the query method to run every 5 minutes
-          self.schedule(self.query, 300)
+          # Schedule the my_method method to run every 5 minutes
+          self.schedule(self.my_method, timedelta(minutes=5))
 
 We can see that the extension is running and the query method was successfully
 executed. For now, it does not do anything useful, so it finishes immediately.
@@ -152,7 +152,7 @@ method executes again.
    :class: note
 
    You might have noticed that there are some additional metrics being sent
-   to Dynatrace. These are called self monitoring metrics and they allow the tenant
+   to Dynatrace. These are called self monitoring metrics and they allow the environment
    to understand how the extension is performing and whether everything is fine with
    the assigned monitoring configuration.
 
@@ -160,13 +160,13 @@ Generate certificates
 ^^^^^^^^^^^^^^^^^^^^^
 
 In order to sign the extension, we need to have a certificate that is uploaded
-to the tenant and to the OneAgent or ActievGate hosts
+to the environment and to the OneAgent or Activegate hosts
 that will run the extension.
 
 .. admonition:: Already have the certificate?
    :class: hint
 
-   If you already have the certificate and it is uploaded to the tenant and hosts
+   If you already have the certificate and it is uploaded to the environment and hosts
    you can skip this step and go directly to the build step.
 
 In order to generate a new certificate, we can use the :doc:`/cli/gencerts` command:
@@ -253,16 +253,16 @@ Once completed, the signed build will be placed in the ``dist`` directory:
 Upload extension
 ^^^^^^^^^^^^^^^^
 
-Finally, we can upload the extension to the tenant using the :doc:`/cli/upload`
-command. It requires us to provide the tenant URL and an API token with the permission
+Finally, we can upload the extension to the environment using the :doc:`/cli/upload`
+command. It requires us to provide the environment URL and an API token with the permission
 to upload extensions. This can be done via environment variables or command line arguments
 
 .. code:: bash
 
    $ dt-sdk upload
-   Uploading extension dist/custom_my-extension-0.0.1.zip to https://<your_tenant_url_here>/
+   Uploading extension dist/custom_my-extension-0.0.1.zip to https://<your_environment_url_here>/
    Extension upload successful!
-   Extension dist/custom_my-extension-0.0.1.zip uploaded to https://<your_tenant_url_here>/
+   Extension dist/custom_my-extension-0.0.1.zip uploaded to https://<your_environment_url_here>/
 
 Documentation
 -------------
