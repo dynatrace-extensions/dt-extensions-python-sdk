@@ -13,6 +13,10 @@
 
 ## Quick Start
 
+### Requirements:
+
+* Python 3.10+
+
 ### Install the SDK
 
 ```bash
@@ -53,10 +57,6 @@ dt-sdk build
 dt-sdk upload
 ```
 
-## License
-
-`dt-extensions-sdk` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
-
 ## Developing
 
 ### Testing
@@ -82,3 +82,7 @@ hatch build
 ```console
 hatch run docs:build
 ```
+
+## License
+
+`dt-extensions-sdk` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
