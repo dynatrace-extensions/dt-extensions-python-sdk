@@ -10,9 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-from datetime import datetime
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, os.path.abspath("."))
 
@@ -90,7 +90,7 @@ html_theme_options = {
     "logo_url": "/",
     "github_url": "https://github.com/dynatrace-extensions/dt-extensions-python-sdk",
     "footer_links": ",".join([
-        "Dynatrace|http://dynatrace.com/",
+        "Dynatrace|https://dynatrace.com/",
         "Extensions Team|mailto:extenions@dynatrace.com",
     ]),
 }
