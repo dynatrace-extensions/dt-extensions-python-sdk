@@ -24,7 +24,6 @@ from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 
-
 HEARTBEAT_INTERVAL = timedelta(seconds=30)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
 SFM_METRIC_SENDING_INTERVAL = timedelta(seconds=60)
@@ -73,7 +72,7 @@ class AggregationMode(Enum):
 
 class DtEventType(str, Enum):
     """Event type.
-    
+
     Note:
         Official API v2 documentation:
 
@@ -125,7 +124,7 @@ class CountMetricRegistrationEntry(NamedTuple):
         return CountMetricRegistrationEntry(metric_key, AggregationMode.NONE, [])
 
     def registration_items_dict(self):
-        result = { "aggregation_mode": self.aggregation_mode.value }
+        result = {"aggregation_mode": self.aggregation_mode.value}
         if self.aggregation_mode == AggregationMode.LIST:
             result["dimensions_list"] = self.dimensions_list
             return result
@@ -142,7 +141,7 @@ def _add_sfm_metric(metric: Metric, sfm_metrics: Optional[List[Metric]] = None):
 
 class Extension:
     """Base class for Python extensions.
-    
+
     Attributes:
         logger: Embedded logger object for the extension.
     """
@@ -254,7 +253,7 @@ class Extension:
     @property
     def monitoring_config_id(self) -> str:
         """Internal property used by the EEC.
-        
+
         Represents a unique identifier of the monitoring configuration.
         that is assigned to this particular extension instance.
         """
@@ -263,7 +262,7 @@ class Extension:
 
     def run(self):
         """Launch the extension instance.
-        
+
         Calling this method starts the main loop of the extension.
 
         This method must be invoked once to start the extension,
@@ -465,7 +464,7 @@ class Extension:
 
         Examples:
             Metric lines must comply with the MINT format.
-            
+
             >>> self.report_mint_lines(["my_metric 1", "my_other_metric 2"])
 
         Args:
@@ -823,10 +822,10 @@ class Extension:
 
     def _prepare_sfm_metrics(self) -> List[str]:
         """Prepare self monitoring metrics.
-        
+
         Builds the list of mint metric lines to send as self monitoring metrics.
         """
-        
+
         sfm_metrics: List[Metric] = []
         sfm_dimensions = {"dt.extension.config.id": self.monitoring_config_id}
         _add_sfm_metric(

@@ -166,6 +166,7 @@ unfixable = [
 ]
 extend-exclude = [
     "dynatrace_extension/sdk/vendor",
+    "docs/*"
 ]
 
 [tool.ruff.isort]
