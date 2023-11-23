@@ -12,7 +12,7 @@ jobs:
   build-docs:
     runs-on: ubuntu-latest
     env:
-      NO_COLOR: true
+      FORCE_COLOR: true
 
     steps:
       - uses: actions/checkout@v2
