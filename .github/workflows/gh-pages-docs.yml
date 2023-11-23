@@ -3,11 +3,17 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: true
+      COLORTERM: truecolor
 
     steps:
       - uses: actions/checkout@v2
