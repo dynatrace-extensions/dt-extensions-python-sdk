@@ -102,9 +102,6 @@ dependencies = [
     "pyyaml",
 ]
 
-[tool.hatch.envs.docs.env-vars]
-FORCE_COLOR = "true"
-
 [tool.hatch.envs.docs.scripts]
 build = "sphinx-build -b html docs docs/_build"
 clean = "rm -rf docs/_build"
