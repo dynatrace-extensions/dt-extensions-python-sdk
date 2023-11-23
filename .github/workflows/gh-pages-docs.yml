@@ -11,8 +11,6 @@ on:
 jobs:
   build-docs:
     runs-on: ubuntu-latest
-    env:
-      TERM: dumb
 
     steps:
       - uses: actions/checkout@v2
