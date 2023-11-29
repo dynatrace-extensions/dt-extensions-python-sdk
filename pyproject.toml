@@ -7,7 +7,7 @@ name = "dt-extensions-sdk"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [
@@ -25,13 +25,14 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = []
+
 [project.optional-dependencies]
 cli = [ "dt-cli==1.6.13", "typer[all]", "pyyaml"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/dynatrace-extensions-sdk#readme"
-Issues = "https://github.com/unknown/dynatrace-extensions-sdk/issues"
-Source = "https://github.com/unknown/dynatrace-extensions-sdk"
+Documentation = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk#readme"
+Issues = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk/issues"
+Source = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk"
 
 [tool.hatch.version]
 path = "dynatrace_extension/__about__.py"
@@ -46,8 +47,9 @@ dependencies = [
     "coverage[toml]>=6.5",
     "pytest",
     "typer[all]",
-    "pyyaml"
+    "pyyaml",
 ]
+
 [tool.hatch.envs.default.scripts]
 test = "python -m pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
@@ -72,6 +74,7 @@ dependencies = [
     "typer[all]",
     "pyyaml"
 ]
+
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:dynatrace_extension tests}"
 style = [
@@ -86,6 +89,28 @@ fmt = [
 all = [
     "style",
     "typing",
+]
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "Sphinx",
+    "sphinx-wagtail-theme",
+    "sphinxcontrib-programoutput",
+    "wutch",
+    "dt-cli",
+    "typer[all]",
+    "pyyaml",
+]
+
+[tool.hatch.envs.docs.env-vars]
+TERM = "dumb"
+
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -b html docs docs/_build"
+clean = "rm -rf docs/_build"
+rebuild = [
+    "clean",
+    "build",
 ]
 
 [tool.black]
@@ -142,9 +167,9 @@ unfixable = [
     # Don't touch unused imports
     "F401",
 ]
-
 extend-exclude = [
     "dynatrace_extension/sdk/vendor",
+    "docs/*"
 ]
 
 [tool.ruff.isort]
@@ -156,7 +181,6 @@ ban-relative-imports = "all"
 [tool.ruff.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252", "ARG002", "ARG001"]
-
 # typer needs to have method calls in arguments sometimes
 "dynatrace_extension/cli/*" = ["B008"]
 

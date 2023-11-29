@@ -61,8 +61,6 @@ class Metric:
         return self._key_and_dimensions() == other._key_and_dimensions()
 
     def to_mint_line(self) -> str:
-        # https://bitbucket.lab.dynatrace.org/projects/ONE/repos/schemaless-metrics-spec/browse
-
         # Add key and dimensions
         line = f"{self._key_and_dimensions()}"
 
