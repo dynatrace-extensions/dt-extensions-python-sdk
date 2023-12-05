@@ -94,3 +94,4 @@ hatch run docs:build
 ## Publishing to PyPI
 
 It's automatically published to PyPi on each pushed tag, and uses [gh-action-pypi-publish](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/)
+Version will be determined using __about__.py
