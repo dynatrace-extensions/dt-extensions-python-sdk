@@ -11,6 +11,10 @@
 - [License](#license)
 - [Developing](#developing)
 
+## Documentation
+
+The documentation can be found on [github pages](https://dynatrace-extensions.github.io/dt-extensions-python-sdk/) 
+
 ## Quick Start
 
 ### Requirements:
@@ -87,9 +91,6 @@ hatch run docs:build
 
 `dt-extensions-sdk` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
-## Documentation
-
-[Documentation](https://dynatrace-extensions.github.io/dt-extensions-python-sdk/) 
 
 ## Publishing to PyPI
 
