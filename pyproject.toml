@@ -39,6 +39,9 @@ artifacts  = [
   "dynatrace_extension/cli/create/extension_template/**/*",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["dynatrace_extension"]
+
 [tool.hatch.envs.default]
 dependencies = [
     "coverage[toml]>=6.5",
