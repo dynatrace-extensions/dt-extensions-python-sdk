@@ -1,7 +1,7 @@
 Extension Structure
 ===================
 
-The basic barebone structure of an extension is as follows:
+The basic bare-bone structure of an extension is as follows:
 
 .. code:: bash
 

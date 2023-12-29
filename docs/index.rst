@@ -273,6 +273,7 @@ Documentation
 
    guides/installation
    guides/extension_structure
+   guides/migration
 
 .. toctree::
    :caption: All Commands
