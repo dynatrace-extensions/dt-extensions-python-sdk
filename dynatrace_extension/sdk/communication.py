@@ -92,7 +92,7 @@ class CommunicationClient(ABC):
         pass
 
     @abstractmethod
-    def send_events(self, event: dict | list[dict]) -> dict | None:
+    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> dict | None:
         pass
 
     @abstractmethod
@@ -275,13 +275,16 @@ class HttpClient(CommunicationClient):
             responses.append(mint_response)
         return responses
 
-    def send_events(self, events: dict | list[dict]) -> dict | None:
+    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> dict | None:
         self.logger.debug(f"Sending log events: {events}")
         event_data = json.dumps(events).encode("utf-8")
         try:
             # EEC returns empty body on success
             return self._make_request(
-                self._events_url, "POST", event_data, extra_headers={"Content-Type": CONTENT_TYPE_JSON}
+                self._events_url,
+                "POST",
+                event_data,
+                extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
             ).json()
         except json.JSONDecodeError:
             return None
@@ -394,8 +397,8 @@ class DebugClient(CommunicationClient):
             responses = [MintResponse(lines_invalid=0, lines_ok=len(mint_lines), error=None, warnings=None)]
         return responses
 
-    def send_events(self, events: dict | list[dict]) -> dict | None:
-        self.logger.info(f"send_events: {events}")
+    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> dict | None:
+        self.logger.info(f"send_events (enrichment = {eec_enrichment}): {events}")
         return None
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:

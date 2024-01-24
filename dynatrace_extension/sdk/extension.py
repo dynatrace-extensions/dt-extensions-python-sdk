@@ -173,6 +173,9 @@ class Extension:
         self._task_id = "development_task_id"
         self._monitoring_config_id = "development_config_id"
 
+        # The user can override default EEC enrichment for logs
+        self.log_event_enrichment = True
+
         # The Communication client
         self._client: CommunicationClient = None  # type: ignore
 
@@ -984,7 +987,7 @@ class Extension:
             self._metrics.extend(lines)
 
     def _send_events_internal(self, events: Union[dict, List[dict]]):
-        response = self._client.send_events(events)
+        response = self._client.send_events(events, self.log_event_enrichment)
         with self._internal_callbacks_results_lock:
             self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.OK)
             if not response or "error" not in response or "message" not in response["error"]:
