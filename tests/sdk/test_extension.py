@@ -4,6 +4,8 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
+import pytest
+
 from dynatrace_extension import Status, StatusValue, get_helper_extension
 from dynatrace_extension.sdk.activation import ActivationConfig
 from dynatrace_extension.sdk.communication import HttpClient, MintResponse
@@ -681,13 +683,8 @@ class TestExtension(unittest.TestCase):
             def initialize(self):
                 raise AttributeError
 
-        ext = MyExtension()
-        ext._running_in_sim = True
-        ext._client = MagicMock()
-        ext._heartbeat_iteration()
-        current_status = ext._build_current_status()
-        assert current_status.status == StatusValue.GENERIC_ERROR
-        assert current_status.message == "Python datasource initialization error: AttributeError()"
+        with pytest.raises(AttributeError):
+            MyExtension()
 
     def test_report_mint_and_log_sending_failure(self):
         extension = get_helper_extension()
