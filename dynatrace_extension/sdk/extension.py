@@ -459,6 +459,10 @@ class Extension:
             if "dt.techrule.id" not in dimensions:
                 dimensions["dt.techrule.id"] = techrule
 
+        if metric_type == MetricType.COUNT and timestamp is None:
+            # We must report a timestamp for count metrics
+            timestamp = datetime.now()
+
         metric = Metric(key=key, value=value, dimensions=dimensions, metric_type=metric_type, timestamp=timestamp)
         self._add_metric(metric)
 
