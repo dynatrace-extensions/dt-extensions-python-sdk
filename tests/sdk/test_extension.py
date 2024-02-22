@@ -347,7 +347,7 @@ class TestExtension(unittest.TestCase):
         extension._client.send_status.assert_called_once()
         self.assertEqual(extension._client.send_status.call_args[0][0].status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "Python datasource fastcheck error: Exception(\'SomeException\')",
+            "Python datasource fastcheck error: Exception('SomeException')",
             extension._client.send_status.call_args[0][0].message,
         )
 
