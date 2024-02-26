@@ -267,6 +267,7 @@ def upload(
     extension_path: Path = typer.Argument(None, help="Path to the extension folder or built zip file"),
     tenant_url: str = typer.Option(None, "--tenant-url", "-u", help="Dynatrace tenant URL"),
     api_token: str = typer.Option(None, "--api-token", "-t", help="Dynatrace API token"),
+    validate: bool = typer.Option(None, "--validate", "-v", help="Validate only"),
 ):
     """
     Uploads the extension to a Dynatrace environment
@@ -274,7 +275,9 @@ def upload(
     :param extension_path: The path to the extension folder or built zip file
     :param tenant_url: The Dynatrace tenant URL
     :param api_token: The Dynatrace API token
+    :param validate: If true, only validate the extension and exit
     """
+    action = "upload" if not validate else "validate"
     zip_file_path = extension_path
     if extension_path is None:
         extension_path = Path(".")
@@ -296,8 +299,8 @@ def upload(
         console.print("Set the --api-token parameter or the DT_API_TOKEN environment variable", style="bold red")
         sys.exit(1)
 
-    command = ["dt", "ext", "upload", "--tenant-url", api_url, "--api-token", api_token, f"{zip_file_path}"]
-    run_process(command, print_message=f"Uploading extension {zip_file_path} to {api_url}")
+    command = ["dt", "ext", action, "--tenant-url", api_url, "--api-token", api_token, f"{zip_file_path}"]
+    run_process(command, print_message=f"{action} extension {zip_file_path} to {api_url}")
     console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
 
 
