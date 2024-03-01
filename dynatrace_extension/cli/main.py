@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import typer
+from dtcli.server_api import upload as dt_cli_upload
+from dtcli.server_api import validate as dt_cli_validate
 from rich.console import Console
 
 from ..__about__ import __version__
@@ -277,7 +279,7 @@ def upload(
     :param api_token: The Dynatrace API token
     :param validate: If true, only validate the extension and exit
     """
-    action = "upload" if not validate else "validate"
+
     zip_file_path = extension_path
     if extension_path is None:
         extension_path = Path(".")
@@ -299,9 +301,11 @@ def upload(
         console.print("Set the --api-token parameter or the DT_API_TOKEN environment variable", style="bold red")
         sys.exit(1)
 
-    command = ["dt", "ext", action, "--tenant-url", api_url, "--api-token", api_token, f"{zip_file_path}"]
-    run_process(command, print_message=f"{action} extension {zip_file_path} to {api_url}")
-    console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
+    if validate:
+        dt_cli_validate(f"{zip_file_path}", api_url, api_token)
+    else:
+        dt_cli_upload(f"{zip_file_path}", api_url, api_token)
+        console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
 
 
 @app.command(help="Generate root and developer certificates and key")
