@@ -13,7 +13,7 @@ from ..__about__ import __version__
 from .create import generate_extension, is_pep8_compliant
 from .schema import ExtensionYaml
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 console = Console()
 
 CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
