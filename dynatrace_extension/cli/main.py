@@ -79,6 +79,7 @@ def build(
     extra_index_url: Optional[str] = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
+    find_links: Optional[str] = typer.Option( None, "--find-links", "-f", help="Extra index url to use when downloading dependencies" ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -90,6 +91,7 @@ def build(
     folder
     :param extra_platforms: Attempt to also download wheels for an extra platform (e.g. manylinux1_x86_64 or win_amd64)
     :param extra_index_url: Extra index url to use when downloading dependencies
+    :param find_links: Extra index url to use when downloading dependencies
     """
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
@@ -98,7 +100,7 @@ def build(
         target_directory.mkdir()
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url)
+    wheel(extension_dir, extra_platforms, extra_index_url, find_links)
 
     console.print("Stage 2 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
@@ -163,6 +165,7 @@ def wheel(
     extra_index_url: Optional[str] = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
+    find_links: Optional[str] = typer.Option( None, "--find-links", "-f", help="Extra index url to use when downloading dependencies" ),
 ):
     """
     Builds the extension and it's dependencies into wheel files
@@ -171,6 +174,7 @@ def wheel(
     :param extension_dir: The directory of the extension, by default this is the current directory
     :param extra_platforms: Attempt to also download wheels for an extra platform (e.g. manylinux1_x86_64 or win_amd64)
     :param extra_index_url: Extra index url to use when downloading dependencies
+    :param find_links: Extra index url to use when downloading dependencies
     """
     relative_lib_folder_dir = "extension/lib"
     lib_folder: Path = extension_dir / relative_lib_folder_dir
@@ -182,6 +186,8 @@ def wheel(
     command = [sys.executable, "-m", "pip", "wheel", "-w", relative_lib_folder_dir]
     if extra_index_url is not None:
         command.extend(["--extra-index-url", extra_index_url])
+    if find_links is not None:
+        command.extend(["--find-links", find_links])
     command.append(".")
     run_process(command, cwd=extension_dir)
 
@@ -201,6 +207,8 @@ def wheel(
             ]
             if extra_index_url:
                 command.extend(["--extra-index-url", extra_index_url])
+            if find_links:
+                command.extend(["--find-links", find_links])
             command.append(".")
 
             run_process(command, cwd=extension_dir)
