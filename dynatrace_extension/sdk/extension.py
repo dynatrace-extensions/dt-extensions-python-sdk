@@ -655,7 +655,7 @@ class Extension:
         return {
             feature_set_name: metric_keys
             for feature_set_name, metric_keys in self._feature_sets.items()
-            if feature_set_name in self.activation_config.feature_sets
+            if feature_set_name in self.activation_config.feature_sets or feature_set_name == "default"
         }
 
     @property
@@ -665,7 +665,7 @@ class Extension:
         Returns:
             List containing names of enabled feature sets.
         """
-        return self.activation_config.feature_sets
+        return list(self.enabled_feature_sets.keys())
 
     @property
     def enabled_feature_sets_metrics(self) -> list[str]:
