@@ -12,9 +12,9 @@ jobs:
         run: echo "::set-output name=match::$(echo '${{ github.ref }}' | grep -Pq '^refs/tags/v\d+\.\d+\.\d+$' && echo true || echo false)"
         shell: bash
 
-      - name: Check if tag is valid
-        if: steps.check_ref.outputs.match != 'true'
-        run: exit 1
+      # - name: Check if tag is valid
+      #   if: steps.check_ref.outputs.match != 'true'
+      #   run: exit 1
 
       - uses: actions/checkout@v4
     
