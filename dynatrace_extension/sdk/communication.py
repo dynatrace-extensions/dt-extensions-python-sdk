@@ -261,16 +261,24 @@ class HttpClient(CommunicationClient):
         return self.send_status(Status())
 
     def send_metrics(self, mint_lines: list[str]) -> list[MintResponse]:
+        total_lines = len(mint_lines)
+        lines_sent = 0
+
+        self.logger.debug(f"Start sending {total_lines} metrics to the EEC")
         responses = []
 
         # We divide into chunks of MAX_MINT_LINES_PER_REQUEST lines to avoid hitting the body size limit
         chunks = divide_into_chunks(mint_lines, MAX_MINT_LINES_PER_REQUEST)
 
         for chunk in chunks:
+            lines_in_chunk = len(chunk)
+            lines_sent += lines_in_chunk
+            self.logger.debug(f"Sending chunk with {lines_in_chunk} metric lines. ({lines_sent}/{total_lines})")
             mint_data = "\n".join(chunk).encode("utf-8")
             response = self._make_request(
                 self._metric_url, "POST", mint_data, extra_headers={"Content-Type": CONTENT_TYPE_PLAIN}
             ).json()
+            self.logger.debug(f"{self._metric_url}: {response}")
             mint_response = MintResponse.from_json(response)
             responses.append(mint_response)
         return responses
