@@ -292,6 +292,8 @@ def upload(
         zip_file_path = Path(extension_path, "dist", zip_file_name)
 
     api_url = tenant_url or os.environ.get("DT_API_URL", "")
+    api_url = api_url.rstrip("/")
+
     if not api_url:
         console.print("Set the --tenant-url parameter or the DT_API_URL environment variable", style="bold red")
         sys.exit(1)
