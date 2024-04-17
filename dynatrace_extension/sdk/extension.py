@@ -655,7 +655,7 @@ class Extension:
         return {
             feature_set_name: metric_keys
             for feature_set_name, metric_keys in self._feature_sets.items()
-            if feature_set_name in self.activation_config.feature_sets
+            if feature_set_name in self.activation_config.feature_sets or feature_set_name == "default"
         }
 
     @property
@@ -665,7 +665,7 @@ class Extension:
         Returns:
             List containing names of enabled feature sets.
         """
-        return self.activation_config.feature_sets
+        return list(self.enabled_feature_sets.keys())
 
     @property
     def enabled_feature_sets_metrics(self) -> list[str]:
@@ -814,6 +814,7 @@ class Extension:
         # Maybe break it down into multiple packets
         with self._metrics_lock and self._internal_callbacks_results_lock:
             if self._metrics:
+                number_of_metrics = len(self._metrics)
                 responses = self._client.send_metrics(self._metrics)
 
                 self._internal_callbacks_results[self._send_metrics.__name__] = Status(StatusValue.OK)
@@ -824,7 +825,7 @@ class Extension:
                         StatusValue.GENERIC_ERROR, message
                     )
 
-                api_logger.info(f"Sent {len(self._metrics)} metric lines to EEC: {responses}")
+                api_logger.info(f"Sent {number_of_metrics} metric lines to EEC: {responses}")
                 self._metrics = []
 
     def _prepare_sfm_metrics(self) -> List[str]:
