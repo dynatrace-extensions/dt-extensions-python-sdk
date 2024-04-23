@@ -25,7 +25,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-cli = [ "dt-cli>=1.6.13", "typer[all]", "pyyaml"]
+cli = [ "dt-cli>=1.6.13", "typer", "pyyaml"]
 
 [project.urls]
 Documentation = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk#readme"
@@ -47,8 +47,9 @@ packages = ["dynatrace_extension"]
 dependencies = [
     "coverage[toml]>=6.5",
     "pytest",
-    "typer[all]",
+    "typer",
     "pyyaml",
+    "dt-cli>=1.6.13"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -72,7 +73,7 @@ dependencies = [
     "black>=23.1.0",
     "mypy>=1.0.0",
     "ruff>=0.0.243",
-    "typer[all]",
+    "typer",
     "pyyaml"
 ]
 
@@ -99,8 +100,9 @@ dependencies = [
     "sphinxcontrib-programoutput",
     "wutch",
     "dt-cli",
-    "typer[all]",
+    "typer",
     "pyyaml",
+    "tomli"
 ]
 
 [tool.hatch.envs.docs.env-vars]
