@@ -47,7 +47,7 @@ packages = ["dynatrace_extension"]
 dependencies = [
     "coverage[toml]>=6.5",
     "pytest",
-    "typer",
+    "typer[all]",
     "pyyaml",
     "dt-cli>=1.6.13"
 ]
@@ -73,7 +73,7 @@ dependencies = [
     "black>=23.1.0",
     "mypy>=1.0.0",
     "ruff>=0.0.243",
-    "typer",
+    "typer[all]",
     "pyyaml"
 ]
 
@@ -100,7 +100,7 @@ dependencies = [
     "sphinxcontrib-programoutput",
     "wutch",
     "dt-cli",
-    "typer",
+    "typer[all]",
     "pyyaml",
     "tomli"
 ]
