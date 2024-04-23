@@ -101,6 +101,7 @@ dependencies = [
     "dt-cli",
     "typer[all]",
     "pyyaml",
+    "tomli"
 ]
 
 [tool.hatch.envs.docs.env-vars]
