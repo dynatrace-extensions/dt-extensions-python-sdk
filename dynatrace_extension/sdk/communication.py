@@ -6,7 +6,9 @@ from __future__ import annotations
 
 import json
 import logging
+import random
 import sys
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -114,8 +116,6 @@ class HttpClient(CommunicationClient):
     """
 
     def __init__(self, base_url: str, datasource_id: str, id_token_file_path: str, logger: logging.Logger):
-        # TODO - Do we need to replace 127.0.0.1 with localhost?
-
         self._activation_config_url = f"{base_url}/userconfig/{datasource_id}"
         self._extension_config_url = f"{base_url}/extconfig/{datasource_id}"
         self._metric_url = f"{base_url}/mint/{datasource_id}"
@@ -324,6 +324,7 @@ class DebugClient(CommunicationClient):
         logger: logging.Logger,
         local_ingest: bool = False,
         local_ingest_port: int = 14499,
+        print_metrics: bool = True
     ):
         self.activation_config = {}
         if activation_config_path and Path(activation_config_path).exists():
@@ -339,6 +340,7 @@ class DebugClient(CommunicationClient):
         self.logger = logger
         self.local_ingest = local_ingest
         self.local_ingest_port = local_ingest_port
+        self.print_metrics = print_metrics
 
     def get_activation_config(self) -> dict:
         return self.activation_config
@@ -386,23 +388,36 @@ class DebugClient(CommunicationClient):
         return self.send_status(Status())
 
     def send_metrics(self, mint_lines: list[str]) -> list[MintResponse]:
+        total_lines = len(mint_lines)
+        lines_sent = 0
+
+        self.logger.info(f"Start sending {total_lines} metrics to the EEC")
+
         responses = []
-        for line in mint_lines:
-            self.logger.info(f"send_metric: {line}")
 
-        if self.local_ingest:
-            mint_data = "\n".join(mint_lines).encode("utf-8")
-            response = request(
-                "POST",
-                f"http://localhost:{self.local_ingest_port}/metrics/ingest",
-                body=mint_data,
-                headers={"Content-Type": CONTENT_TYPE_PLAIN},
-            ).json()
-            mint_response = MintResponse.from_json(response)
-            responses.append(mint_response)
+        chunks = divide_into_chunks(mint_lines, MAX_MINT_LINES_PER_REQUEST)
+        for chunk in chunks:
+            lines_in_chunk = len(chunk)
+            lines_sent += lines_in_chunk
+            self.logger.debug(f"Sending chunk with {lines_in_chunk} metric lines. ({lines_sent}/{total_lines})")
 
-        if not responses:
-            responses = [MintResponse(lines_invalid=0, lines_ok=len(mint_lines), error=None, warnings=None)]
+            if self.local_ingest:
+                mint_data = "\n".join(chunk).encode("utf-8")
+                response = request(
+                    "POST",
+                    f"http://localhost:{self.local_ingest_port}/metrics/ingest",
+                    body=mint_data,
+                    headers={"Content-Type": CONTENT_TYPE_PLAIN},
+                ).json()
+                mint_response = MintResponse.from_json(response)
+                responses.append(mint_response)
+            else:
+                if self.print_metrics:
+                    for line in mint_lines:
+                        self.logger.info(f"send_metric: {line}")
+
+                response = MintResponse(lines_invalid=0, lines_ok=len(chunk), error=None, warnings=None)
+                responses.append(response)
         return responses
 
     def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> dict | None:

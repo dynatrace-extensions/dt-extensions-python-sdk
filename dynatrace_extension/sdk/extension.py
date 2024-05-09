@@ -159,8 +159,6 @@ class Extension:
         if hasattr(self, "logger"):
             return
 
-        # TODO - Move the logging implementation to its own file
-        # TODO - Add sfm logging
         self.logger = extension_logger
 
         self.extension_config: str = ""
@@ -313,7 +311,6 @@ class Extension:
         api_logger.debug(f"Scheduling callback {callback}")
 
         # These properties are updated after the extension starts
-        # TODO - These should be part of an ext singleton object instead
         callback.cluster_time_diff = self._cluster_time_diff
         callback.running_in_sim = self._running_in_sim
         self._scheduled_callbacks.append(callback)
@@ -698,14 +695,21 @@ class Extension:
         # Debug parameters, these are used when running the extension locally
         parser.add_argument("--extensionconfig", required=False, default=None)
         parser.add_argument("--activationconfig", required=False, default="activation.json")
+        parser.add_argument("--no-print-metrics", required=False, action="store_true")
 
         args, unknown = parser.parse_known_args()
         self._is_fastcheck = args.fastcheck
         if args.dsid is None:
             # DEV mode
             self._running_in_sim = True
+            print_metrics = not args.no_print_metrics
             self._client = DebugClient(
-                args.activationconfig, args.extensionconfig, api_logger, args.local_ingest, args.local_ingest_port
+                activation_config_path=args.activationconfig,
+                extension_config_path=args.extensionconfig,
+                logger=api_logger,
+                local_ingest=args.local_ingest,
+                local_ingest_port=args.local_ingest_port,
+                print_metrics=print_metrics
             )
             RuntimeProperties.set_default_log_level(args.loglevel)
         else:
@@ -810,23 +814,22 @@ class Extension:
         self._scheduler.enter(SFM_METRIC_SENDING_INTERVAL.total_seconds(), 1, self._sfm_metrics_iteration)
 
     def _send_metrics(self):
-        # TODO - we might need to check size and number of lines before sending
-        # Maybe break it down into multiple packets
-        with self._metrics_lock and self._internal_callbacks_results_lock:
-            if self._metrics:
-                number_of_metrics = len(self._metrics)
-                responses = self._client.send_metrics(self._metrics)
+        with self._metrics_lock:
+            with self._internal_callbacks_results_lock:
+                if self._metrics:
+                    number_of_metrics = len(self._metrics)
+                    responses = self._client.send_metrics(self._metrics)
 
-                self._internal_callbacks_results[self._send_metrics.__name__] = Status(StatusValue.OK)
-                lines_invalid = sum(response.lines_invalid for response in responses)
-                if lines_invalid > 0:
-                    message = f"{lines_invalid} invalid metric lines found"
-                    self._internal_callbacks_results[self._send_metrics.__name__] = Status(
-                        StatusValue.GENERIC_ERROR, message
-                    )
+                    self._internal_callbacks_results[self._send_metrics.__name__] = Status(StatusValue.OK)
+                    lines_invalid = sum(response.lines_invalid for response in responses)
+                    if lines_invalid > 0:
+                        message = f"{lines_invalid} invalid metric lines found"
+                        self._internal_callbacks_results[self._send_metrics.__name__] = Status(
+                            StatusValue.GENERIC_ERROR, message
+                        )
 
-                api_logger.info(f"Sent {number_of_metrics} metric lines to EEC: {responses}")
-                self._metrics = []
+                    api_logger.info(f"Sent {number_of_metrics} metric lines to EEC: {responses}")
+                    self._metrics = []
 
     def _prepare_sfm_metrics(self) -> List[str]:
         """Prepare self monitoring metrics.

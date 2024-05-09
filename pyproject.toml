@@ -50,6 +50,7 @@ dependencies = [
     "pytest",
     "typer[all]",
     "pyyaml",
+    "dt-cli>=1.6.13"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -102,6 +103,7 @@ dependencies = [
     "dt-cli",
     "typer[all]",
     "pyyaml",
+    "tomli"
 ]
 
 [tool.hatch.envs.docs.env-vars]

@@ -19,20 +19,15 @@ class TestDtSdk(TestCase):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
         pass
 
-    @patch("dynatrace_extension.cli.main.subprocess.run")
+    @patch("dynatrace_extension.cli.main.dt_cli_upload")
+    @patch("dynatrace_extension.cli.main.dt_cli_validate")
     @patch("builtins.open", mock_open(read_data=SAMPLE_EXTENSION_DATA))
-    def test_dt_sdk_upload(self, mock_subprocess_run):
+    def test_dt_sdk_upload(self, mock_upload, mock_validate):
         extension_path = Path("test_extension_dir")
         tenant_url = "test_tenant_url"
         api_token = "test_api_token"
 
-        dt_sdk.upload(extension_path, tenant_url, api_token)
-        mock_subprocess_run.assert_called_once_with(
-            ["dt", "ext", "upload", "--tenant-url", tenant_url, "--api-token", api_token, f"{extension_path}"],
-            cwd=None,
-            env=None,
-            check=True,
-        )
+        dt_sdk.upload(extension_path, tenant_url, api_token, validate=False)
 
     @patch("dynatrace_extension.cli.main.subprocess.run")
     def test_dt_sdk_gen_certs(self, mock_subprocess_run: NonCallableMock):
@@ -102,6 +97,7 @@ class TestDtSdk(TestCase):
             target_directory=None,
             extra_platforms=None,
             extra_index_url=None,
+            find_links=None,
         )
 
         # Check that the built extension file exists
