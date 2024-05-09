@@ -46,6 +46,7 @@ packages = ["dynatrace_extension"]
 [tool.hatch.envs.default]
 dependencies = [
     "coverage[toml]>=6.5",
+    "dt-cli>=1.6.13",
     "pytest",
     "typer[all]",
     "pyyaml",

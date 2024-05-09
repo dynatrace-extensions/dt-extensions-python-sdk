@@ -769,7 +769,7 @@ class Extension:
                 current_thread_id = threading.get_ident()
                 self._running_callbacks[current_thread_id] = callback
 
-            callback(self.activation_config, self.extension_config)
+            callback()
 
             with self._sfm_metrics_lock:
                 self._callbackSfmReport[callback.name()] = callback
