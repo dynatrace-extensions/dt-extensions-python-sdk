@@ -5,9 +5,8 @@
 import logging
 import random
 from datetime import datetime, timedelta
-from inspect import signature
 from timeit import default_timer as timer
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, Tuple
 
 from .activation import ActivationType
 from .communication import Status, StatusValue
@@ -19,8 +18,8 @@ class WrappedCallback:
         interval: timedelta,
         callback: Callable,
         logger: logging.Logger,
-        args: Optional[tuple] = None,
-        kwargs: Optional[dict] = None,
+        args: Optional[Tuple] = None,
+        kwargs: Optional[Dict] = None,
         running_in_sim=False,
         activation_type: Optional[ActivationType] = None,
     ):
@@ -47,12 +46,10 @@ class WrappedCallback:
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
 
-        self.callback_parameters = signature(callback).parameters
-
     def get_current_time_with_cluster_diff(self):
         return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
 
-    def __call__(self, activation_config, extension_config):
+    def __call__(self):
         self.logger.debug(f"Running scheduled callback {self}")
         self.start_timestamp = self.get_current_time_with_cluster_diff()
         self.running = True
@@ -62,11 +59,7 @@ class WrappedCallback:
         start_time = timer()
         failed = False
         try:
-            if "kwargs" in self.callback_parameters:
-                kwargs = {"activation_config": activation_config, "extension_config": extension_config}
-                self.callback(*self.callback_args, **kwargs)
-            else:
-                self.callback(*self.callback_args)
+            self.callback(*self.callback_args, **self.callback_kwargs)
             self.status = Status(StatusValue.OK)
         except Exception as e:
             failed = True
