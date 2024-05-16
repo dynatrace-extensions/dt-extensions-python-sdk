@@ -41,7 +41,7 @@ Here is what a sample extension definition looks like:
       runtime:
         module: my_extension
         version:
-          min: "3.9"
+          min: "3.10"
 
       activation:
         remote:

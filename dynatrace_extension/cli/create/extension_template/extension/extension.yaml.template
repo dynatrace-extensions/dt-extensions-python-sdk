@@ -8,7 +8,7 @@ python:
   runtime:
     module: %extension_name%
     version:
-      min: "3.9"
+      min: "3.10"
 
   activation:
     remote:

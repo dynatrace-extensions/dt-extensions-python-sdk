@@ -16,7 +16,7 @@ python:
   runtime:
     module: mulesoft_cloudhub
     version:
-      min: "3.9"
+      min: "3.10"
 
   activation:
     remote:
@@ -38,7 +38,7 @@ class TestTypes(TestCase):
         assert extension.min_dynatrace_version == "1.902"
         assert extension.author.name == "Dynatrace"
         assert extension.python.runtime.module == "mulesoft_cloudhub"
-        assert extension.python.runtime.version.min_version == "3.9"
+        assert extension.python.runtime.version.min_version == "3.10"
         assert extension.python.activation.remote.path == "activationSchema.json"
         assert extension.python.activation.local is None
 
