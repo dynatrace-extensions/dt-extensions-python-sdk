@@ -33,7 +33,7 @@ Here is what a sample extension definition looks like:
 
     name: custom:my-extension
     version: 0.0.1
-    minDynatraceVersion: "1.253"
+    minDynatraceVersion: "1.285"
     author:
       name: "Dynatrace"
 
