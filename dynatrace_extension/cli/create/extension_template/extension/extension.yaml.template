@@ -1,6 +1,6 @@
 name: %extension-prefix%%extension-name%
 version: 0.0.1
-minDynatraceVersion: "1.253"
+minDynatraceVersion: "1.285"
 author:
   name: "Dynatrace"
 
