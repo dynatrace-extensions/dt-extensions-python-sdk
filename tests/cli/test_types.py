@@ -8,7 +8,7 @@ from dynatrace_extension.cli.schema import ExtensionYaml
 VALID_YAML = """
 name: custom:mulesoft-cloudhub
 version: 0.0.1
-minDynatraceVersion: "1.902"
+minDynatraceVersion: "1.285"
 author:
   name: "Dynatrace"
 
