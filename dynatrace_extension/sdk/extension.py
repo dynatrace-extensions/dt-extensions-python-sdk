@@ -8,6 +8,7 @@ import signal
 import sys
 import threading
 import time
+from collections import deque
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
@@ -996,14 +997,16 @@ class Extension:
             self._metrics.extend(lines)
 
     def _send_events_internal(self, events: Union[dict, List[dict]]):
-        response = self._client.send_events(events, self.log_event_enrichment)
-        with self._internal_callbacks_results_lock:
-            self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.OK)
-            if not response or "error" not in response or "message" not in response["error"]:
-                return
-            self._internal_callbacks_results[self._send_events.__name__] = Status(
-                StatusValue.GENERIC_ERROR, response["error"]["message"]
-            )
+        responses = self._client.send_events(events, self.log_event_enrichment)
+
+        for response in responses:
+            with self._internal_callbacks_results_lock:
+                self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.OK)
+                if not response or "error" not in response or "message" not in response["error"]:
+                    return
+                self._internal_callbacks_results[self._send_events.__name__] = Status(
+                    StatusValue.GENERIC_ERROR, response["error"]["message"]
+                )
 
     def _send_events(self, events: Union[dict, List[dict]]):
         self._internal_executor.submit(self._send_events_internal, events)

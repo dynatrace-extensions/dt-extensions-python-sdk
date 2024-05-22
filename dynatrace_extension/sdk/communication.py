@@ -10,11 +10,12 @@ import random
 import sys
 import time
 from abc import ABC, abstractmethod
+from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from itertools import islice
 from pathlib import Path
-from typing import Any, Iterable, List, TypeVar
+from typing import Any, Iterable, List, TypeVar, Union
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
@@ -22,6 +23,8 @@ CONTENT_TYPE_JSON = "application/json;charset=utf-8"
 CONTENT_TYPE_PLAIN = "text/plain;charset=utf-8"
 COUNT_METRIC_ITEMS_DICT = TypeVar("COUNT_METRIC_ITEMS_DICT", str, List[str])
 MAX_MINT_LINES_PER_REQUEST = 1000
+MAX_LOG_EVENTS_PER_REQUEST = 50_000
+MAX_LOG_REQUEST_SIZE = 5_000_000
 HTTP_BAD_REQUEST = 400
 
 
@@ -94,7 +97,7 @@ class CommunicationClient(ABC):
         pass
 
     @abstractmethod
-    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> dict | None:
+    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> List[Union[dict | None]]:
         pass
 
     @abstractmethod
@@ -283,19 +286,25 @@ class HttpClient(CommunicationClient):
             responses.append(mint_response)
         return responses
 
-    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> dict | None:
+    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> List[Union[dict, None]]:
         self.logger.debug(f"Sending log events: {events}")
-        event_data = json.dumps(events).encode("utf-8")
-        try:
-            # EEC returns empty body on success
-            return self._make_request(
-                self._events_url,
-                "POST",
-                event_data,
-                extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
-            ).json()
-        except json.JSONDecodeError:
-            return None
+        
+        responses = []
+        batches = divide_logs_into_batches([events] if type(events) == dict else events)
+
+        for batch in batches:
+            try:
+                # EEC returns empty body on success
+                responses.append(self._make_request(
+                    self._events_url,
+                    "POST",
+                    batch,
+                    extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
+                ).json())
+            except json.JSONDecodeError:
+                responses.append(None)
+        
+        return responses
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
         mint_data = "\n".join(mint_lines).encode("utf-8")
@@ -448,6 +457,46 @@ def divide_into_chunks(iterable: Iterable, chunk_size: int) -> Iterable:
             return
         yield subset
 
+def divide_logs_into_batches(logs: List[dict]):
+    """
+    Yield successive batches from a list of log events, according to sizing limitations
+    imposed by the EEC: 5 MB payload, 50,000 events
+
+    :param logs: The list of log events
+    """
+    events_left = len(logs)
+    events = deque(logs)
+
+    batch = []
+    batch_size = 0
+    batch_items = 0
+
+    while events_left > 0:
+        if batch_items == MAX_LOG_EVENTS_PER_REQUEST:
+            yield batch
+            batch = []
+            batch_size = 0
+            batch_items = 0
+            continue
+
+        event = events.popleft()
+        events_left -= 1
+
+        if event is not None:
+            event = json.dumps(event).encode("utf-8")
+            event_size = len(event)
+
+            if batch_size + event_size >= MAX_LOG_REQUEST_SIZE:
+                yield batch
+                batch = [event]
+                batch_size = event_size
+                batch_items = 1
+            else:
+                batch.append(event)
+                batch_size += event_size
+                batch_items += 1
+    else:
+        yield batch
 
 @dataclass
 class MintResponse:
