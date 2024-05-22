@@ -1,7 +1,20 @@
+from pathlib import Path
 from setuptools import setup, find_packages
 
+
+def find_version() -> str:
+    extension_yaml_path = Path(__file__).parent / "extension" / "extension.yaml"
+    version = "0.0.0"
+    with open(extension_yaml_path) as f:
+        for l in f.readlines():
+            if l.startswith("version"):
+                version = l.split(" ")[-1].strip("\"")
+                break
+    return version
+
+
 setup(name="%extension_name%",
-      version="0.0.1",
+      version=find_version(),
       description="%Extension_Name% python EF2 extension",
       author="Dynatrace",
       packages=find_packages(),
