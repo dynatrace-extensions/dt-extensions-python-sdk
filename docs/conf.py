@@ -88,7 +88,7 @@ html_theme_options = {
     "logo": "dt-sdk-logo.png",
     "logo_alt": "dt-sdk",
     "logo_url": "/",
-    "github_url": "https://github.com/dynatrace-extensions/dt-extensions-python-sdk",
+    "github_url": "https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/",
     "footer_links": ",".join(
         [
             "Dynatrace|https://dynatrace.com/",
