@@ -8,8 +8,8 @@ import signal
 import sys
 import threading
 import time
-from collections import deque
 from argparse import ArgumentParser
+from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -1015,9 +1015,8 @@ class Extension:
         self._client.send_dt_event(event)
 
     def get_version(self) -> str:
-        """Return the version of extensions sdk library."""
-
-        return __version__
+        """Return the extension version."""
+        return self.activation_config.version
 
     @property
     def techrule(self) -> str:
