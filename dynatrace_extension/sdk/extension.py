@@ -997,16 +997,21 @@ class Extension:
             self._metrics.extend(lines)
 
     def _send_events_internal(self, events: Union[dict, List[dict]]):
-        responses = self._client.send_events(events, self.log_event_enrichment)
+        try:
+            responses = self._client.send_events(events, self.log_event_enrichment)
 
-        for response in responses:
+            for response in responses:
+                with self._internal_callbacks_results_lock:
+                    self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.OK)
+                    if not response or "error" not in response or "message" not in response["error"]:
+                        return
+                    self._internal_callbacks_results[self._send_events.__name__] = Status(
+                        StatusValue.GENERIC_ERROR, response["error"]["message"]
+                    )
+        except Exception as e:
+            api_logger.error(f"Error sending events: {e!r}", exc_info=True)
             with self._internal_callbacks_results_lock:
-                self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.OK)
-                if not response or "error" not in response or "message" not in response["error"]:
-                    return
-                self._internal_callbacks_results[self._send_events.__name__] = Status(
-                    StatusValue.GENERIC_ERROR, response["error"]["message"]
-                )
+                self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
 
     def _send_events(self, events: Union[dict, List[dict]]):
         self._internal_executor.submit(self._send_events_internal, events)
