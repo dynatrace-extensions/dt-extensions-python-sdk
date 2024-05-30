@@ -3,13 +3,16 @@ from setuptools import setup, find_packages
 
 
 def find_version() -> str:
+    version = "0.0.1"
     extension_yaml_path = Path(__file__).parent / "extension" / "extension.yaml"
-    version = "0.0.0"
-    with open(extension_yaml_path) as f:
-        for l in f.readlines():
-            if l.startswith("version"):
-                version = l.split(" ")[-1].strip("\"")
-                break
+    try:
+        with open(extension_yaml_path, encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("version"):
+                    version = line.split(" ")[-1].strip("\"")
+                    break
+    except Exception:
+        pass
     return version
 
 
