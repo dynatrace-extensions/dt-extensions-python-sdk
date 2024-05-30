@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from enum import Enum
 from itertools import islice
 from pathlib import Path
-from typing import Any, Iterable, List, TypeVar, Union
+from typing import Any, Dict, Iterable, List, TypeVar, Union
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
@@ -97,7 +97,7 @@ class CommunicationClient(ABC):
         pass
 
     @abstractmethod
-    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> List[Union[dict | None]]:
+    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> list[Union[dict | None]]:
         pass
 
     @abstractmethod
@@ -286,24 +286,25 @@ class HttpClient(CommunicationClient):
             responses.append(mint_response)
         return responses
 
-    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> List[Union[dict, None]]:
+    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         self.logger.debug(f"Sending log events: {events}")
-        
+
         responses = []
-        batches = divide_logs_into_batches([events] if type(events) == dict else events)
+        batches = divide_logs_into_batches([events] if isinstance(events, dict) else events)
 
         for batch in batches:
             try:
-                # EEC returns empty body on success
-                responses.append(self._make_request(
+                encoded_batch = json.dumps(batch).encode("utf-8")
+                eec_response = self._make_request(
                     self._events_url,
                     "POST",
-                    batch,
+                    encoded_batch,
                     extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
-                ).json())
+                ).json()
+                responses.append(eec_response)
             except json.JSONDecodeError:
                 responses.append(None)
-        
+
         return responses
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
@@ -457,7 +458,7 @@ def divide_into_chunks(iterable: Iterable, chunk_size: int) -> Iterable:
             return
         yield subset
 
-def divide_logs_into_batches(logs: List[dict]):
+def divide_logs_into_batches(logs: list[dict]):
     """
     Yield successive batches from a list of log events, according to sizing limitations
     imposed by the EEC: 5 MB payload, 50,000 events
