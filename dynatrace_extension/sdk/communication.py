@@ -484,7 +484,6 @@ def divide_logs_into_batches(logs: list[dict]):
         events_left -= 1
 
         if event is not None:
-            event = json.dumps(event).encode("utf-8")
             event_size = len(event)
 
             if batch_size + event_size >= MAX_LOG_REQUEST_SIZE:
