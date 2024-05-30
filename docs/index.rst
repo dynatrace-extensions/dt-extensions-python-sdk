@@ -273,6 +273,7 @@ Documentation
 
    guides/installation
    guides/extension_structure
+   guides/building
    guides/migration
 
 .. toctree::
