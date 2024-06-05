@@ -430,9 +430,12 @@ class DebugClient(CommunicationClient):
                 responses.append(response)
         return responses
 
-    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> dict | None:
-        self.logger.info(f"send_events (enrichment = {eec_enrichment}): {events}")
-        return None
+    def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
+        self.logger.info(f"send_events (enrichment = {eec_enrichment}): {len(events)} events")
+        if self.print_metrics:
+            for event in events:
+                self.logger.info(f"sendf_event: {event}")
+        return []
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
         for line in mint_lines:
