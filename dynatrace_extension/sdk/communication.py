@@ -415,6 +415,8 @@ class DebugClient(CommunicationClient):
 
     def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         self.logger.info(f"send_events (enrichment = {eec_enrichment}): {len(events)} events")
+        if isinstance(events, dict):
+            events = [events]
         if self.print_metrics:
             for event in events:
                 self.logger.info(f"send_event: {event}")
