@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
@@ -53,13 +54,13 @@ class TestCommunication(unittest.TestCase):
 
     def test_large_metric_chunk(self):
 
-        metrics = ['my.metric,dim="dim" 10'] * 500 * 100  # 1_300_000 bytes, but becomes 1_149_999 with the newlines
+        metrics = ['my.metric,dim="dim" 10'] * 500 * 100
 
         # it needs to be divided into 2 lists, each with 650_000 bytes
         chunks = list(divide_into_batches(metrics, MAX_METRIC_REQUEST_SIZE, "\n"))
         self.assertEqual(len(chunks), 2)
-        self.assertEqual(len(chunks[0]), 574999)
-        self.assertEqual(len(chunks[1]), 575000)
+        self.assertEqual(len(chunks[0]), 650000)
+        self.assertEqual(len(chunks[1]), 650002)
 
     def test_small_metric_chunk(self):
         metrics = ['my.metric,dim="dim" 10'] * 100
@@ -73,3 +74,19 @@ class TestCommunication(unittest.TestCase):
 
         chunks = list(divide_into_batches(metrics, MAX_METRIC_REQUEST_SIZE, "\n"))
         self.assertEqual(len(chunks), 0)
+
+    def test_large_log_chunk_valid_json(self):
+
+        events = []
+        for i in range(5000):
+            attributes = {}
+            for j in range(150):
+                attributes[f"attribute{j}"] = j
+            events.append(attributes)
+
+        # it needs to be divided into 4 lists, each with 3_665_000 bytes
+        chunks = list(divide_into_batches(events, MAX_LOG_REQUEST_SIZE))
+        self.assertEqual(len(chunks), 4)
+
+        for chunk in chunks:
+            json.loads(chunk)
