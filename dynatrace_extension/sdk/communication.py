@@ -24,7 +24,7 @@ CONTENT_TYPE_PLAIN = "text/plain;charset=utf-8"
 COUNT_METRIC_ITEMS_DICT = TypeVar("COUNT_METRIC_ITEMS_DICT", str, List[str])
 MAX_MINT_LINES_PER_REQUEST = 1000
 MAX_LOG_EVENTS_PER_REQUEST = 50_000
-MAX_LOG_REQUEST_SIZE = 5_000_000
+MAX_LOG_REQUEST_SIZE = 5_000_000  # 5_242_880
 HTTP_BAD_REQUEST = 400
 
 
@@ -487,7 +487,7 @@ def divide_logs_into_batches(logs: list[dict]):
         events_left -= 1
 
         if event is not None:
-            event_size = len(event)
+            event_size = len(f"{event}".encode())
 
             if batch_size + event_size >= MAX_LOG_REQUEST_SIZE:
                 yield batch
