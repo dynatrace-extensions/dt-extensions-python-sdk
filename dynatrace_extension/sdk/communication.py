@@ -6,25 +6,25 @@ from __future__ import annotations
 
 import json
 import logging
-import random
 import sys
-import time
 from abc import ABC, abstractmethod
-from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from itertools import islice
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, TypeVar, Union
+from typing import Any, Generator, List, Sequence, TypeVar, Union
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
 CONTENT_TYPE_JSON = "application/json;charset=utf-8"
 CONTENT_TYPE_PLAIN = "text/plain;charset=utf-8"
 COUNT_METRIC_ITEMS_DICT = TypeVar("COUNT_METRIC_ITEMS_DICT", str, List[str])
+
+# TODO - I believe these can be adjusted via RuntimeConfig, they can't be constants
 MAX_MINT_LINES_PER_REQUEST = 1000
 MAX_LOG_EVENTS_PER_REQUEST = 50_000
-MAX_LOG_REQUEST_SIZE = 5_000_000  # 5_242_880
+MAX_LOG_REQUEST_SIZE = 5_000_000  # actually 5_242_880
+MAX_METRIC_REQUEST_SIZE = 1_000_000  # actually 1_048_576
+
 HTTP_BAD_REQUEST = 400
 
 
@@ -264,22 +264,13 @@ class HttpClient(CommunicationClient):
         return self.send_status(Status())
 
     def send_metrics(self, mint_lines: list[str]) -> list[MintResponse]:
-        total_lines = len(mint_lines)
-        lines_sent = 0
-
-        self.logger.debug(f"Start sending {total_lines} metrics to the EEC")
         responses = []
 
-        # We divide into chunks of MAX_MINT_LINES_PER_REQUEST lines to avoid hitting the body size limit
-        chunks = divide_into_chunks(mint_lines, MAX_MINT_LINES_PER_REQUEST)
-
-        for chunk in chunks:
-            lines_in_chunk = len(chunk)
-            lines_sent += lines_in_chunk
-            self.logger.debug(f"Sending chunk with {lines_in_chunk} metric lines. ({lines_sent}/{total_lines})")
-            mint_data = "\n".join(chunk).encode("utf-8")
+        # We divide into batches of MAX_METRIC_REQUEST_SIZE bytes to avoid hitting the body size limit
+        batches = divide_into_batches(mint_lines, MAX_METRIC_REQUEST_SIZE, "\n")
+        for batch in batches:
             response = self._make_request(
-                self._metric_url, "POST", mint_data, extra_headers={"Content-Type": CONTENT_TYPE_PLAIN}
+                self._metric_url, "POST", batch, extra_headers={"Content-Type": CONTENT_TYPE_PLAIN}
             ).json()
             self.logger.debug(f"{self._metric_url}: {response}")
             mint_response = MintResponse.from_json(response)
@@ -290,15 +281,16 @@ class HttpClient(CommunicationClient):
         self.logger.debug(f"Sending log events: {events}")
 
         responses = []
-        batches = divide_logs_into_batches([events] if isinstance(events, dict) else events)
+        if isinstance(events, dict):
+            events = [events]
+        batches = divide_into_batches(events, MAX_LOG_REQUEST_SIZE)
 
         for batch in batches:
             try:
-                encoded_batch = json.dumps(batch).encode("utf-8")
                 eec_response = self._make_request(
                     self._events_url,
                     "POST",
-                    encoded_batch,
+                    batch,
                     extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
                 ).json()
                 responses.append(eec_response)
@@ -399,24 +391,17 @@ class DebugClient(CommunicationClient):
 
     def send_metrics(self, mint_lines: list[str]) -> list[MintResponse]:
         total_lines = len(mint_lines)
-        lines_sent = 0
-
         self.logger.info(f"Start sending {total_lines} metrics to the EEC")
 
         responses = []
 
-        chunks = divide_into_chunks(mint_lines, MAX_MINT_LINES_PER_REQUEST)
-        for chunk in chunks:
-            lines_in_chunk = len(chunk)
-            lines_sent += lines_in_chunk
-            self.logger.debug(f"Sending chunk with {lines_in_chunk} metric lines. ({lines_sent}/{total_lines})")
-
+        batches = divide_into_batches(mint_lines, MAX_METRIC_REQUEST_SIZE)
+        for batch in batches:
             if self.local_ingest:
-                mint_data = "\n".join(chunk).encode("utf-8")
                 response = request(
                     "POST",
                     f"http://localhost:{self.local_ingest_port}/metrics/ingest",
-                    body=mint_data,
+                    body=batch,
                     headers={"Content-Type": CONTENT_TYPE_PLAIN},
                 ).json()
                 mint_response = MintResponse.from_json(response)
@@ -426,15 +411,13 @@ class DebugClient(CommunicationClient):
                     for line in mint_lines:
                         self.logger.info(f"send_metric: {line}")
 
-                response = MintResponse(lines_invalid=0, lines_ok=len(chunk), error=None, warnings=None)
-                responses.append(response)
         return responses
 
     def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         self.logger.info(f"send_events (enrichment = {eec_enrichment}): {len(events)} events")
         if self.print_metrics:
             for event in events:
-                self.logger.info(f"sendf_event: {event}")
+                self.logger.info(f"send_event: {event}")
         return []
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
@@ -446,60 +429,34 @@ class DebugClient(CommunicationClient):
         return 0
 
 
-def divide_into_chunks(iterable: Iterable, chunk_size: int) -> Iterable:
+def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_with: str | None = None) -> Generator[bytes, None, None]:
     """
-    Yield successive n-sized chunks from iterable.
-    Example: _chunk([1, 2, 3, 4, 5, 6, 7, 8, 9], 3) -> [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    Yield successive batches from a list, according to sizing limitations
 
-    :param iterable: The iterable to chunk
-    :param chunk_size: The size of the chunks
+    :param items: The list items to divide, they myst be encodable to bytes
+    :param max_size_bytes: The maximum size of the payload in bytes
+    :param join_with: A string to join the items with before encoding
+    :return: A generator of batches of log events already encoded
     """
-    iterator = iter(iterable)
-    while True:
-        subset = list(islice(iterator, chunk_size))
-        if not subset:
-            return
-        yield subset
 
-def divide_logs_into_batches(logs: list[dict]):
-    """
-    Yield successive batches from a list of log events, according to sizing limitations
-    imposed by the EEC: 5 MB payload, 50,000 events
+    if not items:
+        return
 
-    :param logs: The list of log events
-    """
-    events_left = len(logs)
-    events = deque(logs)
+    if join_with is not None:
+        items = join_with.join(items)
+    encoded = f"{items}".encode(errors="replace")
+    size = len(encoded)
+    if size <= max_size_bytes:
+        yield encoded
+        return
 
-    batch = []
-    batch_size = 0
-    batch_items = 0
+    # if we get here, the payload is too large, split it in half until we have chunks that are small enough
+    half = len(items) // 2
+    first_half = items[:half]
+    second_half = items[half:]
+    yield from divide_into_batches(first_half, max_size_bytes)
+    yield from divide_into_batches(second_half, max_size_bytes)
 
-    while events_left > 0:
-        if batch_items == MAX_LOG_EVENTS_PER_REQUEST:
-            yield batch
-            batch = []
-            batch_size = 0
-            batch_items = 0
-            continue
-
-        event = events.popleft()
-        events_left -= 1
-
-        if event is not None:
-            event_size = len(f"{event}".encode())
-
-            if batch_size + event_size >= MAX_LOG_REQUEST_SIZE:
-                yield batch
-                batch = [event]
-                batch_size = event_size
-                batch_items = 1
-            else:
-                batch.append(event)
-                batch_size += event_size
-                batch_items += 1
-    else:
-        yield batch
 
 @dataclass
 class MintResponse:
