@@ -445,8 +445,8 @@ def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_w
         return
 
     if join_with is not None:
-        items = join_with.join(items)
-        encoded = f"{items}".encode(errors="replace")
+        joined = join_with.join(items)
+        encoded = f"{joined}".encode(errors="replace")
     else:
         encoded = json.dumps(items).encode(errors="replace")
     size = len(encoded)
