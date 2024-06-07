@@ -69,7 +69,6 @@ class TestCommunication(unittest.TestCase):
         self.assertEqual(len(chunks), 1)
         self.assertEqual(len(chunks[0]), 2299)
 
-
     def test_no_metrics(self):
         metrics = []
 
