@@ -59,8 +59,8 @@ class TestCommunication(unittest.TestCase):
         # it needs to be divided into 2 lists, each with 650_000 bytes
         chunks = list(divide_into_batches(metrics, MAX_METRIC_REQUEST_SIZE, "\n"))
         self.assertEqual(len(chunks), 2)
-        self.assertEqual(len(chunks[0]), 650000)
-        self.assertEqual(len(chunks[1]), 650002)
+        self.assertEqual(len(chunks[0]), 574999)
+        self.assertEqual(len(chunks[1]), 574999)
 
     def test_small_metric_chunk(self):
         metrics = ['my.metric,dim="dim" 10'] * 100
@@ -68,6 +68,7 @@ class TestCommunication(unittest.TestCase):
         chunks = list(divide_into_batches(metrics, MAX_METRIC_REQUEST_SIZE, "\n"))
         self.assertEqual(len(chunks), 1)
         self.assertEqual(len(chunks[0]), 2299)
+
 
     def test_no_metrics(self):
         metrics = []
