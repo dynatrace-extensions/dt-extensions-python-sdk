@@ -445,8 +445,8 @@ def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_w
         return
 
     if join_with is not None:
-        items = join_with.join(items)
-        encoded = f"{items}".encode(errors="replace")
+        joined = join_with.join(items)
+        encoded = f"{joined}".encode(errors="replace")
     else:
         encoded = json.dumps(items).encode(errors="replace")
     size = len(encoded)
@@ -458,8 +458,8 @@ def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_w
     half = len(items) // 2
     first_half = items[:half]
     second_half = items[half:]
-    yield from divide_into_batches(first_half, max_size_bytes)
-    yield from divide_into_batches(second_half, max_size_bytes)
+    yield from divide_into_batches(first_half, max_size_bytes, join_with)
+    yield from divide_into_batches(second_half, max_size_bytes, join_with)
 
 
 @dataclass
