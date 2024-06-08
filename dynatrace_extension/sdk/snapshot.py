@@ -172,7 +172,7 @@ def find_log_dir() -> Path:
     Returns: the Path to the log directory
     """
     config_dir = find_config_directory()
-    installation_conf = config_dir / "agent" / "config" / "installation.conf"
+    installation_conf = config_dir / "installation.conf"
     if not installation_conf.exists():
         msg = f"Could not find installation.conf at {installation_conf}"
         raise Exception(msg)
