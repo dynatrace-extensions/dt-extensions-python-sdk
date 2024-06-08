@@ -1053,6 +1053,13 @@ class Extension:
         Returns:
             Snapshot object.
         """
-        if self._running_in_sim and snapshot_file is None:
-            snapshot_file = Path("snapshot.json")
+        if self._running_in_sim:
+            if snapshot_file is None:
+                snapshot_file = Path("snapshot.json")
+            if isinstance(snapshot_file, str):
+                snapshot_file = Path(snapshot_file)
+            if not snapshot_file.exists():
+                msg = f"snapshot file '{snapshot_file}' not found"
+                raise FileNotFoundError(msg)
+
         return Snapshot.parse_from_file(snapshot_file)
