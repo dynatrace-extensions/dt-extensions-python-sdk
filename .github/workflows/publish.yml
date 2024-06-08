@@ -26,6 +26,14 @@ jobs:
       - name: Install hatch
         run: |
           pip install hatch --user
+
+      - name: Run tests
+        run: |
+          python3 -m hatch run test
+
+      - name: Run linting
+        run: |
+          python3 -m hatch run lint:all
     
       - name: Build a wheel and a source tarball
         run: |
