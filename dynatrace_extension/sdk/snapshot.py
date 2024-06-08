@@ -145,19 +145,22 @@ class Snapshot:
 def find_config_directory() -> Path:
     """
     Attempt to find the OneAgent config directory.
-    We are at an advantage here, we know this extension is running from somewhere in the OneAgent config directory.
-    So we can move up the directory tree until we find the config directory
-    Returns: the Path to the config directory
-
+    Note, the user can never modify these directories
+    Windows -> https://docs.dynatrace.com/docs/shortlink/oneagent-disk-requirements-windows#oneagent-files-aging-mechanism
+    Linux -> https://docs.dynatrace.com/docs/shortlink/oneagent-disk-requirements-linux#sizes
     """
-    executable_path = Path(sys.executable).resolve()
-    checking_dir = executable_path.parent
-    while checking_dir.parent != checking_dir:
-        if checking_dir.name == "oneagent":
-            return checking_dir
-        checking_dir = checking_dir.parent
+    config_dir_base = os.path.expandvars("%PROGRAMDATA%") if os.name == "nt" else "/var/lib"
+    config_dir = Path(config_dir_base) / "dynatrace" / "oneagent" / "agent" / "config"
+    if config_dir.exists():
+        return config_dir
+    file_path = Path(__file__).resolve()
 
-    msg = f"Could not find the OneAgent config directory from {executable_path}"
+    while file_path.parent != file_path:
+        file_path = file_path.parent
+        if file_path.name == "agent":
+            return file_path / "config"
+
+    msg = "Could not find the OneAgent config directory"
     raise Exception(msg)
 
 
