@@ -35,7 +35,7 @@ class TestTypes(TestCase):
         extension = ExtensionYaml(Path("extension.yaml"))
         assert extension.name == "custom:mulesoft-cloudhub"
         assert extension.version == "0.0.1"
-        assert extension.min_dynatrace_version == "1.902"
+        assert extension.min_dynatrace_version == "1.285"
         assert extension.author.name == "Dynatrace"
         assert extension.python.runtime.module == "mulesoft_cloudhub"
         assert extension.python.runtime.version.min_version == "3.10"

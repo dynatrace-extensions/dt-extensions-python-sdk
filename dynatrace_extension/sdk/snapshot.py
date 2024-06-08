@@ -137,7 +137,7 @@ class Snapshot:
             snapshot_json = json.load(f)
 
         host_id = snapshot_json.get("host_id", "0X0000000000000000")
-        host_id = f"PREFIX_HOST-{host_id[-16:]}"
+        host_id = f"{PREFIX_HOST}-{host_id[-16:]}"
         entries = [Entry.from_json(e) for e in snapshot_json.get("entries", [])]
         return Snapshot(host_id, entries)
 
