@@ -9,21 +9,21 @@ import sys
 import threading
 import time
 from argparse import ArgumentParser
-from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from itertools import chain
+from pathlib import Path
 from threading import Lock, RLock, active_count
 from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional, Union
 
-from ..__about__ import __version__
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
 from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
+from .snapshot import Snapshot
 
 HEARTBEAT_INTERVAL = timedelta(seconds=30)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
@@ -1043,3 +1043,16 @@ class Extension:
             ActivationConfig object.
         """
         return self.activation_config
+
+    def get_snapshot(self, snapshot_file: Path | str | None = None) -> Snapshot:
+        """Retrieves an oneagent snapshot.
+
+        Args:
+            snapshot_file: Optional path to the snapshot file, only used when running from dt-sdk run
+
+        Returns:
+            Snapshot object.
+        """
+        if self._running_in_sim and snapshot_file is None:
+            snapshot_file = Path("snapshot.json")
+        return Snapshot.parse_from_file(snapshot_file)
