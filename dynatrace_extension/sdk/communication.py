@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Generator, List, Sequence, TypeVar, Union
+from typing import Any, Generator, List, Sequence, TypeVar
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
@@ -97,7 +97,7 @@ class CommunicationClient(ABC):
         pass
 
     @abstractmethod
-    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> list[Union[dict | None]]:
+    def send_events(self, event: dict | list[dict], eec_enrichment: bool) -> list[dict | None]:
         pass
 
     @abstractmethod
@@ -406,10 +406,9 @@ class DebugClient(CommunicationClient):
                 ).json()
                 mint_response = MintResponse.from_json(response)
                 responses.append(mint_response)
-            else:
-                if self.print_metrics:
-                    for line in mint_lines:
-                        self.logger.info(f"send_metric: {line}")
+            elif self.print_metrics:
+                for line in mint_lines:
+                    self.logger.info(f"send_metric: {line}")
 
         return responses
 

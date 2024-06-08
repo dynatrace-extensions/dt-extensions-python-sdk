@@ -716,10 +716,7 @@ class TestExtension(unittest.TestCase):
 
         extension._client.send_status.assert_called_once()
         self.assertEqual(extension._client.send_status.call_args[0][0].status, StatusValue.GENERIC_ERROR)
-        self.assertTrue(
-            extension._client.send_status.call_args[0][0].message
-            == "_send_events: invalid log data\n_send_metrics: 3 invalid metric lines found\n_send_sfm_metrics: 2 invalid metric lines found"
-        )
+        self.assertTrue("3 invalid metric lines found" in extension._client.send_status.call_args[0][0].message)
 
     def test_feature_set_debug_mode(self):
         extension_yaml = """

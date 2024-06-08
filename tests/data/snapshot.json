@@ -1,0 +1,3764 @@
+{
+    "host_id": "0X524E3E2974F9AC2A",
+    "entries": [
+        {
+            "group_id": "0X6082BE2AD9025968",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X32CC8003ADFBF542",
+            "process_type": "14",
+            "group_name": "Dynatrace ActiveGate Source SQL",
+            "processes": [
+                {
+                    "pid": "2235478",
+                    "process_name": "java",
+                    "properties": [
+                        {
+                            "CmdLine": "-cp /opt/dynatrace/remotepluginmodule/agent/datasources/sqlMySql/../../res/java/commonjars/dynatracesourcesql.jar:/opt/dynatrace/remotepluginmodule/agent/datasources/sqlMySql/../../res/java/libs/*:/var/lib/dynatrace/remotepluginmodule/agent/conf/userdata/libs/* -Xms4M -Xmx128M -Xss320K -XX:ReservedCodeCacheSize=24M -XX:+UseParallelGC com.dynatrace.datasource.SQL --userdata=/var/lib/dynatrace/remotepluginmodule/agent/conf/userdata --dsid=-4668159365613895608 --url=http://127.0.0.1:14599 --idtoken=/var/lib/dynatrace/remotepluginmodule/agent/runtime/datasources/dsauthtoken --monitoring_config_id=9bd7e53b-bf17-3bfb-9af6-7fee8c0216a8"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/res/dsruntime/java/bin/java"
+                        },
+                        {
+                            "ParentPid": "2033836"
+                        },
+                        {
+                            "WorkDir": "/var/lib/dynatrace/remotepluginmodule/agent/runtime/datasources/working_directories/-46681593656138956081717798670672"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,JAVA,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace,Java"
+                }
+            ]
+        },
+        {
+            "group_id": "0X6DDD08EF27271F23",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X3F9336C653DEB309",
+            "process_type": "14",
+            "group_name": "Dynatrace ActiveGate Source SQL",
+            "processes": [
+                {
+                    "pid": "2235479",
+                    "process_name": "java",
+                    "properties": [
+                        {
+                            "CmdLine": "-cp /opt/dynatrace/remotepluginmodule/agent/datasources/sqlMySql/../../res/java/commonjars/dynatracesourcesql.jar:/opt/dynatrace/remotepluginmodule/agent/datasources/sqlMySql/../../res/java/libs/*:/var/lib/dynatrace/remotepluginmodule/agent/conf/userdata/libs/* -Xms4M -Xmx128M -Xss320K -XX:ReservedCodeCacheSize=24M -XX:+UseParallelGC com.dynatrace.datasource.SQL --userdata=/var/lib/dynatrace/remotepluginmodule/agent/conf/userdata --dsid=7577205817290686815 --url=http://127.0.0.1:14599 --idtoken=/var/lib/dynatrace/remotepluginmodule/agent/runtime/datasources/dsauthtoken --monitoring_config_id=cc918fca-3226-3628-8623-8f99f0d5809d"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/res/dsruntime/java/bin/java"
+                        },
+                        {
+                            "ParentPid": "2033836"
+                        },
+                        {
+                            "WorkDir": "/var/lib/dynatrace/remotepluginmodule/agent/runtime/datasources/working_directories/75772058172906868151717798670680"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,JAVA,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace,Java"
+                }
+            ]
+        },
+        {
+            "group_id": "0X55BB99EBACB51463",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XFC49C5713BEC52B8",
+            "process_type": "14",
+            "group_name": "OneAgent network monitoring",
+            "processes": [
+                {
+                    "pid": "17831",
+                    "process_name": "oneagentnetwork",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50004"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentnetwork"
+                        },
+                        {
+                            "ParentPid": "17311"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0XB27330900F0E858D",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X0E00CAFB0A683E8C",
+            "process_type": "14",
+            "group_name": "OneAgent monitoring extensions",
+            "processes": [
+                {
+                    "pid": "17624",
+                    "process_name": "oneagentplugin",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50002"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentplugin"
+                        },
+                        {
+                            "ParentPid": "17311"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0XC22F591B1DC26ABE",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X576E4CDE70871D0F",
+            "process_type": "14",
+            "group_name": "Dynatrace OneAgent Extensions Controller",
+            "processes": [
+                {
+                    "pid": "17432",
+                    "process_name": "oneagentextensions",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50003"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentextensions"
+                        },
+                        {
+                            "ListeningPorts": "14499"
+                        },
+                        {
+                            "ParentPid": "17311"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_14499"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0X019591F766455D40",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XA34ED17A33203E7C",
+            "process_type": "0",
+            "group_name": "remotepluginlauncher",
+            "processes": [
+                {
+                    "pid": "1767788",
+                    "process_name": "remotepluginlauncher",
+                    "properties": [
+                        {
+                            "CmdLine": "-bg -config=/opt/dynatrace/remotepluginmodule/agent/lib64/../conf/remotepluginlauncher.ini"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/lib64/remotepluginlauncher"
+                        },
+                        {
+                            "ListeningPorts": "50007"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_50007"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/remotepluginmodule/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": []
+        },
+        {
+            "group_id": "0X6FBC3EB792CEF9EA",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X604A3825DFFE50DB",
+            "process_type": "38",
+            "group_name": "collector",
+            "processes": [
+                {
+                    "pid": "19302",
+                    "process_name": "collector",
+                    "properties": [
+                        {
+                            "CmdLine": "--config /config.yaml"
+                        },
+                        {
+                            "DockerContainerId": "31ca821ee79a31e0711f4a21af867f08091d8701ebc9ea8c9261516ebf7ec206"
+                        },
+                        {
+                            "DockerMount": "/proc/"
+                        },
+                        {
+                            "ExePath": "/collector"
+                        },
+                        {
+                            "ListeningPorts": "4317 8888"
+                        },
+                        {
+                            "ParentPid": "19282"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_8888;127.0.0.1_4317"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "GO,GO,DOCKER"
+                },
+                {
+                    "pgTechnologies": "Docker,Go"
+                }
+            ]
+        },
+        {
+            "group_id": "0X5EEEAA0E0F6E7445",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X5EAAA7793C3517C2",
+            "process_type": "14",
+            "group_name": "OneAgent NetTracer",
+            "processes": [
+                {
+                    "pid": "23468",
+                    "process_name": "oneagentnettracer",
+                    "properties": [
+                        {
+                            "CmdLine": "-p /opt/dynatrace/oneagent/agent/lib64/nettracer-bpf.o -n -i -l /var/log/dynatrace/oneagent/os/ -m 4096"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentnettracer"
+                        },
+                        {
+                            "ParentPid": "17320"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0XDA52C7DE4DCF26C3",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X29DDC2089A2F079D",
+            "process_type": "38",
+            "group_name": "snapd",
+            "processes": [
+                {
+                    "pid": "3457537",
+                    "process_name": "snapd",
+                    "properties": [
+                        {
+                            "ExePath": "/snap/snapd/21759/usr/lib/snapd/snapd"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "GO,GO"
+                },
+                {
+                    "pgTechnologies": "Go"
+                }
+            ]
+        },
+        {
+            "group_id": "0X4F6264254199189E",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XC79597B8E349193B",
+            "process_type": "14",
+            "group_name": "OneAgent eBPF service discovery",
+            "processes": [
+                {
+                    "pid": "17605",
+                    "process_name": "oneagentebpfdiscovery",
+                    "properties": [
+                        {
+                            "CmdLine": "--log-dir /var/log/dynatrace/oneagent/os/ --log-no-stdout --log-level info"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentebpfdiscovery"
+                        },
+                        {
+                            "ParentPid": "17320"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0X933FF135868A3102",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X3FC2D3A1DABB829F",
+            "process_type": "14",
+            "group_name": "Dynatrace OneAgent Source StatsD",
+            "processes": [
+                {
+                    "pid": "17517",
+                    "process_name": "oneagentsourcestatsd",
+                    "properties": [
+                        {
+                            "CmdLine": "--dsid=statsd_0 --url=http://127.0.0.1:14499 --idtoken=/var/lib/dynatrace/oneagent/agent/runtime/datasources/dsauthtoken --monitoring_config_id=statsd_listener"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/datasources/statsd/oneagentsourcestatsd"
+                        },
+                        {
+                            "ParentPid": "17432"
+                        },
+                        {
+                            "WorkDir": "/var/lib/dynatrace/oneagent/agent/runtime/datasources/working_directories/statsd_01714704752167"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG,GO"
+                },
+                {
+                    "pgTechnologies": "Dynatrace,Go"
+                }
+            ]
+        },
+        {
+            "group_id": "0X68B404144F1EFBEA",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X6148E8EA3B67E219",
+            "process_type": "0",
+            "group_name": "systemd-resolved",
+            "processes": [
+                {
+                    "pid": "776",
+                    "process_name": "systemd-resolved",
+                    "properties": [
+                        {
+                            "ExePath": "/usr/lib/systemd/systemd-resolved"
+                        },
+                        {
+                            "ListeningPorts": "53"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "PortBindings": "127.0.0.53_53"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": []
+        },
+        {
+            "group_id": "0XEB8DC01B8DCD02BE",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X106544164F0EEF80",
+            "process_type": "14",
+            "group_name": "Dynatrace ActiveGate Extensions Controller",
+            "processes": [
+                {
+                    "pid": "2033836",
+                    "process_name": "extensionsmodule",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50006 -limit.unlimited_memlock=false cluster"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/lib64/extensionsmodule"
+                        },
+                        {
+                            "ListeningPorts": "14599"
+                        },
+                        {
+                            "ParentPid": "2033832"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_14599"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/remotepluginmodule/agent/lib64"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2033832",
+                    "process_name": "extensionsmodulelauncher",
+                    "properties": [
+                        {
+                            "CmdLine": "-bg -config=/opt/dynatrace/remotepluginmodule/agent/lib64/../conf/extensionsmodulewatchdog.ini"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/lib64/extensionsmodulelauncher"
+                        },
+                        {
+                            "ListeningPorts": "50006"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_50006"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/remotepluginmodule/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG,PYTHON"
+                },
+                {
+                    "pgTechnologies": "Dynatrace,Python"
+                }
+            ]
+        },
+        {
+            "group_id": "0X9DA2F9D5CF3AA476",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XCFECC7FCBBC3085C",
+            "process_type": "14",
+            "group_name": "Dynatrace ActiveGate",
+            "processes": [
+                {
+                    "pid": "2234490",
+                    "process_name": "java",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=180 -classpath ./lib/* --add-opens=java.base/java.lang=ALL-UNNAMED -Xms1024M -XX:ErrorFile=/var/log/dynatrace/gateway/hs_err_pid_%p.log -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions -Duser.language=en -Djava.util.logging.manager=com.dynatrace.gen2.foundation.logging.impl.backend.CustomShutdownLogManager -Djdk.tls.ephemeralDHKeySize=2048 -Dorg.xerial.snappy.lib.path=/opt/dynatrace/gateway/lib/native -Dorg.xerial.snappy.lib.name=libsnappyjava.so -Djava.io.tmpdir=/var/lib/dynatrace/gateway/temp -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Djava.security.egd=file:/dev/urandom -DZstdNativePath=/opt/dynatrace/gateway/lib/native/libzstd-jni.so -Xmx4762M -Dcom.compuware.apm.WatchDogPort=50005 com.compuware.apm.collector.core.CollectorImpl -CONFIG_DIR /var/lib/dynatrace/gateway/config"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/gateway/jre/bin/java"
+                        },
+                        {
+                            "ListeningPorts": "9999"
+                        },
+                        {
+                            "ParentPid": "2234486"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_9999"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/gateway"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2234486",
+                    "process_name": "dynatracegateway",
+                    "properties": [
+                        {
+                            "CmdLine": "-bg -config /var/lib/dynatrace/gateway/config/dynatracegateway.ini"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/gateway/launcher/dynatracegateway"
+                        },
+                        {
+                            "ListeningPorts": "50005"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_50005"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/gateway"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0X423D6B90119F41AC",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X5BB9ECD0CC0B2BCF",
+            "process_type": "14",
+            "group_name": "OneAgent remote monitoring extensions",
+            "processes": [
+                {
+                    "pid": "2233569",
+                    "process_name": "oneagentremoteplugin",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50007"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/remotepluginmodule/agent/lib64/oneagentremoteplugin"
+                        },
+                        {
+                            "ParentPid": "1767788"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/remotepluginmodule/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0X5D9C06EF8DBBD306",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XFD952E87AF88BE62",
+            "process_type": "36",
+            "group_name": "dockerd",
+            "processes": [
+                {
+                    "pid": "1912",
+                    "process_name": "dockerd",
+                    "properties": [
+                        {
+                            "CmdLine": "--group docker --exec-root=/run/snap.docker --data-root=/var/snap/docker/common/var-lib-docker --pidfile=/run/snap.docker/docker.pid --config-file=/var/snap/docker/2915/config/daemon.json"
+                        },
+                        {
+                            "ExePath": "/snap/docker/2915/bin/dockerd"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/var/snap/docker/2915"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "LISTEN_SOCKET": "/var/run/docker.sock"
+                },
+                {
+                    "Technologies": "Docker Daemon,DOCKERDEAMON,GO"
+                },
+                {
+                    "pgTechnologies": "Docker Daemon,Go"
+                }
+            ]
+        },
+        {
+            "group_id": "0X00BB4F9DC04D5FEC",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X9BF86E13986FC4ED",
+            "process_type": "0",
+            "group_name": "squid",
+            "processes": [
+                {
+                    "pid": "2245656",
+                    "process_name": "squid",
+                    "properties": [
+                        {
+                            "CmdLine": "-f /etc/squid/squid.conf -NYC"
+                        },
+                        {
+                            "DockerContainerId": "5a2e539c840288c3abacd6c7551497833f50823c7aa8849d4559a3bfe93bef68"
+                        },
+                        {
+                            "DockerMount": "/proc/"
+                        },
+                        {
+                            "ExePath": "/usr/sbin/squid"
+                        },
+                        {
+                            "ListeningPorts": "3128"
+                        },
+                        {
+                            "ParentPid": "2245600"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_3128"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "DOCKER"
+                },
+                {
+                    "pgTechnologies": "Docker"
+                }
+            ]
+        },
+        {
+            "group_id": "0X8A0DF0F9C446635C",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X21E6D991511AC522",
+            "process_type": "38",
+            "group_name": "containerd-shim-runc-v*",
+            "processes": [
+                {
+                    "pid": "19397",
+                    "process_name": "containerd-shim-runc-v2",
+                    "properties": [
+                        {
+                            "CmdLine": "-namespace moby -id 2aaddb8d37eb1c98475da838fdca1b243bd594b60fdae531948f175cc90c9469 -address /run/snap.docker/containerd/containerd.sock"
+                        },
+                        {
+                            "ExePath": "/snap/docker/2915/bin/containerd-shim-runc-v2"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/run/snap.docker/containerd/daemon/io.containerd.runtime.v2.task/moby/2aaddb8d37eb1c98475da838fdca1b243bd594b60fdae531948f175cc90c9469"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2245578",
+                    "process_name": "containerd-shim-runc-v2",
+                    "properties": [
+                        {
+                            "CmdLine": "-namespace moby -id 5a2e539c840288c3abacd6c7551497833f50823c7aa8849d4559a3bfe93bef68 -address /run/snap.docker/containerd/containerd.sock"
+                        },
+                        {
+                            "ExePath": "/snap/docker/2915/bin/containerd-shim-runc-v2"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/run/snap.docker/containerd/daemon/io.containerd.runtime.v2.task/moby/5a2e539c840288c3abacd6c7551497833f50823c7aa8849d4559a3bfe93bef68"
+                        }
+                    ]
+                },
+                {
+                    "pid": "148058",
+                    "process_name": "containerd-shim-runc-v2",
+                    "properties": [
+                        {
+                            "CmdLine": "-namespace moby -id f4cee16221ccc712faa9eb83067e285e5da46cf02efd87e18fc1cf678acc613f -address /run/snap.docker/containerd/containerd.sock"
+                        },
+                        {
+                            "ExePath": "/snap/docker/2915/bin/containerd-shim-runc-v2"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/run/snap.docker/containerd/daemon/io.containerd.runtime.v2.task/moby/f4cee16221ccc712faa9eb83067e285e5da46cf02efd87e18fc1cf678acc613f"
+                        }
+                    ]
+                },
+                {
+                    "pid": "19282",
+                    "process_name": "containerd-shim-runc-v2",
+                    "properties": [
+                        {
+                            "CmdLine": "-namespace moby -id 31ca821ee79a31e0711f4a21af867f08091d8701ebc9ea8c9261516ebf7ec206 -address /run/snap.docker/containerd/containerd.sock"
+                        },
+                        {
+                            "ExePath": "/snap/docker/2915/bin/containerd-shim-runc-v2"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "WorkDir": "/run/snap.docker/containerd/daemon/io.containerd.runtime.v2.task/moby/31ca821ee79a31e0711f4a21af867f08091d8701ebc9ea8c9261516ebf7ec206"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "GO,GO"
+                },
+                {
+                    "pgTechnologies": "Go"
+                }
+            ]
+        },
+        {
+            "group_id": "0XEF1E81586EB8EDD6",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X4791B1FDB74EE60E",
+            "process_type": "1",
+            "group_name": "Linux System",
+            "processes": [
+                {
+                    "pid": "2245573",
+                    "process_name": "kworker/u4:5-events_unbound",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:5-events_unbound"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2243491",
+                    "process_name": "kworker/u4:4",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:4"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2240516",
+                    "process_name": "kworker/u4:1-events_power_efficient",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:1-events_power_efficient"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2231177",
+                    "process_name": "kworker/u4:0-writeback",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:0-writeback"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "261",
+                    "process_name": "scsi_eh_13",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_13"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "276",
+                    "process_name": "card0-crtc2",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc2"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "4",
+                    "process_name": "rcu_par_gp",
+                    "properties": [
+                        {
+                            "ExePath": "rcu_par_gp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "204",
+                    "process_name": "scsi_eh_2",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_2"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "5",
+                    "process_name": "slub_flushwq",
+                    "properties": [
+                        {
+                            "ExePath": "slub_flushwq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "290",
+                    "process_name": "scsi_tmf_18",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_18"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "96",
+                    "process_name": "irq/24-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/24-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "136",
+                    "process_name": "mld",
+                    "properties": [
+                        {
+                            "ExePath": "mld"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "263",
+                    "process_name": "scsi_tmf_13",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_13"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2170052",
+                    "process_name": "kworker/1:0-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/1:0-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "554",
+                    "process_name": "kmpath_rdacd",
+                    "properties": [
+                        {
+                            "ExePath": "kmpath_rdacd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "266",
+                    "process_name": "ttm_swap",
+                    "properties": [
+                        {
+                            "ExePath": "ttm_swap"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "548",
+                    "process_name": "kaluad",
+                    "properties": [
+                        {
+                            "ExePath": "kaluad"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "104",
+                    "process_name": "irq/32-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/32-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "303",
+                    "process_name": "scsi_tmf_21",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_21"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "120",
+                    "process_name": "irq/48-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/48-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "319",
+                    "process_name": "scsi_tmf_28",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_28"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "82",
+                    "process_name": "blkcg_punt_bio",
+                    "properties": [
+                        {
+                            "ExePath": "blkcg_punt_bio"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "281",
+                    "process_name": "card0-crtc6",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc6"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "87",
+                    "process_name": "devfreq_wq",
+                    "properties": [
+                        {
+                            "ExePath": "devfreq_wq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "275",
+                    "process_name": "card0-crtc1",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "81",
+                    "process_name": "kblockd",
+                    "properties": [
+                        {
+                            "ExePath": "kblockd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "280",
+                    "process_name": "card0-crtc5",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc5"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "128",
+                    "process_name": "acpi_thermal_pm",
+                    "properties": [
+                        {
+                            "ExePath": "acpi_thermal_pm"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "327",
+                    "process_name": "scsi_tmf_32",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_32"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "85",
+                    "process_name": "md",
+                    "properties": [
+                        {
+                            "ExePath": "md"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "279",
+                    "process_name": "card0-crtc4",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc4"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "80",
+                    "process_name": "kintegrityd",
+                    "properties": [
+                        {
+                            "ExePath": "kintegrityd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "274",
+                    "process_name": "card0-crtc0",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "32",
+                    "process_name": "ksmd",
+                    "properties": [
+                        {
+                            "ExePath": "ksmd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "323",
+                    "process_name": "scsi_tmf_30",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_30"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "124",
+                    "process_name": "irq/52-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/52-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2237289",
+                    "process_name": "kworker/1:2-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/1:2-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "131",
+                    "process_name": "scsi_tmf_0",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "325",
+                    "process_name": "scsi_tmf_31",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_31"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "126",
+                    "process_name": "irq/54-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/54-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2243157",
+                    "process_name": "kworker/0:3-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:3-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "228",
+                    "process_name": "scsi_tmf_7",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_7"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "29",
+                    "process_name": "oom_reaper",
+                    "properties": [
+                        {
+                            "ExePath": "oom_reaper"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "86",
+                    "process_name": "edac-poller",
+                    "properties": [
+                        {
+                            "ExePath": "edac-poller"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "285",
+                    "process_name": "scsi_eh_17",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_17"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "110",
+                    "process_name": "irq/38-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/38-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "309",
+                    "process_name": "scsi_tmf_24",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_24"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "16",
+                    "process_name": "idle_inject/0",
+                    "properties": [
+                        {
+                            "ExePath": "idle_inject/0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "19",
+                    "process_name": "cpuhp/1",
+                    "properties": [
+                        {
+                            "ExePath": "cpuhp/1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "283",
+                    "process_name": "scsi_tmf_16",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_16"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "84",
+                    "process_name": "ata_sff",
+                    "properties": [
+                        {
+                            "ExePath": "ata_sff"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "278",
+                    "process_name": "card0-crtc3",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc3"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "272",
+                    "process_name": "irq/16-vmwgfx",
+                    "properties": [
+                        {
+                            "ExePath": "irq/16-vmwgfx"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "130",
+                    "process_name": "scsi_eh_0",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "99",
+                    "process_name": "irq/27-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/27-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2220252",
+                    "process_name": "kworker/0:1-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:1-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "208",
+                    "process_name": "scsi_tmf_3",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_3"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "267",
+                    "process_name": "scsi_tmf_14",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_14"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "359",
+                    "process_name": "kdmflush",
+                    "properties": [
+                        {
+                            "ExePath": "kdmflush"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "265",
+                    "process_name": "scsi_eh_14",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_14"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "127",
+                    "process_name": "irq/55-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/55-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "326",
+                    "process_name": "scsi_eh_32",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_32"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "30",
+                    "process_name": "writeback",
+                    "properties": [
+                        {
+                            "ExePath": "writeback"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "229",
+                    "process_name": "scsi_eh_8",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_8"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "152",
+                    "process_name": "kworker/u5:0",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u5:0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "273",
+                    "process_name": "scsi_tmf_15",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_15"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "27",
+                    "process_name": "kauditd",
+                    "properties": [
+                        {
+                            "ExePath": "kauditd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "318",
+                    "process_name": "scsi_eh_28",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_28"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "119",
+                    "process_name": "irq/47-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/47-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "277",
+                    "process_name": "scsi_eh_16",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_16"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "14",
+                    "process_name": "rcu_sched",
+                    "properties": [
+                        {
+                            "ExePath": "rcu_sched"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "24",
+                    "process_name": "kworker/1:0H-events_highpri",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/1:0H-events_highpri"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "206",
+                    "process_name": "vmw_pvscsi_wq_2",
+                    "properties": [
+                        {
+                            "ExePath": "vmw_pvscsi_wq_2"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "12",
+                    "process_name": "rcu_tasks_trace",
+                    "properties": [
+                        {
+                            "ExePath": "rcu_tasks_trace"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "211",
+                    "process_name": "scsi_tmf_4",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_4"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "151",
+                    "process_name": "zswap-shrink",
+                    "properties": [
+                        {
+                            "ExePath": "zswap-shrink"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "255",
+                    "process_name": "scsi_eh_11",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_11"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "111",
+                    "process_name": "irq/39-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/39-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "310",
+                    "process_name": "scsi_eh_25",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_25"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "33",
+                    "process_name": "khugepaged",
+                    "properties": [
+                        {
+                            "ExePath": "khugepaged"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "25",
+                    "process_name": "kdevtmpfs",
+                    "properties": [
+                        {
+                            "ExePath": "kdevtmpfs"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "224",
+                    "process_name": "scsi_eh_7",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_7"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "122",
+                    "process_name": "irq/50-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/50-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "321",
+                    "process_name": "scsi_tmf_29",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_29"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2230501",
+                    "process_name": "kworker/u4:2-flush-253:0",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:2-flush-253:0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "109",
+                    "process_name": "irq/37-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/37-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "308",
+                    "process_name": "scsi_eh_24",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_24"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "8",
+                    "process_name": "kworker/0:0H-events_highpri",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:0H-events_highpri"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "207",
+                    "process_name": "scsi_eh_3",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_3"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "105",
+                    "process_name": "irq/33-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/33-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "304",
+                    "process_name": "scsi_eh_22",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_22"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "13",
+                    "process_name": "ksoftirqd/0",
+                    "properties": [
+                        {
+                            "ExePath": "ksoftirqd/0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "299",
+                    "process_name": "scsi_tmf_19",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_19"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "100",
+                    "process_name": "irq/28-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/28-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "3",
+                    "process_name": "rcu_gp",
+                    "properties": [
+                        {
+                            "ExePath": "rcu_gp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "18",
+                    "process_name": "cpuhp/0",
+                    "properties": [
+                        {
+                            "ExePath": "cpuhp/0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "157",
+                    "process_name": "charger_manager",
+                    "properties": [
+                        {
+                            "ExePath": "charger_manager"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "555",
+                    "process_name": "kmpathd",
+                    "properties": [
+                        {
+                            "ExePath": "kmpathd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "132",
+                    "process_name": "scsi_eh_1",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "320",
+                    "process_name": "scsi_eh_29",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_29"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "121",
+                    "process_name": "irq/49-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/49-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "259",
+                    "process_name": "scsi_tmf_12",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_12"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "294",
+                    "process_name": "scsi_eh_19",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_19"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "95",
+                    "process_name": "kthrotld",
+                    "properties": [
+                        {
+                            "ExePath": "kthrotld"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "90",
+                    "process_name": "kworker/0:1H-kblockd",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:1H-kblockd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "289",
+                    "process_name": "scsi_eh_18",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_18"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2243364",
+                    "process_name": "kworker/u4:3-events_freezable_power_",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/u4:3-events_freezable_power_"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "236",
+                    "process_name": "scsi_tmf_8",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_8"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "556",
+                    "process_name": "kmpath_handlerd",
+                    "properties": [
+                        {
+                            "ExePath": "kmpath_handlerd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "221",
+                    "process_name": "scsi_eh_6",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_6"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "22",
+                    "process_name": "ksoftirqd/1",
+                    "properties": [
+                        {
+                            "ExePath": "ksoftirqd/1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "445",
+                    "process_name": "jbd2/dm-0-8",
+                    "properties": [
+                        {
+                            "ExePath": "jbd2/dm-0-8"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "257",
+                    "process_name": "scsi_tmf_11",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_11"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "244",
+                    "process_name": "scsi_tmf_10",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_10"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "316",
+                    "process_name": "scsi_tmf_27",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_27"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "117",
+                    "process_name": "irq/45-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/45-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "446",
+                    "process_name": "ext4-rsv-conver",
+                    "properties": [
+                        {
+                            "ExePath": "ext4-rsv-conver"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "258",
+                    "process_name": "scsi_eh_12",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_12"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "241",
+                    "process_name": "scsi_eh_10",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_10"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "240",
+                    "process_name": "scsi_tmf_9",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_9"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2",
+                    "process_name": "kthreadd",
+                    "properties": [
+                        {
+                            "ExePath": "kthreadd"
+                        },
+                        {
+                            "ParentPid": "0"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2232420",
+                    "process_name": "kworker/0:0-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:0-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "237",
+                    "process_name": "scsi_eh_9",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_9"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "222",
+                    "process_name": "scsi_tmf_6",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_6"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "324",
+                    "process_name": "scsi_eh_31",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_31"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "125",
+                    "process_name": "irq/53-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/53-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "28",
+                    "process_name": "khungtaskd",
+                    "properties": [
+                        {
+                            "ExePath": "khungtaskd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "115",
+                    "process_name": "irq/43-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/43-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "314",
+                    "process_name": "scsi_tmf_26",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_26"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "93",
+                    "process_name": "ecryptfs-kthrea",
+                    "properties": [
+                        {
+                            "ExePath": "ecryptfs-kthrea"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "92",
+                    "process_name": "kswapd0",
+                    "properties": [
+                        {
+                            "ExePath": "kswapd0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "394",
+                    "process_name": "raid5wq",
+                    "properties": [
+                        {
+                            "ExePath": "raid5wq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "20",
+                    "process_name": "idle_inject/1",
+                    "properties": [
+                        {
+                            "ExePath": "idle_inject/1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "219",
+                    "process_name": "scsi_eh_5",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_5"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "118",
+                    "process_name": "irq/46-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/46-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "311",
+                    "process_name": "scsi_tmf_25",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_25"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "112",
+                    "process_name": "irq/40-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/40-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "107",
+                    "process_name": "irq/35-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/35-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "306",
+                    "process_name": "scsi_eh_23",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_23"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "15",
+                    "process_name": "migration/0",
+                    "properties": [
+                        {
+                            "ExePath": "migration/0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "209",
+                    "process_name": "scsi_eh_4",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_4"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "10",
+                    "process_name": "mm_percpu_wq",
+                    "properties": [
+                        {
+                            "ExePath": "mm_percpu_wq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "315",
+                    "process_name": "scsi_eh_27",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_27"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "116",
+                    "process_name": "irq/44-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/44-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "106",
+                    "process_name": "irq/34-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/34-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "146968",
+                    "process_name": "dio/dm-0",
+                    "properties": [
+                        {
+                            "ExePath": "dio/dm-0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "305",
+                    "process_name": "scsi_tmf_22",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_22"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "137",
+                    "process_name": "ipv6_addrconf",
+                    "properties": [
+                        {
+                            "ExePath": "ipv6_addrconf"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "21",
+                    "process_name": "migration/1",
+                    "properties": [
+                        {
+                            "ExePath": "migration/1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "220",
+                    "process_name": "scsi_tmf_5",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_5"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "26",
+                    "process_name": "inet_frag_wq",
+                    "properties": [
+                        {
+                            "ExePath": "inet_frag_wq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "2243030",
+                    "process_name": "kworker/0:2-events",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/0:2-events"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "300",
+                    "process_name": "scsi_eh_20",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_20"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "101",
+                    "process_name": "irq/29-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/29-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "6",
+                    "process_name": "netns",
+                    "properties": [
+                        {
+                            "ExePath": "netns"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "205",
+                    "process_name": "scsi_tmf_2",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_2"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "103",
+                    "process_name": "irq/31-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/31-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "302",
+                    "process_name": "scsi_eh_21",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_21"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "108",
+                    "process_name": "irq/36-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/36-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "307",
+                    "process_name": "scsi_tmf_23",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_23"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "11",
+                    "process_name": "rcu_tasks_rude_",
+                    "properties": [
+                        {
+                            "ExePath": "rcu_tasks_rude_"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "210",
+                    "process_name": "cryptd",
+                    "properties": [
+                        {
+                            "ExePath": "cryptd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "133",
+                    "process_name": "scsi_tmf_1",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_1"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "270",
+                    "process_name": "scsi_eh_15",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_15"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "113",
+                    "process_name": "irq/41-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/41-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "710",
+                    "process_name": "jbd2/sda2-8",
+                    "properties": [
+                        {
+                            "ExePath": "jbd2/sda2-8"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "31",
+                    "process_name": "kcompactd0",
+                    "properties": [
+                        {
+                            "ExePath": "kcompactd0"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "123",
+                    "process_name": "irq/51-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/51-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "322",
+                    "process_name": "scsi_eh_30",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_30"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "301",
+                    "process_name": "scsi_tmf_20",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_20"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "102",
+                    "process_name": "irq/30-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/30-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "98",
+                    "process_name": "irq/26-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/26-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "135",
+                    "process_name": "vfio-irqfd-clea",
+                    "properties": [
+                        {
+                            "ExePath": "vfio-irqfd-clea"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "287",
+                    "process_name": "scsi_tmf_17",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_tmf_17"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "88",
+                    "process_name": "watchdogd",
+                    "properties": [
+                        {
+                            "ExePath": "watchdogd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "97",
+                    "process_name": "irq/25-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/25-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "180",
+                    "process_name": "kworker/1:1H-kblockd",
+                    "properties": [
+                        {
+                            "ExePath": "kworker/1:1H-kblockd"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "282",
+                    "process_name": "card0-crtc7",
+                    "properties": [
+                        {
+                            "ExePath": "card0-crtc7"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "83",
+                    "process_name": "tpm_dev_wq",
+                    "properties": [
+                        {
+                            "ExePath": "tpm_dev_wq"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "313",
+                    "process_name": "scsi_eh_26",
+                    "properties": [
+                        {
+                            "ExePath": "scsi_eh_26"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "114",
+                    "process_name": "irq/42-pciehp",
+                    "properties": [
+                        {
+                            "ExePath": "irq/42-pciehp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "711",
+                    "process_name": "ext4-rsv-conver",
+                    "properties": [
+                        {
+                            "ExePath": "ext4-rsv-conver"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                },
+                {
+                    "pid": "148",
+                    "process_name": "kstrp",
+                    "properties": [
+                        {
+                            "ExePath": "kstrp"
+                        },
+                        {
+                            "ParentPid": "2"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "Linux System,LINUX_SYSTEM"
+                },
+                {
+                    "pgTechnologies": "Linux"
+                }
+            ]
+        },
+        {
+            "group_id": "0X216FDBEF8325B5C6",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XB0873E6409B3CC45",
+            "process_type": "14",
+            "group_name": "OneAgent log analytics",
+            "processes": [
+                {
+                    "pid": "17469",
+                    "process_name": "oneagentloganalytics",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -Dcom.compuware.apm.WatchDogPort=50001"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentloganalytics"
+                        },
+                        {
+                            "ParentPid": "17311"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0XECE82357AF59AF52",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X9AE4FFC64DA63C48",
+            "process_type": "0",
+            "group_name": "Short-lived processes",
+            "processes": [],
+            "properties": []
+        },
+        {
+            "group_id": "0X30DCB5EACE59580B",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XE2ECC8D9DF4D443C",
+            "process_type": "9",
+            "group_name": "MySQL",
+            "processes": [
+                {
+                    "pid": "148078",
+                    "process_name": "mysqld",
+                    "properties": [
+                        {
+                            "CmdLine": "--mysql-native-password=ON"
+                        },
+                        {
+                            "DockerContainerId": "f4cee16221ccc712faa9eb83067e285e5da46cf02efd87e18fc1cf678acc613f"
+                        },
+                        {
+                            "DockerMount": "/proc/"
+                        },
+                        {
+                            "ExePath": "/usr/sbin/mysqld"
+                        },
+                        {
+                            "ListeningPorts": "3306 33060"
+                        },
+                        {
+                            "ParentPid": "148058"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_3306;127.0.0.1_33060"
+                        },
+                        {
+                            "WorkDir": "/var/lib/mysql"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "MySQL,MYSQL,DOCKER"
+                },
+                {
+                    "pgTechnologies": "Docker,MySQL"
+                }
+            ]
+        },
+        {
+            "group_id": "0X3AD9FB79C914520C",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0XD2D2F3B5E6DF13A7",
+            "process_type": "14",
+            "group_name": "OneAgent system monitoring",
+            "processes": [
+                {
+                    "pid": "17311",
+                    "process_name": "oneagentwatchdog",
+                    "properties": [
+                        {
+                            "CmdLine": "-bg -config=/opt/dynatrace/oneagent/agent/conf/watchdog.conf"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentwatchdog"
+                        },
+                        {
+                            "ListeningPorts": "50000 50001 50002 50003 50004"
+                        },
+                        {
+                            "ParentPid": "1"
+                        },
+                        {
+                            "PortBindings": "127.0.0.1_50001;127.0.0.1_50000;127.0.0.1_50002;127.0.0.1_50003;127.0.0.1_50004"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                },
+                {
+                    "pid": "17320",
+                    "process_name": "oneagentos",
+                    "properties": [
+                        {
+                            "CmdLine": "-Dcom.compuware.apm.WatchDogTimeout=900 -watchdog.restart_file_location=/var/lib/dynatrace/oneagent/agent/watchdog/watchdog_restart_file -Dcom.compuware.apm.WatchDogPort=50000"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagentos"
+                        },
+                        {
+                            "ParentPid": "17311"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                },
+                {
+                    "pid": "17424",
+                    "process_name": "oneagenthelper",
+                    "properties": [
+                        {
+                            "CmdLine": "-p 1912 --trace-pid 2012"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagenthelper"
+                        },
+                        {
+                            "ParentPid": "17320"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                },
+                {
+                    "pid": "17388",
+                    "process_name": "oneagenteventstracer",
+                    "properties": [
+                        {
+                            "CmdLine": "--logdir /var/log/dynatrace/oneagent/os --cputimeoffset 0x108"
+                        },
+                        {
+                            "ExePath": "/opt/dynatrace/oneagent/agent/lib64/oneagenteventstracer"
+                        },
+                        {
+                            "ParentPid": "17320"
+                        },
+                        {
+                            "WorkDir": "/opt/dynatrace/oneagent/agent/lib64"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "APM NG,APMNG"
+                },
+                {
+                    "pgTechnologies": "Dynatrace"
+                }
+            ]
+        },
+        {
+            "group_id": "0X93F7297106342312",
+            "node_id": "0X0000000000000000",
+            "group_instance_id": "0X952FA0F6F6841048",
+            "process_type": "38",
+            "group_name": "nflow-generator",
+            "processes": [
+                {
+                    "pid": "19419",
+                    "process_name": "nflow-generator",
+                    "properties": [
+                        {
+                            "CmdLine": "-t 172.18.147.163 -p 2055"
+                        },
+                        {
+                            "DockerContainerId": "2aaddb8d37eb1c98475da838fdca1b243bd594b60fdae531948f175cc90c9469"
+                        },
+                        {
+                            "DockerMount": "/proc/"
+                        },
+                        {
+                            "ExePath": "/usr/local/bin/nflow-generator"
+                        },
+                        {
+                            "ParentPid": "19397"
+                        },
+                        {
+                            "WorkDir": "/"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "Technologies": "GO,GO,DOCKER"
+                },
+                {
+                    "pgTechnologies": "Docker,Go"
+                }
+            ]
+        }
+    ],
+    "containers": []
+}
