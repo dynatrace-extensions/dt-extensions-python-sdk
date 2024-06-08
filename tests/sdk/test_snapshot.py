@@ -41,10 +41,8 @@ class TestSnapshot(unittest.TestCase):
                     self.assertEqual(process.pid, 2245656)
                     self.assertEqual(len(process.properties.listening_ports), 1)
                     self.assertEqual(process.properties.listening_ports[0], 3128)
-                    self.assertEqual(process.properties.cmd_line,  "-f /etc/squid/squid.conf -NYC")
+                    self.assertEqual(process.properties.cmd_line, "-f /etc/squid/squid.conf -NYC")
                     self.assertEqual(len(process.properties.port_bindings), 1)
 
                     self.assertEqual(process.properties.port_bindings[0].ip, "127.0.0.1")
                     self.assertEqual(process.properties.port_bindings[0].port, 3128)
-
-

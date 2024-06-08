@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import typer
-from dtcli.server_api import upload as dt_cli_upload
+from dtcli.server_api import upload as dt_cli_upload  # type: ignore
 from dtcli.server_api import validate as dt_cli_validate
 from rich.console import Console
 
@@ -83,7 +83,9 @@ def build(
     extra_index_url: Optional[str] = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
-    find_links: Optional[str] = typer.Option( None, "--find-links", "-f", help="Extra index url to use when downloading dependencies" ),
+    find_links: Optional[str] = typer.Option(
+        None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
+    ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -169,7 +171,9 @@ def wheel(
     extra_index_url: Optional[str] = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
-    find_links: Optional[str] = typer.Option( None, "--find-links", "-f", help="Extra index url to use when downloading dependencies" ),
+    find_links: Optional[str] = typer.Option(
+        None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
+    ),
 ):
     """
     Builds the extension and it's dependencies into wheel files

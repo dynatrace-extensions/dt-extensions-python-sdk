@@ -651,7 +651,7 @@ class TestExtension(unittest.TestCase):
             "set1": ["metric1set1", "metric2set1"],
             "set2": ["metric1set2"],
             "set3": ["metric1set3", "metric2set3", "metric3set3"],
-            "default": ["metric1default", "metric2default"]
+            "default": ["metric1default", "metric2default"],
         }
 
         activation_config_dict = {
@@ -668,12 +668,19 @@ class TestExtension(unittest.TestCase):
 
         correct_enabled_feature_sets_names = ["set1", "set2", "default"]
 
-        correct_enabled_feature_sets = {"set1": ["metric1set1", "metric2set1"],
-                                        "set2": ["metric1set2"],
-                                        "default": ["metric1default", "metric2default"]}
+        correct_enabled_feature_sets = {
+            "set1": ["metric1set1", "metric2set1"],
+            "set2": ["metric1set2"],
+            "default": ["metric1default", "metric2default"],
+        }
 
-        correct_enabled_feature_sets_metrics = ["metric1set1", "metric2set1", "metric1set2",
-                                                "metric1default", "metric2default"]
+        correct_enabled_feature_sets_metrics = [
+            "metric1set1",
+            "metric2set1",
+            "metric1set2",
+            "metric1default",
+            "metric2default",
+        ]
 
         ext._feature_sets = feature_sets
         ext.activation_config = activation_config

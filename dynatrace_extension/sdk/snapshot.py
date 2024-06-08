@@ -56,15 +56,17 @@ class ProcessProperties:
         docker_mount = json_data.get("DockerMount", "unknown-docker-mount")
         docker_container_id = json_data.get("DockerContainerId", "unknown-docker-container-id")
         listening_internal_ports = json_data.get("ListeningInternalPorts", "unknown-listening-internal-ports")
-        return ProcessProperties(cmd_line,
-                                 exe_path,
-                                 parent_pid,
-                                 work_dir,
-                                 listening_ports,
-                                 port_bindings,
-                                 docker_mount,
-                                 docker_container_id,
-                                 listening_internal_ports)
+        return ProcessProperties(
+            cmd_line,
+            exe_path,
+            parent_pid,
+            work_dir,
+            listening_ports,
+            port_bindings,
+            docker_mount,
+            docker_container_id,
+            listening_internal_ports,
+        )
 
 
 @dataclass

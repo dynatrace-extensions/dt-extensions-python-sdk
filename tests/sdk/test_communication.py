@@ -2,7 +2,12 @@ import json
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
-from dynatrace_extension.sdk.communication import MAX_LOG_REQUEST_SIZE, MAX_METRIC_REQUEST_SIZE, HttpClient, divide_into_batches
+from dynatrace_extension.sdk.communication import (
+    MAX_LOG_REQUEST_SIZE,
+    MAX_METRIC_REQUEST_SIZE,
+    HttpClient,
+    divide_into_batches,
+)
 
 
 class TestCommunication(unittest.TestCase):

@@ -711,7 +711,7 @@ class Extension:
                 logger=api_logger,
                 local_ingest=args.local_ingest,
                 local_ingest_port=args.local_ingest_port,
-                print_metrics=print_metrics
+                print_metrics=print_metrics,
             )
             RuntimeProperties.set_default_log_level(args.loglevel)
         else:

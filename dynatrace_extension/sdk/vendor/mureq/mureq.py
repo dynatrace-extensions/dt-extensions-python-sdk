@@ -4,6 +4,7 @@ in-tree by Linux systems software and other lightweight applications.
 mureq is copyright 2021 by its contributors and is released under the
 0BSD ("zero-clause BSD") license.
 """
+
 import contextlib
 import io
 import os.path

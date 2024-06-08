@@ -326,7 +326,7 @@ class DebugClient(CommunicationClient):
         logger: logging.Logger,
         local_ingest: bool = False,
         local_ingest_port: int = 14499,
-        print_metrics: bool = True
+        print_metrics: bool = True,
     ):
         self.activation_config = {}
         if activation_config_path and Path(activation_config_path).exists():
@@ -430,7 +430,9 @@ class DebugClient(CommunicationClient):
         return 0
 
 
-def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_with: str | None = None) -> Generator[bytes, None, None]:
+def divide_into_batches(
+    items: Sequence[dict | str], max_size_bytes: int, join_with: str | None = None
+) -> Generator[bytes, None, None]:
     """
     Yield successive batches from a list, according to sizing limitations
 
@@ -444,7 +446,7 @@ def divide_into_batches(items: Sequence[dict | str], max_size_bytes: int, join_w
         return
 
     if join_with is not None:
-        joined = join_with.join(items)
+        joined = join_with.join(items)  # type: ignore
         encoded = f"{joined}".encode(errors="replace")
     else:
         encoded = json.dumps(items).encode(errors="replace")
