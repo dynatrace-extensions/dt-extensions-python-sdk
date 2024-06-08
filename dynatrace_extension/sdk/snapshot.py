@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
-import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+PREFIX_HOST = "HOST"
+PREFIX_PG = "PROCESS_GROUP"
+PREFIX_PGI = "PROCESS_GROUP_INSTANCE"
 
 
 @dataclass
@@ -92,9 +95,14 @@ class Entry:
 
     @staticmethod
     def from_json(json_data: dict) -> Entry:
-        group_id = json_data.get("group_id", "unknown-group-id")
-        node_id = json_data.get("node_id", "unknown-node-id")
-        group_instance_id = json_data.get("group_instance_id", "unknown-group-instance-id")
+        group_id = json_data.get("group_id", "0X0000000000000000")
+        group_id = f"{PREFIX_PG}-{group_id[-16:]}"
+
+        node_id = json_data.get("node_id", "0X0000000000000000")
+
+        group_instance_id = json_data.get("group_instance_id", "0X0000000000000000")
+        group_instance_id = f"{PREFIX_PGI}-{group_instance_id[-16:]}"
+
         process_type = int(json_data.get("process_type", "0"))
         group_name = json_data.get("group_name", "unknown-group-name")
         processes = [Process.from_json(p) for p in json_data.get("processes", [])]
@@ -128,7 +136,8 @@ class Snapshot:
         with open(snapshot_file) as f:
             snapshot_json = json.load(f)
 
-        host_id = snapshot_json.get("host_id", "unknown")
+        host_id = snapshot_json.get("host_id", "0X0000000000000000")
+        host_id = f"PREFIX_HOST-{host_id[-16:]}"
         entries = [Entry.from_json(e) for e in snapshot_json.get("entries", [])]
         return Snapshot(host_id, entries)
 
