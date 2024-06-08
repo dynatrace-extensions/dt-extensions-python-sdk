@@ -26,7 +26,7 @@ class TestCommunication(unittest.TestCase):
 
         # This is 14_660_000 bytes
         events = []
-        for i in range(5000):
+        for _ in range(5000):
             attributes = {}
             for j in range(150):
                 attributes[f"attribute{j}"] = j
@@ -42,7 +42,7 @@ class TestCommunication(unittest.TestCase):
 
     def test_small_log_chunk(self):
         events = []
-        for i in range(10):
+        for _ in range(10):
             attributes = {}
             for j in range(10):
                 attributes[f"attribute{j}"] = j
@@ -78,7 +78,7 @@ class TestCommunication(unittest.TestCase):
     def test_large_log_chunk_valid_json(self):
 
         events = []
-        for i in range(5000):
+        for _ in range(5000):
             attributes = {}
             for j in range(150):
                 attributes[f"attribute{j}"] = j
