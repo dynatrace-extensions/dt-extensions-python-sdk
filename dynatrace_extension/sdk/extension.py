@@ -342,6 +342,10 @@ class Extension:
         if isinstance(interval, int):
             interval = timedelta(seconds=interval)
 
+        if interval.total_seconds() < 1:
+            msg = f"Interval must be at least 1 second, got {interval.total_seconds()} seconds"
+            raise ValueError(msg)
+
         callback = WrappedCallback(interval, callback, api_logger, args, activation_type=activation_type)
         if self._is_fastcheck:
             self._scheduled_callbacks_before_run.append(callback)
