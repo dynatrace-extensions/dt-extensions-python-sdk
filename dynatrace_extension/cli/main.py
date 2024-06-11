@@ -20,7 +20,9 @@ console = Console()
 
 # if we are not python 3.10.X, exit with an error
 if sys.version_info < (3, 10) or sys.version_info >= (3, 11):
-    console.print(f"Python 3.10.X is required to run build extensions, you are using {sys.version_info}", style="bold red")
+    console.print(
+        f"Python 3.10.X is required to run build extensions, you are using {sys.version_info}", style="bold red"
+    )
     sys.exit(1)
 
 CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
