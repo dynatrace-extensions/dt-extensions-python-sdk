@@ -51,7 +51,8 @@ class WrappedCallback:
 
     def __call__(self):
         self.logger.debug(f"Running scheduled callback {self}")
-        self.start_timestamp = self.get_current_time_with_cluster_diff()
+        if self.executions_total == 0:
+            self.start_timestamp = self.get_current_time_with_cluster_diff()
         self.running = True
         self.executions_total += 1
         self.executions_per_interval += 1
