@@ -94,10 +94,10 @@ class TestExtension(unittest.TestCase):
             nonlocal callback_call_count
             callback_call_count += 1
 
-        extension.schedule(callback, timedelta(seconds=0.01))
-        extension.schedule(callback, timedelta(seconds=0.02))
+        extension.schedule(callback, timedelta(seconds=1))
+        extension.schedule(callback, timedelta(seconds=1))
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
 
         self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
@@ -132,7 +132,7 @@ class TestExtension(unittest.TestCase):
 
             def initialize(self):
                 self.callback_call_count = 0
-                self.schedule(self.callback, timedelta(seconds=0.01))
+                self.schedule(self.callback, timedelta(seconds=1))
 
         extension = MyExt()
         extension.logger = MagicMock()
@@ -141,7 +141,7 @@ class TestExtension(unittest.TestCase):
         extension._client = MagicMock()
 
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 2)
         self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
@@ -160,7 +160,7 @@ class TestExtension(unittest.TestCase):
                 self.callback_that_schedules_another_callback_call_count += 1
                 if not self.another_callback_scheduled:
                     self.another_callback_scheduled = True
-                    self.schedule(self.another_callback, timedelta(seconds=0.01))
+                    self.schedule(self.another_callback, timedelta(seconds=1))
 
             def another_callback(self):
                 self.another_callback_call_count += 1
@@ -171,17 +171,17 @@ class TestExtension(unittest.TestCase):
         extension._is_fastcheck = False
         extension._client = MagicMock()
 
-        extension.schedule(extension.callback_that_schedules_another_callback, timedelta(seconds=0.01))
+        extension.schedule(extension.callback_that_schedules_another_callback, timedelta(seconds=1))
         self.assertEqual(len(extension._scheduled_callbacks), 2)
 
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 3)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
         self.assertEqual(extension.callback_that_schedules_another_callback_call_count, 1)
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 3)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 2)
@@ -190,7 +190,7 @@ class TestExtension(unittest.TestCase):
         self.assertGreaterEqual(extension.callback_that_schedules_another_callback_call_count, 1)
 
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
         assert len(extension._scheduled_callbacks) == 3
 
     def test_callback_scheduled_exception(self):
@@ -215,11 +215,11 @@ class TestExtension(unittest.TestCase):
 
         def run_scheduler():
             nonlocal extension, callback, callback_wait, callback_call_count
-            extension.schedule(callback, timedelta(seconds=0.01))
+            extension.schedule(callback, timedelta(seconds=1))
             extension._scheduler.run(blocking=False)
-            time.sleep(0.1)
+            time.sleep(1)
             extension._scheduler.run(blocking=False)
-            time.sleep(0.1)
+            time.sleep(1)
             if callback_call_count < 2:
                 callback_wait.notify()
 
@@ -235,7 +235,7 @@ class TestExtension(unittest.TestCase):
                 super().__init__()
                 self.called_callback = False
 
-            @schedule_method(timedelta(seconds=0.01))
+            @schedule_method(timedelta(seconds=1))
             def callback(self):
                 self.called_callback = True
 
@@ -250,14 +250,14 @@ class TestExtension(unittest.TestCase):
     def test_schedule_function_decorator(self):
         callback_done = False
 
-        @schedule_function(timedelta(seconds=0.01))
+        @schedule_function(timedelta(seconds=1))
         def callback():
             nonlocal callback_done
             callback_done = True
 
         extension = _HelperExtension()
         extension._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 1)
         self.assertTrue(callback_done)
@@ -277,12 +277,12 @@ class TestExtension(unittest.TestCase):
                 msg = "test exception"
                 raise RuntimeError(msg)
 
-        extension.schedule(callback, timedelta(seconds=0.01))
+        extension.schedule(callback, timedelta(seconds=1))
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
         self.assertEqual(extension._build_current_status().status, StatusValue.GENERIC_ERROR)
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
         self.assertEqual(extension._build_current_status().status, StatusValue.OK)
 
     def test_register_fastcheck(self):
@@ -486,16 +486,16 @@ class TestExtension(unittest.TestCase):
         extension._client = MagicMock()
 
         def callback():
-            time.sleep(0.25)
+            time.sleep(1.1)
             return 1
 
-        extension.schedule(callback, timedelta(seconds=0.2))
+        extension.schedule(callback, timedelta(seconds=1))
         extension._scheduler.run(blocking=False)
-        time.sleep(0.3)
+        time.sleep(2)
         sfm = extension._prepare_sfm_metrics()
         expected_values = {
             "dsfm:datasource.python.threads": 0,
-            "dsfm:datasource.python.execution.time": 0.3,
+            "dsfm:datasource.python.execution.time": 1.1,
             "dsfm:datasource.python.execution.total.count": 1,
             "dsfm:datasource.python.execution.count": 1,
             "dsfm:datasource.python.execution.ok.count": 0,
@@ -515,9 +515,9 @@ class TestExtension(unittest.TestCase):
             msg = "Ups ..."
             raise Exception(msg)
 
-        extension.schedule(callback, timedelta(seconds=0.2))
+        extension.schedule(callback, timedelta(seconds=1))
         extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
+        time.sleep(1)
         sfm = extension._prepare_sfm_metrics()
         expected_values = {
             "dsfm:datasource.python.threads": 0,

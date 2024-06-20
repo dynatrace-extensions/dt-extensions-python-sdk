@@ -1,4 +1,4 @@
-Extension
+ pExtension
 =========
 
 .. autoclass:: dynatrace_extension.Extension

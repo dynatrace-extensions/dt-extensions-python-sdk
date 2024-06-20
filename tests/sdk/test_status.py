@@ -85,11 +85,11 @@ class TestStatus(unittest.TestCase):
         extension._client = MagicMock()
 
         def callback():
-            time.sleep(0.1)
+            time.sleep(1)
 
-        extension.schedule(callback, timedelta(seconds=0.01))
+        extension.schedule(callback, timedelta(seconds=1))
         extension._scheduler.run(blocking=False)
-        time.sleep(0.2)
+        time.sleep(2)
 
         self.assertTrue(extension._scheduled_callbacks[1].status.is_error())
         self.assertIn("longer than the interval", extension._scheduled_callbacks[1].status.message)
