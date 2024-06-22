@@ -789,7 +789,9 @@ class Extension:
 
     def _callback_iteration(self, callback: WrappedCallback):
         self._callbacks_executor.submit(self._run_callback, callback)
-        self._scheduler.enter(callback.interval.total_seconds(), 1, self._callback_iteration, (callback,))
+        callback.iterations += 1
+        next_timestamp = callback.get_next_execution_timestamp()
+        self._scheduler.enterabs(next_timestamp, 1, self._callback_iteration, (callback,))
 
     def _start_extension_loop(self):
         api_logger.debug(f"Starting main loop for monitoring configuration: '{self.monitoring_config_name}'")
