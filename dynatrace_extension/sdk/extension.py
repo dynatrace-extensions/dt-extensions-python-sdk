@@ -25,7 +25,7 @@ from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 from .snapshot import Snapshot
 
-HEARTBEAT_INTERVAL = timedelta(seconds=30)
+HEARTBEAT_INTERVAL = timedelta(seconds=60)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
 SFM_METRIC_SENDING_INTERVAL = timedelta(seconds=60)
 TIME_DIFF_INTERVAL = timedelta(seconds=60)
@@ -953,7 +953,6 @@ class Extension:
                 return overall_status
 
         for callback in self._scheduled_callbacks:
-            overall_status.timestamp = int(callback.get_adjusted_metric_timestamp().timestamp() * 1000)
             if callback.status.is_error():
                 overall_status.status = callback.status.status
                 messages.append(f"{callback}: {callback.status.message}")
