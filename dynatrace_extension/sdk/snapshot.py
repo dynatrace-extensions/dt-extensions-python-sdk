@@ -17,8 +17,8 @@ class EntryProperties:
 
     @staticmethod
     def from_json(json_data: dict) -> EntryProperties:
-        technologies = json_data.get("Technologies", "unknown-technologies").split(",")
-        pg_technologies = json_data.get("pgTechnologies", "unknown-pg-technologies").split(",")
+        technologies = json_data.get("Technologies", "").split(",")
+        pg_technologies = json_data.get("pgTechnologies", "").split(",")
         return EntryProperties(technologies, pg_technologies)
 
 
@@ -47,15 +47,15 @@ class ProcessProperties:
 
     @staticmethod
     def from_json(json_data: dict) -> ProcessProperties:
-        cmd_line = json_data.get("CmdLine", "unknown-cmd-line")
-        exe_path = json_data.get("ExePath", "unknown-exe-path")
-        parent_pid = int(json_data.get("ParentPid", "-1"))
-        work_dir = json_data.get("WorkDir", "unknown-work-dir")
+        cmd_line = json_data.get("CmdLine")
+        exe_path = json_data.get("ExePath")
+        parent_pid = int(json_data.get("ParentPid", -1))
+        work_dir = json_data.get("WorkDir")
         listening_ports = [int(p) for p in json_data.get("ListeningPorts", "").split(" ") if p != ""]
         port_bindings = [PortBinding.from_string(p) for p in json_data.get("PortBindings", "").split(";") if p != ""]
-        docker_mount = json_data.get("DockerMount", "unknown-docker-mount")
-        docker_container_id = json_data.get("DockerContainerId", "unknown-docker-container-id")
-        listening_internal_ports = json_data.get("ListeningInternalPorts", "unknown-listening-internal-ports")
+        docker_mount = json_data.get("DockerMount")
+        docker_container_id = json_data.get("DockerContainerId")
+        listening_internal_ports = json_data.get("ListeningInternalPorts")
         return ProcessProperties(
             cmd_line,
             exe_path,
@@ -145,11 +145,11 @@ class Snapshot:
         return Snapshot(host_id, entries)
 
     # Returns list of Process groups matching a technology. Use to simulate activation
-    def get_process_groups_by_technology(self, technology: str) -> list[Process]:
+    def get_process_groups_by_technology(self, technology: str) -> list[Entry]:
         pgs = []
         for entry in self.entries:
             if technology in entry.properties.technologies:
-                pgs.extend(entry.processes)
+                pgs.append(entry)
 
         return pgs
 
