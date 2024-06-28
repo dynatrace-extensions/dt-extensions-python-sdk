@@ -145,11 +145,11 @@ class Snapshot:
         return Snapshot(host_id, entries)
 
     # Returns list of Process groups matching a technology. Use to simulate activation
-    def get_process_groups_by_technology(self, technology: str) -> list[Process]:
+    def get_process_groups_by_technology(self, technology: str) -> list[Entry]:
         pgs = []
         for entry in self.entries:
             if technology in entry.properties.technologies:
-                pgs.extend(entry.processes)
+                pgs.append(entry)
 
         return pgs
 
