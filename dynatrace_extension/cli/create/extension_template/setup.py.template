@@ -1,27 +1,112 @@
 from pathlib import Path
 from setuptools import setup, find_packages
+import json
+import yaml
 
 
-def find_version() -> str:
-    version = "0.0.1"
-    extension_yaml_path = Path(__file__).parent / "extension" / "extension.yaml"
-    try:
-        with open(extension_yaml_path, encoding="utf-8") as f:
-            for line in f:
-                if line.startswith("version"):
-                    version = line.split(" ")[-1].strip("\"")
-                    break
-    except Exception:
-        pass
-    return version
+class ExtensionMetadata():
+    '''
+    Collects and makes available all extension metadata available to populate
+    the setup() command when building the extension.
+    '''
 
+    '''Path to the activationSchema.json within the extension project.'''
+    PATH_ACTIVATIONSCHEMA_JSON = Path(__file__).parent / "extension" / "activationSchema.json"
+
+    '''Path to the extension.yaml within the extension project.'''
+    PATH_EXTENSION_YAML = Path(__file__).parent / "extension" / "extension.yaml"
+
+    def __init__(self):
+        '''
+        Collect the metadata associated with the extension by reading in and
+        parsing the activationSchema.json and extension.yaml files.
+        '''
+
+        with open(self.PATH_ACTIVATIONSCHEMA_JSON, mode='r', encoding="utf-8") as fActivationSchema:
+            self._activation = json.load(fActivationSchema)
+
+        with open(self.PATH_EXTENSION_YAML, mode='r', encoding="utf-8") as fExtensionYaml:
+            self._extension = yaml.safe_load(fExtensionYaml)
+
+    @property
+    def author(self) -> str:
+        '''
+        Returns the author as configured by the 'author.name' setting within
+        the extension.yaml.
+
+        Returns:
+            the name of the extension author. if none is configured, the
+            value 'dynatrace' is returned.
+        '''
+
+        return self._extension.get('author', {}).get('name', 'dynatrace')
+
+    @property
+    def display_name(self) -> str:
+        '''
+        Returns the display name as configured by the 'displayName'
+        value within the activationSchema.json file.
+
+        Returns:
+            the display name of the extension. if none is configured, the
+            value '%extension_name%' is returned.
+        '''
+
+        return self._activation.get('displayName', '%extension_name%')
+
+    @property
+    def long_description(self) -> str:
+        '''
+        Returns the long description as configured by the 'description'
+        value within the activationSchema.json file.
+
+        Returns:
+            the description of the extension. if none is configured, the
+            value '%extension_name%' is returned.
+        '''
+
+        return self._activation.get('description', '%extension_name%')
+
+    @property
+    def python_min_version(self) -> str:
+        '''
+        Returns the minimum python version as configured by the
+        'python.runtime.version.min' setting within the extension.yaml.
+
+        Returns:
+            the minimum python version supported by the extension. if none is
+            configured, '3.10' is returned.
+        '''
+
+        return self._extension.get('python', {}).get('runtime', {}).get('version', {}).get('min', '3.10')
+
+    @property
+    def version(self) -> str:
+        '''
+        Returns the extension version as configured by the 'version' setting
+        within the extension.yaml.
+
+        Returns:
+            the current version of this extension. if none is configured, the
+            value '0.0.1' is returned.
+        '''
+
+        return self._extension.get('version', '0.0.1')
+
+#
+# Setup
+#
+
+# Read in available extension metadata from the project file(s).
+ext_meta = ExtensionMetadata()
 
 setup(name="%extension_name%",
-      version=find_version(),
-      description="%Extension_Name% python EF2 extension",
-      author="Dynatrace",
+      version=ext_meta.version,
+      description=ext_meta.display_name,
+      long_description=ext_meta.long_description,
+      author=ext_meta.author,
       packages=find_packages(),
-      python_requires=">=3.10",
+      python_requires=f">={ext_meta.python_min_version}",
       include_package_data=True,
       install_requires=["dt-extensions-sdk"],
       extras_require={"dev": ["dt-extensions-sdk[cli]"]},
