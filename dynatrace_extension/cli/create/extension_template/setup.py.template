@@ -16,10 +16,10 @@ class ExtensionMetadata():
         Initialize our internal data structures accordingly.
         '''
 
-        self._activation = self.__read_activation()
-        self._extension = self.__read_extension()
+        self._activation = self._read_activation()
+        self._extension = self._read_extension()
 
-    def __read_activation(self):
+    def _read_activation(self):
         '''
         Load the metadata for this extension from the activationSchema.json
         file. If a failure occurs (i.e. no file), initialize with an empty
@@ -31,12 +31,12 @@ class ExtensionMetadata():
 
         try:
             with open(Path(__file__).parent / "extension" / "activationSchema.json",
-                      mode='r', encoding="utf-8") as fActivationSchema:
-                return json.load(fActivationSchema)
+                      mode='r', encoding="utf-8") as f_activation_schema:
+                return json.load(f_activation_schema)
         except Exception:
             return {}
 
-    def __read_extension(self):
+    def _read_extension(self):
         '''
         Load the metadata for this extension from the extension.yaml file
         If a failure occurs (i.e. no file), initialize with an empty dict
@@ -54,13 +54,13 @@ class ExtensionMetadata():
             # the config dict.
 
             with open(Path(__file__).parent / "extension" / "extension.yaml",
-                        mode='r', encoding="utf-8") as fExtension:
+                        mode='r', encoding="utf-8") as f_extension_yaml:
                 
                 # We are using key to keep track of where we are in the
                 # yaml document.
 
                 key = ''
-                for line in fExtension:
+                for line in f_extension_yaml:
 
                     # skip blank lines...
 
