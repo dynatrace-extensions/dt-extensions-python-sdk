@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 from setuptools import setup, find_packages
 
+EXTENSION_NAME = '%extension_name%'
 
 class ExtensionMetadata():
     '''
@@ -133,10 +134,10 @@ class ExtensionMetadata():
 
         Returns:
             the display name of the extension. if none is configured, the
-            value '%extension_name%' is returned.
+            value of EXTENSION_NAME is returned.
         '''
 
-        return self._activation.get('displayName', '%extension_name%')
+        return self._activation.get('displayName', EXTENSION_NAME)
 
     @property
     def long_description(self) -> str:
@@ -146,10 +147,10 @@ class ExtensionMetadata():
 
         Returns:
             the description of the extension. if none is configured, the
-            value '%extension_name%' is returned.
+            value of EXTENSION_NAME is returned.
         '''
 
-        return self._activation.get('description', '%extension_name%')
+        return self._activation.get('description', EXTENSION_NAME)
 
     @property
     def python_min_version(self) -> str:
@@ -184,7 +185,7 @@ class ExtensionMetadata():
 # Read in available extension metadata from the project file(s).
 ext_meta = ExtensionMetadata()
 
-setup(name="ftb_fi1770",
+setup(EXTENSION_NAME,
       version=ext_meta.version,
       description=ext_meta.display_name,
       long_description=ext_meta.long_description,
