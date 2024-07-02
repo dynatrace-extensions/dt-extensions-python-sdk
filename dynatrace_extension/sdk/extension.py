@@ -169,7 +169,7 @@ class Extension:
 
         # Useful metadata, populated once the extension is started
         self.extension_name = name
-        self.extension_version = self.get_version()
+        self.extension_version = ""
         self.monitoring_config_name = ""
         self._task_id = "development_task_id"
         self._monitoring_config_id = "development_config_id"
@@ -239,8 +239,12 @@ class Extension:
                 params = params + args
             self.schedule(function, interval, params, activation_type)
 
-        api_logger.info("-----------------------------------------------------")
-        api_logger.info(f"Starting {self.__class__} {self.extension_name}, version: {self.get_version()}")
+        starting_message = f"Starting {self}"
+        api_logger.info("-" * len(starting_message))
+        api_logger.info(starting_message)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.extension_name}, version={self.extension_version})"
 
     @property
     def is_helper(self) -> bool:
