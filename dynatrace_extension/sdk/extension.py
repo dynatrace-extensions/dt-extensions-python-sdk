@@ -156,19 +156,20 @@ class Extension:
             Extension._instance = super(__class__, cls).__new__(cls)
         return Extension._instance
 
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
         # do not initialize already created singleton
         if hasattr(self, "logger"):
             return
 
         self.logger = extension_logger
+        self.logger.name = name
 
         self.extension_config: str = ""
         self._feature_sets: dict[str, list[str]] = {}
 
         # Useful metadata, populated once the extension is started
-        self.extension_name = ""  # Needs to be set by the developer if they so decide
-        self.extension_version = ""
+        self.extension_name = name
+        self.extension_version = self.get_version()
         self.monitoring_config_name = ""
         self._task_id = "development_task_id"
         self._monitoring_config_id = "development_config_id"

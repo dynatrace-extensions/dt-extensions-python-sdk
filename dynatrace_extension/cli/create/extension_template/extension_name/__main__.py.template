@@ -3,12 +3,6 @@ from dynatrace_extension import Extension, Status, StatusValue
 
 class ExtensionImpl(Extension):
 
-    def initialize(self):
-        self.extension_name = "%extension_name%"
-        self.extension_version = self.activation_config.version
-        self.logger.name = self.extension_name
-        self.logger.info(f"Initializing {self.extension_name} {self.extension_version}")
-
     def query(self):
         """
         The query method is automatically scheduled to run every minute
@@ -38,7 +32,7 @@ class ExtensionImpl(Extension):
 
 
 def main():
-    ExtensionImpl().run()
+    ExtensionImpl(name="%extension_name%").run()
 
 
 
