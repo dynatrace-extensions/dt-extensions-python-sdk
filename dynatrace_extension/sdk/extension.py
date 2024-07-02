@@ -156,7 +156,7 @@ class Extension:
             Extension._instance = super(__class__, cls).__new__(cls)
         return Extension._instance
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str = "") -> None:
         # do not initialize already created singleton
         if hasattr(self, "logger"):
             return
