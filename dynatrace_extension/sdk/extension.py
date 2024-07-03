@@ -156,18 +156,19 @@ class Extension:
             Extension._instance = super(__class__, cls).__new__(cls)
         return Extension._instance
 
-    def __init__(self) -> None:
+    def __init__(self, name: str = "") -> None:
         # do not initialize already created singleton
         if hasattr(self, "logger"):
             return
 
         self.logger = extension_logger
+        self.logger.name = name
 
         self.extension_config: str = ""
         self._feature_sets: dict[str, list[str]] = {}
 
         # Useful metadata, populated once the extension is started
-        self.extension_name = ""  # Needs to be set by the developer if they so decide
+        self.extension_name = name
         self.extension_version = ""
         self.monitoring_config_name = ""
         self._task_id = "development_task_id"
@@ -238,8 +239,14 @@ class Extension:
                 params = params + args
             self.schedule(function, interval, params, activation_type)
 
-        api_logger.info("-----------------------------------------------------")
-        api_logger.info(f"Starting {self.__class__} {self.extension_name}, version: {self.get_version()}")
+        starting_message = f"Starting {self}"
+        api_logger.info("-" * len(starting_message))
+        api_logger.info(starting_message)
+        api_logger.info("-" * len(starting_message))
+
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.extension_name}, version={self.extension_version})"
 
     @property
     def is_helper(self) -> bool:

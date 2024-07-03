@@ -79,12 +79,12 @@ dependencies = [
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:dynatrace_extension tests}"
 style = [
-    "ruff {args:.}",
+    "ruff check {args:.}",
     "black --check --diff {args:.}",
 ]
 fmt = [
     "black {args:.}",
-    "ruff --fix {args:.}",
+    "ruff check --fix {args:.}",
     "style",
 ]
 all = [
