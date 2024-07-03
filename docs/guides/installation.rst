@@ -9,7 +9,7 @@ Requirements
 ``dt-extensions-sdk`` requires only the following dependencies to be
 present in the environment.
 
-- Python >= 3.10
+- Python 3.10
 
 Installing from PyPI
 ^^^^^^^^^^^^^^^^^^^^
