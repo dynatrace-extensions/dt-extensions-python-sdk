@@ -151,7 +151,7 @@ class Extension:
     _instance: ClassVar = None
     schedule_decorators: ClassVar = []
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):  # noqa: ARG003
         if Extension._instance is None:
             Extension._instance = super(__class__, cls).__new__(cls)
         return Extension._instance
