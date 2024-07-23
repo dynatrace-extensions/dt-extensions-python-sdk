@@ -19,7 +19,7 @@ The documentation can be found on [github pages](https://dynatrace-extensions.gi
 
 ### Requirements:
 
-* Python 3.10+
+* Python 3.10
 
 ### Install the SDK
 
