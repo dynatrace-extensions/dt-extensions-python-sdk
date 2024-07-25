@@ -211,10 +211,10 @@ class Extension:
 
         # Timestamps for scheduling of internal callbacks
         self._next_internal_callbacks_timestamps: Dict[str, datetime] = {
-            'timediff': datetime.now() + TIME_DIFF_INTERVAL,
-            'heartbeat': datetime.now() + HEARTBEAT_INTERVAL,
-            'metrics': datetime.now() + METRIC_SENDING_INTERVAL,
-            'sfm_metrics': datetime.now() + SFM_METRIC_SENDING_INTERVAL
+            "timediff": datetime.now() + TIME_DIFF_INTERVAL,
+            "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
+            "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
+            "sfm_metrics": datetime.now() + SFM_METRIC_SENDING_INTERVAL,
         }
 
         # Executors for the callbacks and internal methods
@@ -821,22 +821,22 @@ class Extension:
 
     def _timediff_iteration(self):
         self._internal_executor.submit(self._update_cluster_time_diff)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp('timediff', TIME_DIFF_INTERVAL)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp("timediff", TIME_DIFF_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 1, self._timediff_iteration)
 
     def _heartbeat_iteration(self):
         self._internal_executor.submit(self._heartbeat)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp('heartbeat', HEARTBEAT_INTERVAL)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp("heartbeat", HEARTBEAT_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 2, self._heartbeat_iteration)
 
     def _metrics_iteration(self):
         self._internal_executor.submit(self._send_metrics)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp('metrics', METRIC_SENDING_INTERVAL)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp("metrics", METRIC_SENDING_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 1, self._metrics_iteration)
 
     def _sfm_metrics_iteration(self):
         self._internal_executor.submit(self._send_sfm_metrics)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp('sfm_metrics', SFM_METRIC_SENDING_INTERVAL)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp("sfm_metrics", SFM_METRIC_SENDING_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 1, self._sfm_metrics_iteration)
 
     def _send_metrics(self):
