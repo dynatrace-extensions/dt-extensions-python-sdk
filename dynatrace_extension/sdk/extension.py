@@ -209,6 +209,14 @@ class Extension:
 
         self._scheduler = sched.scheduler(time.time, time.sleep)
 
+        # Timestamps for scheduling of internal callbacks
+        self._next_internal_callbacks_timestamps: Dict[str, datetime] = {
+            'timediff': datetime.now() + TIME_DIFF_INTERVAL,
+            'heartbeat': datetime.now() + HEARTBEAT_INTERVAL,
+            'metrics': datetime.now() + METRIC_SENDING_INTERVAL,
+            'sfm_metrics': datetime.now() + SFM_METRIC_SENDING_INTERVAL
+        }
+
         # Executors for the callbacks and internal methods
         self._callbacks_executor = ThreadPoolExecutor(max_workers=CALLBACKS_THREAD_POOL_SIZE)
         self._internal_executor = ThreadPoolExecutor(max_workers=INTERNAL_THREAD_POOL_SIZE)
@@ -813,19 +821,23 @@ class Extension:
 
     def _timediff_iteration(self):
         self._internal_executor.submit(self._update_cluster_time_diff)
-        self._scheduler.enter(TIME_DIFF_INTERVAL.total_seconds(), 1, self._timediff_iteration)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp('timediff', TIME_DIFF_INTERVAL)
+        self._scheduler.enterabs(next_timestamp, 1, self._timediff_iteration)
 
     def _heartbeat_iteration(self):
         self._internal_executor.submit(self._heartbeat)
-        self._scheduler.enter(HEARTBEAT_INTERVAL.total_seconds(), 1, self._heartbeat_iteration)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp('heartbeat', HEARTBEAT_INTERVAL)
+        self._scheduler.enterabs(next_timestamp, 2, self._heartbeat_iteration)
 
     def _metrics_iteration(self):
         self._internal_executor.submit(self._send_metrics)
-        self._scheduler.enter(METRIC_SENDING_INTERVAL.total_seconds(), 1, self._metrics_iteration)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp('metrics', METRIC_SENDING_INTERVAL)
+        self._scheduler.enterabs(next_timestamp, 1, self._metrics_iteration)
 
     def _sfm_metrics_iteration(self):
         self._internal_executor.submit(self._send_sfm_metrics)
-        self._scheduler.enter(SFM_METRIC_SENDING_INTERVAL.total_seconds(), 1, self._sfm_metrics_iteration)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp('sfm_metrics', SFM_METRIC_SENDING_INTERVAL)
+        self._scheduler.enterabs(next_timestamp, 1, self._sfm_metrics_iteration)
 
     def _send_metrics(self):
         with self._metrics_lock:
@@ -1029,6 +1041,11 @@ class Extension:
 
     def _send_dt_event(self, event: dict[str, str | int | dict[str, str]]):
         self._client.send_dt_event(event)
+
+    def _get_and_set_next_internal_callback_timestamp(self, callback_name: str, interval: timedelta):
+        next_timestamp = self._next_internal_callbacks_timestamps[callback_name]
+        self._next_internal_callbacks_timestamps[callback_name] += interval
+        return next_timestamp.timestamp()
 
     def get_version(self) -> str:
         """Return the extension version."""
