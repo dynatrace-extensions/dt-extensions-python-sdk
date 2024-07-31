@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>dynatrace_extension.sdk.extension &mdash; dt-sdk 1.0.0 documentation</title>
+    
+        <link rel="shortcut icon" href="../../../_static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dist/theme.css?v=ea6a6c20" />
+            <link rel="index" title="Index" href="../../../genindex.html" />
+            <link rel="search" title="Search" href="../../../search.html" />
+            <link rel="top" title="dt-sdk 1.0.0 documentation" href="#" />
+            <link rel="up" title="Module code" href="../../index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../../../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="/"
+                        title="dt-sdk"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../../../_static/dt-sdk-logo.png" width="45" height="59" alt="dt-sdk"
+                            class="logo-img"
+                        />
+                        dt-sdk
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../../../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/extension_structure.html">Extension Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/building.html">Building Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/migration.html">Migrating EF1 Extensions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">All Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/create.html">Create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/upload.html">Upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/help.html">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/assemble.html">Assemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/gencerts.html">Generate Certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/sign.html">Sign</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/wheel.html">Wheel</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/extension.html"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/events/index.html">Events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/events/event_severity.html">Event Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/events/event_type.html">Event Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/metrics/index.html">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics/metric.html">Metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics/metric_type.html">Metric Type</a></li>
+</ul>
+</li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../../../index.html">Docs</a></li>
+            <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+        <li class="breadcrumb-item active" aria-current="page">dynatrace_extension.sdk.extension</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/_modules/dynatrace_extension/sdk/extension" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <h1>Source code for dynatrace_extension.sdk.extension</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: 2023-present Dynatrace LLC</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sched</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">RLock</span><span class="p">,</span> <span class="n">active_count</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">.activation</span> <span class="kn">import</span> <span class="n">ActivationConfig</span><span class="p">,</span> <span class="n">ActivationType</span>
+<span class="kn">from</span> <span class="nn">.callback</span> <span class="kn">import</span> <span class="n">WrappedCallback</span>
+<span class="kn">from</span> <span class="nn">.communication</span> <span class="kn">import</span> <span class="n">CommunicationClient</span><span class="p">,</span> <span class="n">DebugClient</span><span class="p">,</span> <span class="n">HttpClient</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusValue</span>
+<span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">Severity</span>
+<span class="kn">from</span> <span class="nn">.metric</span> <span class="kn">import</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">MetricType</span><span class="p">,</span> <span class="n">SfmMetric</span><span class="p">,</span> <span class="n">SummaryStat</span>
+<span class="kn">from</span> <span class="nn">.runtime</span> <span class="kn">import</span> <span class="n">RuntimeProperties</span>
+<span class="kn">from</span> <span class="nn">.snapshot</span> <span class="kn">import</span> <span class="n">Snapshot</span>
+
+<span class="n">HEARTBEAT_INTERVAL</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">METRIC_SENDING_INTERVAL</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">SFM_METRIC_SENDING_INTERVAL</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">TIME_DIFF_INTERVAL</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">CALLBACKS_THREAD_POOL_SIZE</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">INTERNAL_THREAD_POOL_SIZE</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">RFC_3339_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%SZ&quot;</span>
+<span class="n">DATASOURCE_TYPE</span> <span class="o">=</span> <span class="s2">&quot;python&quot;</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">raiseExceptions</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> [</span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(name)s</span><span class="s2"> (</span><span class="si">%(threadName)s</span><span class="s2">): </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">error_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">error_handler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">record</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">levelno</span> <span class="o">&gt;=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="n">error_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">std_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="n">std_handler</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">record</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">levelno</span> <span class="o">&lt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="n">std_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">extension_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">extension_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">extension_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">error_handler</span><span class="p">)</span>
+<span class="n">extension_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">std_handler</span><span class="p">)</span>
+
+<span class="n">api_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;api&quot;</span><span class="p">)</span>
+<span class="n">api_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">api_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">error_handler</span><span class="p">)</span>
+<span class="n">api_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">std_handler</span><span class="p">)</span>
+
+<span class="n">DT_EVENT_SCHEMA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;eventType&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;startTime&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s2">&quot;entitySelector&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">AggregationMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="s2">&quot;include_all&quot;</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;include_none&quot;</span>
+    <span class="n">LIST</span> <span class="o">=</span> <span class="s2">&quot;include_list&quot;</span>
+
+
+<div class="viewcode-block" id="DtEventType">
+<a class="viewcode-back" href="../../../api/events/event_type.html#dynatrace_extension.DtEventType">[docs]</a>
+<span class="k">class</span> <span class="nc">DtEventType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Event type.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Official API v2 documentation:</span>
+
+<span class="sd">        https://docs.dynatrace.com/docs/dynatrace-api/environment-api/events-v2/post-event</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">AVAILABILITY_EVENT</span> <span class="o">=</span> <span class="s2">&quot;AVAILABILITY_EVENT&quot;</span>
+    <span class="n">CUSTOM_INFO</span> <span class="o">=</span> <span class="s2">&quot;CUSTOM_INFO&quot;</span>
+    <span class="n">CUSTOM_ALERT</span> <span class="o">=</span> <span class="s2">&quot;CUSTOM_ALERT&quot;</span>
+    <span class="n">CUSTOM_ANNOTATION</span> <span class="o">=</span> <span class="s2">&quot;CUSTOM_ANNOTATION&quot;</span>
+    <span class="n">CUSTOM_CONFIGURATION</span> <span class="o">=</span> <span class="s2">&quot;CUSTOM_CONFIGURATION&quot;</span>
+    <span class="n">CUSTOM_DEPLOYMENT</span> <span class="o">=</span> <span class="s2">&quot;CUSTOM_DEPLOYMENT&quot;</span>
+    <span class="n">ERROR_EVENT</span> <span class="o">=</span> <span class="s2">&quot;ERROR_EVENT&quot;</span>
+    <span class="n">MARKED_FOR_TERMINATION</span> <span class="o">=</span> <span class="s2">&quot;MARKED_FOR_TERMINATION&quot;</span>
+    <span class="n">PERFORMANCE_EVENT</span> <span class="o">=</span> <span class="s2">&quot;PERFORMANCE_EVENT&quot;</span>
+    <span class="n">RESOURCE_CONTENTION_EVENT</span> <span class="o">=</span> <span class="s2">&quot;RESOURCE_CONTENTION_EVENT&quot;</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">CountMetricRegistrationEntry</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">metric_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">aggregation_mode</span><span class="p">:</span> <span class="n">AggregationMode</span>
+    <span class="n">dimensions_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_list</span><span class="p">(</span><span class="n">metric_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an entry that uses defined list of dimensions for aggregation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric_key: Metric key in string.</span>
+<span class="sd">            dimensions_list: List of dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CountMetricRegistrationEntry</span><span class="p">(</span><span class="n">metric_key</span><span class="p">,</span> <span class="n">AggregationMode</span><span class="o">.</span><span class="n">LIST</span><span class="p">,</span> <span class="n">dimensions_list</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_all</span><span class="p">(</span><span class="n">metric_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an entry that uses all mint dimensions for aggregation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric_key: Metric key in string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CountMetricRegistrationEntry</span><span class="p">(</span><span class="n">metric_key</span><span class="p">,</span> <span class="n">AggregationMode</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_none</span><span class="p">(</span><span class="n">metric_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an entry that uses none of mint dimensions for aggregation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric_key: Metric key in string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CountMetricRegistrationEntry</span><span class="p">(</span><span class="n">metric_key</span><span class="p">,</span> <span class="n">AggregationMode</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="k">def</span> <span class="nf">registration_items_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;aggregation_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_mode</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_mode</span> <span class="o">==</span> <span class="n">AggregationMode</span><span class="o">.</span><span class="n">LIST</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;dimensions_list&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions_list</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">_add_sfm_metric</span><span class="p">(</span><span class="n">metric</span><span class="p">:</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">sfm_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sfm_metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sfm_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">metric</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+    <span class="n">sfm_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Extension">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension">[docs]</a>
+<span class="k">class</span> <span class="nc">Extension</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Python extensions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        logger: Embedded logger object for the extension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_instance</span><span class="p">:</span> <span class="n">ClassVar</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">schedule_decorators</span><span class="p">:</span> <span class="n">ClassVar</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># noqa: ARG003</span>
+        <span class="k">if</span> <span class="n">Extension</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Extension</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Extension</span><span class="o">.</span><span class="n">_instance</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># do not initialize already created singleton</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;logger&quot;</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">extension_logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">extension_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_feature_sets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Useful metadata, populated once the extension is started</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extension_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extension_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_id</span> <span class="o">=</span> <span class="s2">&quot;development_task_id&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_config_id</span> <span class="o">=</span> <span class="s2">&quot;development_config_id&quot;</span>
+
+        <span class="c1"># The user can override default EEC enrichment for logs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_event_enrichment</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># The Communication client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">:</span> <span class="n">CommunicationClient</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># Set to true when --fastcheck is passed as a parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_fastcheck</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># If this is true, we are running locally during development</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_running_in_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Response from EEC to /alive/ requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runtime_properties</span><span class="p">:</span> <span class="n">RuntimeProperties</span> <span class="o">=</span> <span class="n">RuntimeProperties</span><span class="p">({})</span>
+
+        <span class="c1"># The time difference between the local machine and the cluster time, used to sync callbacks with cluster</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_time_diff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Optional callback to be invoked during the fastcheck</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fast_check_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">ActivationConfig</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Status</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># List of all scheduled callbacks we must run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">WrappedCallback</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks_before_run</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">WrappedCallback</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Internal callbacks results, used to report statuses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Status</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span> <span class="n">Lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+        <span class="c1"># Running callbacks, used to get the callback info when reporting metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">WrappedCallback</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks_lock</span><span class="p">:</span> <span class="n">Lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="o">=</span> <span class="n">sched</span><span class="o">.</span><span class="n">scheduler</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+
+        <span class="c1"># Timestamps for scheduling of internal callbacks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_internal_callbacks_timestamps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;timediff&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">TIME_DIFF_INTERVAL</span><span class="p">,</span>
+            <span class="s2">&quot;heartbeat&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">HEARTBEAT_INTERVAL</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">METRIC_SENDING_INTERVAL</span><span class="p">,</span>
+            <span class="s2">&quot;sfm_metrics&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">SFM_METRIC_SENDING_INTERVAL</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Executors for the callbacks and internal methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks_executor</span> <span class="o">=</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">CALLBACKS_THREAD_POOL_SIZE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span> <span class="o">=</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">INTERNAL_THREAD_POOL_SIZE</span><span class="p">)</span>
+
+        <span class="c1"># Extension metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Self monitoring metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sfm_metrics_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbackSfmReport</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">WrappedCallback</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Count metric delta signals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delta_signal_buffer</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registered_count_metrics</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Self tech rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_techrule</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Error message from caught exception in self.initialize()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialization_error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_args</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">function</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">activation_type</span> <span class="ow">in</span> <span class="n">Extension</span><span class="o">.</span><span class="n">schedule_decorators</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="o">+</span> <span class="n">args</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">activation_type</span><span class="p">)</span>
+
+        <span class="n">starting_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Starting </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">starting_message</span><span class="p">))</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">starting_message</span><span class="p">)</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">starting_message</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">extension_name</span><span class="si">}</span><span class="s2">, version=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">extension_version</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal property used by the EEC.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal property used by the EEC.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">monitoring_config_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal property used by the EEC.</span>
+
+<span class="sd">        Represents a unique identifier of the monitoring configuration.</span>
+<span class="sd">        that is assigned to this particular extension instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_config_id</span>
+
+<div class="viewcode-block" id="Extension.run">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Launch the extension instance.</span>
+
+<span class="sd">        Calling this method starts the main loop of the extension.</span>
+
+<span class="sd">        This method must be invoked once to start the extension,</span>
+
+<span class="sd">        if `--fastcheck` is set, the extension will run in fastcheck mode,</span>
+<span class="sd">        otherwise the main loop is started, which periodically runs:</span>
+
+<span class="sd">        * The scheduled callbacks</span>
+<span class="sd">        * The heartbeat method</span>
+<span class="sd">        * The metrics publisher method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_signal_handlers</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fastcheck</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_fastcheck</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_extension_loop</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_setup_signal_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+            <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGBREAK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_signal_handler</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_signal_handler</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_shutdown_signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>  <span class="c1"># noqa: ARG002</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">Signals</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> captured. Flushing metrics and exiting...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_shutdown</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_metrics</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_sfm_metrics</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Extension.on_shutdown">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.on_shutdown">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback method to be invoked when the extension is shutting down.</span>
+
+<span class="sd">        Called when extension exits after it has received shutdown signal from EEC</span>
+<span class="sd">        This is executed before metrics are flushed to EEC</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_schedule_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">WrappedCallback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callback</span><span class="o">.</span><span class="n">activation_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">callback</span><span class="o">.</span><span class="n">activation_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Skipping </span><span class="si">{</span><span class="n">callback</span><span class="si">}</span><span class="s2"> with activation type </span><span class="si">{</span><span class="n">callback</span><span class="o">.</span><span class="n">activation_type</span><span class="si">}</span><span class="s2"> because it is not </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scheduling callback </span><span class="si">{</span><span class="n">callback</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># These properties are updated after the extension starts</span>
+        <span class="n">callback</span><span class="o">.</span><span class="n">cluster_time_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_time_diff</span>
+        <span class="n">callback</span><span class="o">.</span><span class="n">running_in_sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_in_sim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enter</span><span class="p">(</span><span class="n">callback</span><span class="o">.</span><span class="n">initial_wait_time</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callback_iteration</span><span class="p">,</span> <span class="p">(</span><span class="n">callback</span><span class="p">,))</span>
+
+<div class="viewcode-block" id="Extension.schedule">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.schedule">[docs]</a>
+    <span class="k">def</span> <span class="nf">schedule</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">interval</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">activation_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ActivationType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Schedule a method to be executed periodically.</span>
+
+<span class="sd">        The callback method will be periodically invoked in a separate thread.</span>
+<span class="sd">        The callback method is always immediately scheduled for execution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback: The callback method to be invoked</span>
+<span class="sd">            interval: The time interval between invocations, can be a timedelta object,</span>
+<span class="sd">                or an int representing the number of seconds</span>
+<span class="sd">            args: Arguments to the callback, if any</span>
+<span class="sd">            activation_type: Optional activation type when this callback should run,</span>
+<span class="sd">                can be &#39;ActivationType.LOCAL&#39; or &#39;ActivationType.REMOTE&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Interval must be at least 1 second, got </span><span class="si">{</span><span class="n">interval</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">callback</span> <span class="o">=</span> <span class="n">WrappedCallback</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">api_logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">activation_type</span><span class="o">=</span><span class="n">activation_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fastcheck</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks_before_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.query">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.query">[docs]</a>
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback to be executed every minute by default.</span>
+
+<span class="sd">        Optional method that can be implemented by subclasses.</span>
+<span class="sd">        The query method is always scheduled to run every minute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Extension.initialize">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.initialize">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback to be executed when the extension starts.</span>
+
+<span class="sd">        Called once after the extension starts and the processes arguments are parsed.</span>
+<span class="sd">        Sometimes there are tasks the user needs to do that must happen before runtime,</span>
+<span class="sd">        but after the activation config has been received, example: Setting the schedule frequency</span>
+<span class="sd">        based on the user input on the monitoring configuration, this can be done on this method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Extension.fastcheck">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.fastcheck">[docs]</a>
+    <span class="k">def</span> <span class="nf">fastcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback executed when extension is launched.</span>
+
+<span class="sd">        Called if the extension is run in the `fastcheck` mode. Only invoked for remote</span>
+<span class="sd">        extensions.</span>
+<span class="sd">        This method is not called if fastcheck callback was already registered with</span>
+<span class="sd">        Extension.register_fastcheck().</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Status with optional message whether the fastcheck succeed or failed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.register_fastcheck">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.register_fastcheck">[docs]</a>
+    <span class="k">def</span> <span class="nf">register_fastcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fast_check_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ActivationConfig</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Status</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Registers fastcheck callback that is executed in the `fastcheck` mode.</span>
+
+<span class="sd">        Extension.fastcheck() is not called if fastcheck callback is registered with this method</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fast_check_callback: callable called with ActivationConfig and</span>
+<span class="sd">            extension_config arguments. Must return the Status with optional message</span>
+<span class="sd">            whether the fastcheck succeed or failed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_check_callback</span><span class="p">:</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;More than one function assigned to fastcheck, last registered one was kept.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fast_check_callback</span> <span class="o">=</span> <span class="n">fast_check_callback</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_register_count_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">count_metric_entries</span><span class="p">:</span> <span class="n">CountMetricRegistrationEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a count metric registration request to EEC.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            count_metric_entries: CountMetricRegistrationEntry objects for each count metric to register</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">json_pattern</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">metric_entry</span><span class="o">.</span><span class="n">metric_key</span><span class="p">:</span> <span class="n">metric_entry</span><span class="o">.</span><span class="n">registration_items_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">metric_entry</span> <span class="ow">in</span> <span class="n">count_metric_entries</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">register_count_metrics</span><span class="p">(</span><span class="n">json_pattern</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_count_delta_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric_keys</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send calculate-delta signal to EEC monotonic converter.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric_keys: List with metrics for which we want to calculate deltas</span>
+<span class="sd">            force: If true, it forces the metrics from cache to be pushed into EEC and then delta signal request is</span>
+<span class="sd">                sent. Otherwise, it puts delta signal request in cache and request is sent after nearest (in time) sending</span>
+<span class="sd">                metrics to EEC event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">metric_keys</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_delta_signal_buffer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_metrics</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_count_delta_signal</span><span class="p">(</span><span class="n">metric_keys</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delta_signal_buffer</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">metric_key</span> <span class="k">for</span> <span class="n">metric_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_signal_buffer</span> <span class="k">if</span> <span class="n">metric_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metric_keys</span>
+            <span class="p">}</span>
+
+<div class="viewcode-block" id="Extension.report_metric">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_metric">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_metric</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">SummaryStat</span><span class="p">],</span>
+        <span class="n">dimensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">techrule</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric_type</span><span class="p">:</span> <span class="n">MetricType</span> <span class="o">=</span> <span class="n">MetricType</span><span class="o">.</span><span class="n">GAUGE</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a metric.</span>
+
+<span class="sd">        Metric is sent to EEC using an HTTP request and MINT protocol. EEC then</span>
+<span class="sd">        sends the metrics to the tenant.</span>
+
+<span class="sd">        By default, it reports a gauge metric.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key: The metric key, must follow the MINT specification</span>
+<span class="sd">            value: The metric value, can be a simple value or a SummaryStat</span>
+<span class="sd">            dimensions: A dictionary of dimensions</span>
+<span class="sd">            techrule: The technology rule string set by self.techrule setter.</span>
+<span class="sd">            timestamp: The timestamp of the metric, defaults to the current time</span>
+<span class="sd">            metric_type: The type of the metric, defaults to MetricType.GAUGE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">techrule</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dimensions</span><span class="p">:</span>
+                <span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="s2">&quot;dt.techrule.id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">:</span>
+                <span class="n">dimensions</span><span class="p">[</span><span class="s2">&quot;dt.techrule.id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">techrule</span>
+
+        <span class="k">if</span> <span class="n">metric_type</span> <span class="o">==</span> <span class="n">MetricType</span><span class="o">.</span><span class="n">COUNT</span> <span class="ow">and</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># We must report a timestamp for count metrics</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">metric</span> <span class="o">=</span> <span class="n">Metric</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">dimensions</span><span class="p">,</span> <span class="n">metric_type</span><span class="o">=</span><span class="n">metric_type</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_metric</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_mint_lines">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_mint_lines">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_mint_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report mint lines using the MINT protocol</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Metric lines must comply with the MINT format.</span>
+
+<span class="sd">            &gt;&gt;&gt; self.report_mint_lines([&quot;my_metric 1&quot;, &quot;my_other_metric 2&quot;])</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines: A list of mint lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_mint_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_event">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_event">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">severity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Severity</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Severity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report an event using log ingest.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title: The title of the event</span>
+<span class="sd">            description: The description of the event</span>
+<span class="sd">            properties: A dictionary of extra event properties</span>
+<span class="sd">            timestamp: The timestamp of the event, defaults to the current time</span>
+<span class="sd">            severity: The severity of the event, defaults to Severity.INFO</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">event</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">RFC_3339_FORMAT</span><span class="p">),</span>
+            <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">severity</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="n">Severity</span><span class="p">)</span> <span class="k">else</span> <span class="n">severity</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">properties</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_dt_event">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_dt_event">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_dt_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_type</span><span class="p">:</span> <span class="n">DtEventType</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">entity_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reports an event using the v2 event ingest API.</span>
+
+<span class="sd">        Unlike ``report_event``, this directly raises an event or even a problem</span>
+<span class="sd">        based on the specified ``event_type``.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_type: The event type chosen from type Enum (required)</span>
+<span class="sd">            title: The title of the event (required)</span>
+<span class="sd">            start_time: The start time of event in UTC ms, if not set, current timestamp (optional)</span>
+<span class="sd">            end_time: The end time of event in UTC ms, if not set, current timestamp + timeout (optional)</span>
+<span class="sd">            timeout: The timeout of event in minutes, if not set, 15 (optional)</span>
+<span class="sd">            entity_selector: The entity selector, if not set, the event is associated with environment entity (optional)</span>
+<span class="sd">            properties: A map of event properties (optional)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;eventType&quot;</span><span class="p">:</span> <span class="n">event_type</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">start_time</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;startTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="k">if</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;endTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_time</span>
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="k">if</span> <span class="n">entity_selector</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;entitySelector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity_selector</span>
+        <span class="k">if</span> <span class="n">properties</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">properties</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_dt_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_dt_event_dict">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_dt_event_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_dt_event_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report an event using event ingest API with provided dictionary.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            For reference see: https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event</span>
+
+<span class="sd">        Format of the event dictionary::</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;type&quot;: &quot;object&quot;,</span>
+<span class="sd">                &quot;required&quot;: [&quot;eventType&quot;, &quot;title&quot;],</span>
+<span class="sd">                &quot;properties&quot;: {</span>
+<span class="sd">                    &quot;eventType&quot;: {</span>
+<span class="sd">                        &quot;type&quot;: &quot;string&quot;,</span>
+<span class="sd">                        &quot;enum&quot;: [</span>
+<span class="sd">                            &quot;CUSTOM_INFO&quot;,</span>
+<span class="sd">                            &quot;CUSTOM_ANNOTATION&quot;,</span>
+<span class="sd">                            &quot;CUSTOM_CONFIGURATION&quot;,</span>
+<span class="sd">                            &quot;CUSTOM_DEPLOYMENT&quot;,</span>
+<span class="sd">                            &quot;MARKED_FOR_TERMINATION&quot;,</span>
+<span class="sd">                            &quot;ERROR_EVENT&quot;,</span>
+<span class="sd">                            &quot;AVAILABILITY_EVENT&quot;,</span>
+<span class="sd">                            &quot;PERFORMANCE_EVENT&quot;,</span>
+<span class="sd">                            &quot;RESOURCE_CONTENTION_EVENT&quot;,</span>
+<span class="sd">                            &quot;CUSTOM_ALERT&quot;</span>
+<span class="sd">                        ]</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &quot;title&quot;: {</span>
+<span class="sd">                        &quot;type&quot;: &quot;string&quot;,</span>
+<span class="sd">                        &quot;minLength&quot;: 1</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &quot;startTime&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class="sd">                    &quot;endTime&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class="sd">                    &quot;timeout&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class="sd">                    &quot;entitySelector&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="sd">                    &quot;properties&quot;: {</span>
+<span class="sd">                        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="sd">                        &quot;patternProperties&quot;: {</span>
+<span class="sd">                            &quot;^.*$&quot;: {&quot;type&quot;: &quot;string&quot;}</span>
+<span class="sd">                        }</span>
+<span class="sd">                    }</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s2">&quot;eventType&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">event</span> <span class="ow">or</span> <span class="s2">&quot;title&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;eventType&quot; not present&#39;</span> <span class="k">if</span> <span class="s2">&quot;eventType&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">event</span> <span class="k">else</span> <span class="s1">&#39;&quot;title&quot; not present in event&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">DT_EVENT_SCHEMA</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;invalid member: &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;eventType&quot;</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">DtEventType</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Event type must be a DtEventType enum value, got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;properties&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">prop_key</span><span class="p">,</span> <span class="n">prop_val</span> <span class="ow">in</span> <span class="n">event</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop_val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;invalid &quot;properties&quot; member: </span><span class="si">{</span><span class="n">prop_key</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">prop_val</span><span class="si">}</span><span class="s1">, required: &quot;str&quot;: str&#39;</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_dt_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_log_event">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_log_event">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_log_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a custom log event using log ingest.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            See reference: https://www.dynatrace.com/support/help/shortlink/log-monitoring-log-data-ingestion</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_event: The log event dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="p">(</span><span class="n">log_event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_log_events">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_log_events">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_log_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a list of custom log events using log ingest.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_events: The list of log events</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="p">(</span><span class="n">log_events</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Extension.report_log_lines">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.report_log_lines">[docs]</a>
+    <span class="k">def</span> <span class="nf">report_log_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a list of log lines using log ingest</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_lines: The list of log lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">line</span><span class="p">}</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log_lines</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="p">(</span><span class="n">events</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enabled_feature_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Map of enabled feautre sets and corresponding metrics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary containing enabled feature sets with corresponding</span>
+<span class="sd">            metrics defined in ``extension.yaml``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">feature_set_name</span><span class="p">:</span> <span class="n">metric_keys</span>
+            <span class="k">for</span> <span class="n">feature_set_name</span><span class="p">,</span> <span class="n">metric_keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_sets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">feature_set_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">feature_sets</span> <span class="ow">or</span> <span class="n">feature_set_name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enabled_feature_sets_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of enabled feature sets.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List containing names of enabled feature sets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enabled_feature_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enabled_feature_sets_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enabled metrics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of all metric keys from enabled feature sets</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">enabled_feature_sets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">_parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Python extension parameters&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Production parameters, these are passed by the EEC</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dsid&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--url&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--idtoken&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--loglevel&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set extension log level. Info is default.&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">],</span>
+            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--fastcheck&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--monitoring_config_id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--local-ingest&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--local-ingest-port&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">14499</span><span class="p">)</span>
+
+        <span class="c1"># Debug parameters, these are used when running the extension locally</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--extensionconfig&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--activationconfig&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;activation.json&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--no-print-metrics&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+        <span class="n">args</span><span class="p">,</span> <span class="n">unknown</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_fastcheck</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">fastcheck</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dsid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># DEV mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_running_in_sim</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">print_metrics</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_print_metrics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">DebugClient</span><span class="p">(</span>
+                <span class="n">activation_config_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">activationconfig</span><span class="p">,</span>
+                <span class="n">extension_config_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">extensionconfig</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="n">api_logger</span><span class="p">,</span>
+                <span class="n">local_ingest</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">local_ingest</span><span class="p">,</span>
+                <span class="n">local_ingest_port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">local_ingest_port</span><span class="p">,</span>
+                <span class="n">print_metrics</span><span class="o">=</span><span class="n">print_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">RuntimeProperties</span><span class="o">.</span><span class="n">set_default_log_level</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loglevel</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># EEC mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dsid</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">idtoken</span><span class="p">,</span> <span class="n">api_logger</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_task_id</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">dsid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_config_id</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">monitoring_config_id</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DSID = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="si">}</span><span class="s2">, monitoring config id = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_config_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span> <span class="o">=</span> <span class="n">ActivationConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">get_activation_config</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extension_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">get_extension_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_feature_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">get_feature_sets</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extension_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">version</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fastcheck</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_helper</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error running self.initialize </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="n">api_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_status</span><span class="p">(</span><span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_initialization_error</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;dt.extension.config.id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtime_properties</span><span class="o">.</span><span class="n">extconfig</span><span class="p">,</span>
+            <span class="s2">&quot;dt.extension.ds&quot;</span><span class="p">:</span> <span class="n">DATASOURCE_TYPE</span><span class="p">,</span>
+            <span class="s2">&quot;dt.extension.version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension_version</span><span class="p">,</span>
+            <span class="s2">&quot;dt.extension.name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension_name</span><span class="p">,</span>
+            <span class="s2">&quot;monitoring.configuration&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_name</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_run_fastcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running fastcheck for monitoring configuration &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_check_callback</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_check_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension_config</span><span class="p">)</span>
+                <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sending fastcheck status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_status</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fastcheck</span><span class="p">()</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sending fastcheck status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_status</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Python datasource fastcheck error: </span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error running fastcheck </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_status</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">def</span> <span class="nf">_run_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">WrappedCallback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">callback</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+            <span class="c1"># Add the callback to the list of running callbacks</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks_lock</span><span class="p">:</span>
+                <span class="n">current_thread_id</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">get_ident</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks</span><span class="p">[</span><span class="n">current_thread_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">callback</span>
+
+            <span class="n">callback</span><span class="p">()</span>
+
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sfm_metrics_lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_callbackSfmReport</span><span class="p">[</span><span class="n">callback</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">callback</span>
+            <span class="c1"># Remove the callback from the list of running callbacks</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks_lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">current_thread_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_callback_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">WrappedCallback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_callback</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+        <span class="n">callback</span><span class="o">.</span><span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">get_next_execution_timestamp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">next_timestamp</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callback_iteration</span><span class="p">,</span> <span class="p">(</span><span class="n">callback</span><span class="p">,))</span>
+
+    <span class="k">def</span> <span class="nf">_start_extension_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">api_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting main loop for monitoring configuration: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># These were scheduled before the extension started, schedule them now</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks_before_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat_iteration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_iteration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sfm_metrics_iteration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timediff_iteration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_timediff_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_cluster_time_diff</span><span class="p">)</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_and_set_next_internal_callback_timestamp</span><span class="p">(</span><span class="s2">&quot;timediff&quot;</span><span class="p">,</span> <span class="n">TIME_DIFF_INTERVAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">next_timestamp</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timediff_iteration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_heartbeat_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat</span><span class="p">)</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_and_set_next_internal_callback_timestamp</span><span class="p">(</span><span class="s2">&quot;heartbeat&quot;</span><span class="p">,</span> <span class="n">HEARTBEAT_INTERVAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">next_timestamp</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat_iteration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_metrics_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_metrics</span><span class="p">)</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_and_set_next_internal_callback_timestamp</span><span class="p">(</span><span class="s2">&quot;metrics&quot;</span><span class="p">,</span> <span class="n">METRIC_SENDING_INTERVAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">next_timestamp</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_iteration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_sfm_metrics_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_sfm_metrics</span><span class="p">)</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_and_set_next_internal_callback_timestamp</span><span class="p">(</span><span class="s2">&quot;sfm_metrics&quot;</span><span class="p">,</span> <span class="n">SFM_METRIC_SENDING_INTERVAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">next_timestamp</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sfm_metrics_iteration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_lock</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">:</span>
+                    <span class="n">number_of_metrics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">)</span>
+                    <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_metrics</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+                    <span class="n">lines_invalid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">lines_invalid</span> <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">responses</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">lines_invalid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lines_invalid</span><span class="si">}</span><span class="s2"> invalid metric lines found&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_metrics</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span>
+                            <span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="n">message</span>
+                        <span class="p">)</span>
+
+                    <span class="n">api_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sent </span><span class="si">{</span><span class="n">number_of_metrics</span><span class="si">}</span><span class="s2"> metric lines to EEC: </span><span class="si">{</span><span class="n">responses</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_sfm_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare self monitoring metrics.</span>
+
+<span class="sd">        Builds the list of mint metric lines to send as self monitoring metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sfm_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sfm_dimensions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dt.extension.config.id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_id</span><span class="p">}</span>
+        <span class="n">_add_sfm_metric</span><span class="p">(</span>
+            <span class="n">SfmMetric</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="n">active_count</span><span class="p">(),</span> <span class="n">sfm_dimensions</span><span class="p">,</span> <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">),</span>
+            <span class="n">sfm_metrics</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbackSfmReport</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">sfm_dimensions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;callback&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;dt.extension.config.id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitoring_config_id</span><span class="p">}</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.time&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">callback</span><span class="o">.</span><span class="n">duration_interval_total</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">GAUGE</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.total.count&quot;</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">.</span><span class="n">executions_total</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.count&quot;</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">.</span><span class="n">executions_per_interval</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.ok.count&quot;</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">.</span><span class="n">ok_count</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.timeout.count&quot;</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">.</span><span class="n">timeouts_count</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_add_sfm_metric</span><span class="p">(</span>
+                <span class="n">SfmMetric</span><span class="p">(</span>
+                    <span class="s2">&quot;execution.exception.count&quot;</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">.</span><span class="n">exception_count</span><span class="p">,</span>
+                    <span class="n">sfm_dimensions</span><span class="p">,</span>
+                    <span class="n">client_facing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">sfm_metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">callback</span><span class="o">.</span><span class="n">clear_sfm_metrics</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">to_mint_line</span><span class="p">()</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">sfm_metrics</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_send_sfm_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sfm_metrics_lock</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_sfm_metrics</span><span class="p">()</span>
+            <span class="c1"># Flushes the cache of metrics, maybe we should only flush if they were successfully sent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_callbackSfmReport</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_sfm_metrics</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_sfm_metrics</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">lines_invalid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">lines_invalid</span><span class="si">}</span><span class="s2"> invalid metric lines found&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_sfm_metrics</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span>
+                    <span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="n">message</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_current_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">overall_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialization_error</span><span class="p">:</span>
+            <span class="n">overall_status</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span>
+            <span class="n">overall_status</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialization_error</span>
+            <span class="k">return</span> <span class="n">overall_status</span>
+
+        <span class="n">internal_callback_error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">callback</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">is_error</span><span class="p">():</span>
+                    <span class="n">internal_callback_error</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">overall_status</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">callback</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">internal_callback_error</span><span class="p">:</span>
+                <span class="n">overall_status</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">overall_status</span>
+
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">is_error</span><span class="p">():</span>
+                <span class="n">overall_status</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">status</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">callback</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">callback</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">overall_status</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">overall_status</span>
+
+    <span class="k">def</span> <span class="nf">_update_cluster_time_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_time_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">get_cluster_time_diff</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduled_callbacks</span><span class="p">:</span>
+            <span class="n">callback</span><span class="o">.</span><span class="n">cluster_time_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_time_diff</span>
+
+    <span class="k">def</span> <span class="nf">_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="s2">&quot;not set&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">overall_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_current_status</span><span class="p">()</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_status</span><span class="p">(</span><span class="n">overall_status</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_runtime_properties</span> <span class="o">=</span> <span class="n">RuntimeProperties</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Heartbeat failed because </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, response </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_add_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Metric</span><span class="p">):</span>
+        <span class="n">metric</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks_lock</span><span class="p">:</span>
+            <span class="n">current_thread_id</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">get_ident</span><span class="p">()</span>
+            <span class="n">current_callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">current_thread_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">current_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">metric</span><span class="o">.</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Adjust the metric timestamp according to the callback start time</span>
+            <span class="c1"># If the user manually set a metric timestamp, don&#39;t adjust it</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">current_callback</span><span class="o">.</span><span class="n">get_adjusted_metric_timestamp</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">current_callback</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">metric</span><span class="o">.</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Metric </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2"> was added by unknown thread </span><span class="si">{</span><span class="n">current_thread_id</span><span class="si">}</span><span class="s2">, cannot adjust the timestamp&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="o">.</span><span class="n">to_mint_line</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_add_mint_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_events_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_events</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_event_enrichment</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">responses</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span> <span class="ow">or</span> <span class="s2">&quot;error&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span> <span class="ow">or</span> <span class="s2">&quot;message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]:</span>
+                        <span class="k">return</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span>
+                        <span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">api_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error sending events: </span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results_lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_internal_callbacks_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_events</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">GENERIC_ERROR</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_send_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_events_internal</span><span class="p">,</span> <span class="n">events</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_dt_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_dt_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_and_set_next_internal_callback_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="n">timedelta</span><span class="p">):</span>
+        <span class="n">next_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_internal_callbacks_timestamps</span><span class="p">[</span><span class="n">callback_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_internal_callbacks_timestamps</span><span class="p">[</span><span class="n">callback_name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">interval</span>
+        <span class="k">return</span> <span class="n">next_timestamp</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Extension.get_version">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.get_version">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the extension version.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span><span class="o">.</span><span class="n">version</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">techrule</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal property used by the EEC.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_techrule</span>
+
+    <span class="nd">@techrule</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">techrule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_techrule</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Extension.get_activation_config">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.get_activation_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_activation_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivationConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the activation config.</span>
+
+<span class="sd">        Represents activation configuration assigned to this particular</span>
+<span class="sd">        extension instance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ActivationConfig object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_config</span></div>
+
+
+<div class="viewcode-block" id="Extension.get_snapshot">
+<a class="viewcode-back" href="../../../api/extension.html#dynatrace_extension.Extension.get_snapshot">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Snapshot</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves an oneagent snapshot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            snapshot_file: Optional path to the snapshot file, only used when running from dt-sdk run</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Snapshot object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running_in_sim</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">snapshot_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">snapshot_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;snapshot.json&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snapshot_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">snapshot_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snapshot_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">snapshot_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;snapshot file &#39;</span><span class="si">{</span><span class="n">snapshot_file</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Snapshot</span><span class="o">.</span><span class="n">parse_from_file</span><span class="p">(</span><span class="n">snapshot_file</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+</main>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://dynatrace.com/">Dynatrace</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="mailto:extenions@dynatrace.com">Extensions Team</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center">
+                <p style="display: none">
+                    <a class="text-light" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Wagtail Sphinx Theme 6.3.0
+                    </a>
+                </p>
+            </div>
+            <div class="text-center">
+                    &copy; Copyright 2023–2024, Dynatrace LLC
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script type="text/javascript" src="../../../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../../../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../../../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../../../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Installation &mdash; dt-sdk 1.0.0 documentation</title>
+    
+        <link rel="shortcut icon" href="../_static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=ea6a6c20" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="dt-sdk 1.0.0 documentation" href="#" />
+            <link rel="next" title="Extension Structure" href="extension_structure.html" />
+            <link rel="prev" title="Dynatrace Extensions SDK for Python" href="../index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="/"
+                        title="dt-sdk"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/dt-sdk-logo.png" width="45" height="59" alt="dt-sdk"
+                            class="logo-img"
+                        />
+                        dt-sdk
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension_structure.html">Extension Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrating EF1 Extensions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">All Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/create.html">Create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/upload.html">Upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/help.html">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/assemble.html">Assemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/gencerts.html">Generate Certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/sign.html">Sign</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/wheel.html">Wheel</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/extension.html"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/events/index.html">Events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/events/event_severity.html">Event Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/events/event_type.html">Event Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/metrics/index.html">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/metrics/metric.html">Metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/metrics/metric_type.html">Metric Type</a></li>
+</ul>
+</li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Installation</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/guides/installation.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/guides/installation.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<section id="requirements">
+<span id="installation-requirements"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dt-extensions-sdk</span></code> requires only the following dependencies to be
+present in the environment.</p>
+<ul class="simple">
+<li><p>Python 3.10</p></li>
+</ul>
+</section>
+<section id="installing-from-pypi">
+<h2>Installing from PyPI<a class="headerlink" href="#installing-from-pypi" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dt-extensions-sdk</span></code> can both be installed as a system wide package and as
+a dependency in a python project.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>dt-extensions-sdk<span class="o">[</span>cli<span class="o">]</span>
+</pre></div>
+</div>
+<p>Once installed, the <code class="docutils literal notranslate"><span class="pre">dt-sdk</span></code> binary will become available in the <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.</p>
+<div class="warning admonition">
+<p class="admonition-title">Core package</p>
+<p>When installing <code class="docutils literal notranslate"><span class="pre">dt-extensions-sdk[cli]</span></code> with the optional set of
+dependecies called <code class="docutils literal notranslate"><span class="pre">[cli]</span></code>, multiple additional packages which are required
+to make command line tools work will be installed.
+For example, such packages as <code class="docutils literal notranslate"><span class="pre">typer[all]</span></code>, <code class="docutils literal notranslate"><span class="pre">pyyaml</span></code>, and <code class="docutils literal notranslate"><span class="pre">dt-cli</span></code>.</p>
+<p>When extension is being built, these additional packages are ignored,
+because the core dependecy of every extension is just the <code class="docutils literal notranslate"><span class="pre">dt-extensions-sdk</span></code>
+itself. When the optioncal <code class="docutils literal notranslate"><span class="pre">[cli]</span></code> part is omitted, only the core package
+that is required to make any Python extension work on ActiveGate and OneAgent
+will be installed.</p>
+</div>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../index.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Dynatrace Extensions SDK for Python
+    </a>
+    <a class="float-right" href="extension_structure.html" title="Next">
+        Extension Structure <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installing-from-pypi">Installing from PyPI</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://dynatrace.com/">Dynatrace</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="mailto:extenions@dynatrace.com">Extensions Team</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center">
+                <p style="display: none">
+                    <a class="text-light" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Wagtail Sphinx Theme 6.3.0
+                    </a>
+                </p>
+            </div>
+            <div class="text-center">
+                    &copy; Copyright 2023–2024, Dynatrace LLC
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
