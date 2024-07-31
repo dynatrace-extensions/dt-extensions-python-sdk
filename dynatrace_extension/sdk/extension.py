@@ -25,7 +25,7 @@ from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 from .snapshot import Snapshot
 
-HEARTBEAT_INTERVAL = timedelta(seconds=60)
+HEARTBEAT_INTERVAL = timedelta(seconds=50)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
 SFM_METRIC_SENDING_INTERVAL = timedelta(seconds=60)
 TIME_DIFF_INTERVAL = timedelta(seconds=60)
