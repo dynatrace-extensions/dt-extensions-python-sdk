@@ -984,6 +984,8 @@ class Extension:
             callback.cluster_time_diff = self._cluster_time_diff
 
     def _heartbeat(self):
+        if self._is_fastcheck:
+            return
         response = bytes("not set", "utf-8")
         try:
             overall_status = self._build_current_status()
