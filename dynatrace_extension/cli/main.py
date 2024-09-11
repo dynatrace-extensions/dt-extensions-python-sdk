@@ -91,6 +91,12 @@ def build(
     find_links: Optional[str] = typer.Option(
         None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
     ),
+    only_extra_platforms: Optional[bool] = typer.Option(
+        False,
+        "--only-extra-platforms",
+        "-o",
+        help="Only build for the extra platforms, useful when building from arm64 (mac)",
+    ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -103,6 +109,7 @@ def build(
     :param extra_platforms: Attempt to also download wheels for an extra platform (e.g. manylinux1_x86_64 or win_amd64)
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
+    :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
     """
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
@@ -111,7 +118,7 @@ def build(
         target_directory.mkdir()
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url, find_links)
+    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms)
 
     console.print("Stage 2 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
@@ -179,6 +186,12 @@ def wheel(
     find_links: Optional[str] = typer.Option(
         None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
     ),
+    only_extra_platforms: Optional[bool] = typer.Option(
+        False,
+        "--only-extra-platforms",
+        "-o",
+        help="Only build for the extra platforms, useful when building from arm64 (mac)",
+    ),
 ):
     """
     Builds the extension and it's dependencies into wheel files
@@ -188,6 +201,7 @@ def wheel(
     :param extra_platforms: Attempt to also download wheels for an extra platform (e.g. manylinux1_x86_64 or win_amd64)
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
+    :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
     """
     relative_lib_folder_dir = "extension/lib"
     lib_folder: Path = extension_dir / relative_lib_folder_dir
@@ -201,6 +215,8 @@ def wheel(
         command.extend(["--extra-index-url", extra_index_url])
     if find_links is not None:
         command.extend(["--find-links", find_links])
+    if only_extra_platforms:
+        command.append("--no-deps")
     command.append(".")
     run_process(command, cwd=extension_dir)
 
