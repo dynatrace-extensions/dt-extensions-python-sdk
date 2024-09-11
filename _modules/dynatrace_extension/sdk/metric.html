@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>dynatrace_extension.sdk.metric &mdash; dt-sdk 1.0.0 documentation</title>
+    
+        <link rel="shortcut icon" href="../../../_static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dist/theme.css?v=ea6a6c20" />
+            <link rel="index" title="Index" href="../../../genindex.html" />
+            <link rel="search" title="Search" href="../../../search.html" />
+            <link rel="top" title="dt-sdk 1.0.0 documentation" href="#" />
+            <link rel="up" title="Module code" href="../../index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../../../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="/"
+                        title="dt-sdk"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../../../_static/dt-sdk-logo.png" width="45" height="59" alt="dt-sdk"
+                            class="logo-img"
+                        />
+                        dt-sdk
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../../../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/extension_structure.html">Extension Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/building.html">Building Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/migration.html">Migrating EF1 Extensions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">All Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/create.html">Create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/upload.html">Upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/help.html">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/assemble.html">Assemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/gencerts.html">Generate Certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/sign.html">Sign</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/wheel.html">Wheel</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/extension.html"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/events/index.html">Events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/events/event_severity.html">Event Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/events/event_type.html">Event Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/metrics/index.html">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics/metric.html">Metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics/metric_type.html">Metric Type</a></li>
+</ul>
+</li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../../../index.html">Docs</a></li>
+            <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+        <li class="breadcrumb-item active" aria-current="page">dynatrace_extension.sdk.metric</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/_modules/dynatrace_extension/sdk/metric" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <h1>Source code for dynatrace_extension.sdk.metric</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: 2023-present Dynatrace LLC</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="c1"># https://bitbucket.lab.dynatrace.org/projects/ONE/repos/schemaless-metrics-spec/browse/limits.md</span>
+<span class="n">LIMIT_DIMENSIONS_COUNT</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">LIMIT_LINE_LENGTH</span> <span class="o">=</span> <span class="mi">2000</span>
+
+<span class="n">CLIENT_FACING_SFM_NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;dsfm&quot;</span>
+<span class="n">INTERNAL_SFM_NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;isfm&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">SummaryStat</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">value_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">value_sum</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">value_count</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_min</span> <span class="o">=</span> <span class="n">value_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_max</span> <span class="o">=</span> <span class="n">value_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_sum</span> <span class="o">=</span> <span class="n">value_sum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_count</span> <span class="o">=</span> <span class="n">value_count</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;min=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value_min</span><span class="si">}</span><span class="s2">,max=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value_max</span><span class="si">}</span><span class="s2">,sum=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value_sum</span><span class="si">}</span><span class="s2">,count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value_count</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<div class="viewcode-block" id="MetricType">
+<a class="viewcode-back" href="../../../api/metrics/metric_type.html#dynatrace_extension.MetricType">[docs]</a>
+<span class="k">class</span> <span class="nc">MetricType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">GAUGE</span> <span class="o">=</span> <span class="s2">&quot;gauge&quot;</span>
+    <span class="n">COUNT</span> <span class="o">=</span> <span class="s2">&quot;count&quot;</span>
+    <span class="n">DELTA</span> <span class="o">=</span> <span class="s2">&quot;count,delta&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Metric">
+<a class="viewcode-back" href="../../../api/metrics/metric.html#dynatrace_extension.Metric">[docs]</a>
+<span class="k">class</span> <span class="nc">Metric</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">SummaryStat</span><span class="p">],</span>
+        <span class="n">dimensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric_type</span><span class="p">:</span> <span class="n">MetricType</span> <span class="o">=</span> <span class="n">MetricType</span><span class="o">.</span><span class="n">GAUGE</span><span class="p">,</span>
+        <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">SummaryStat</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric_type</span><span class="p">:</span> <span class="n">MetricType</span> <span class="o">=</span> <span class="n">metric_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_and_dimensions</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_and_dimensions</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_key_and_dimensions</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Metric.to_mint_line">
+<a class="viewcode-back" href="../../../api/metrics/metric.html#dynatrace_extension.Metric.to_mint_line">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_mint_line</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Add key and dimensions</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_and_dimensions</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Add value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric_type</span> <span class="o">==</span> <span class="n">MetricType</span><span class="o">.</span><span class="n">DELTA</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Add timestamp</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">line</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_mint_line</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_key_and_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">dimensions_string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">dimensions_string</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="Metric.validate">
+<a class="viewcode-back" href="../../../api/metrics/metric.html#dynatrace_extension.Metric.validate">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">LIMIT_DIMENSIONS_COUNT</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Metric dimension count of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span><span class="si">}</span><span class="s2"> exceeds limit of </span><span class="si">{</span><span class="n">LIMIT_DIMENSIONS_COUNT</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">line_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_mint_line</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">line_length</span> <span class="o">&gt;</span> <span class="n">LIMIT_LINE_LENGTH</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Metric line length </span><span class="si">{</span><span class="n">line_length</span><span class="si">}</span><span class="s2"> exceeds limit of </span><span class="si">{</span><span class="n">LIMIT_LINE_LENGTH</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="k">class</span> <span class="nc">SfmMetric</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">SummaryStat</span><span class="p">],</span>
+        <span class="n">dimensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric_type</span><span class="p">:</span> <span class="n">MetricType</span> <span class="o">=</span> <span class="n">MetricType</span><span class="o">.</span><span class="n">GAUGE</span><span class="p">,</span>
+        <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">client_facing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">create_sfm_metric_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">client_facing</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">metric_type</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_sfm_metric_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client_facing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">CLIENT_FACING_SFM_NAMESPACE</span> <span class="k">if</span> <span class="n">client_facing</span> <span class="k">else</span> <span class="n">INTERNAL_SFM_NAMESPACE</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s2">:datasource.python.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</main>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://dynatrace.com/">Dynatrace</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="mailto:extenions@dynatrace.com">Extensions Team</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center">
+                <p style="display: none">
+                    <a class="text-light" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Wagtail Sphinx Theme 6.3.0
+                    </a>
+                </p>
+            </div>
+            <div class="text-center">
+                    &copy; Copyright 2023–2024, Dynatrace LLC
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script type="text/javascript" src="../../../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../../../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../../../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../../../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

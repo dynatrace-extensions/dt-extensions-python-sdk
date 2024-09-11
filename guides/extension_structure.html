@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Extension Structure &mdash; dt-sdk 1.0.0 documentation</title>
+    
+        <link rel="shortcut icon" href="../_static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=ea6a6c20" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="dt-sdk 1.0.0 documentation" href="#" />
+            <link rel="next" title="Building Extensions" href="building.html" />
+            <link rel="prev" title="Installation" href="installation.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="/"
+                        title="dt-sdk"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/dt-sdk-logo.png" width="45" height="59" alt="dt-sdk"
+                            class="logo-img"
+                        />
+                        dt-sdk
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extension Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrating EF1 Extensions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">All Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/create.html">Create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/upload.html">Upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/help.html">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/assemble.html">Assemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/gencerts.html">Generate Certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/sign.html">Sign</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/wheel.html">Wheel</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/extension.html"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/events/index.html">Events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/events/event_severity.html">Event Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/events/event_type.html">Event Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/metrics/index.html">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/metrics/metric.html">Metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/metrics/metric_type.html">Metric Type</a></li>
+</ul>
+</li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Extension Structure</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/guides/extension_structure.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/guides/extension_structure.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="extension-structure">
+<h1>Extension Structure<a class="headerlink" href="#extension-structure" title="Link to this heading">¶</a></h1>
+<p>The basic bare-bone structure of an extension is as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>my_extension
+├──<span class="w"> </span>README.md
+├──<span class="w"> </span>activation.json
+├──<span class="w"> </span>extension
+│<span class="w">   </span>├──<span class="w"> </span>activationSchema.json
+│<span class="w">   </span>└──<span class="w"> </span>extension.yaml
+├──<span class="w"> </span>my_extension
+│<span class="w">   </span>├──<span class="w"> </span>__init__.py
+│<span class="w">   </span>└──<span class="w"> </span>__main__.py
+└──<span class="w"> </span>setup.py
+</pre></div>
+</div>
+<p>This structure can be generated by running the <a class="reference internal" href="../cli/create.html"><span class="doc">Create</span></a> command
+<code class="docutils literal notranslate"><span class="pre">dt-sdk</span> <span class="pre">create</span> <span class="pre">my_extension</span></code>.</p>
+<section id="extension-definition">
+<h2>Extension Definition<a class="headerlink" href="#extension-definition" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">extension.yaml</span></code></p>
+<p>This is the main configuration file of the extension. It contains information
+about the extension name, version, and so on.</p>
+<p>Here is what a sample extension definition looks like:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom:my-extension</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0.1</span>
+<span class="nt">minDynatraceVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.285&quot;</span>
+<span class="nt">author</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dynatrace&quot;</span>
+
+<span class="nt">python</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_extension</span>
+<span class="w">    </span><span class="nt">version</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.10&quot;</span>
+
+<span class="w">  </span><span class="nt">activation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">remote</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">activationSchema.json</span>
+<span class="w">    </span><span class="nt">local</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">activationSchema.json</span>
+</pre></div>
+</div>
+<section id="extension-name">
+<h3>Extension Name<a class="headerlink" href="#extension-name" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">name:</span></code></p>
+<p>All extensions must have a unique name. The name must be in the <code class="docutils literal notranslate"><span class="pre">custom:</span></code> namespace,
+when it is a custom extension.</p>
+<div class="warning admonition">
+<p class="admonition-title">Official extensions</p>
+<p>Only Dynatrace can create extensions in the <code class="docutils literal notranslate"><span class="pre">com.dynatrace.extension</span></code> namespace.
+These extensions are signed by Dynatrace and are considered official.</p>
+</div>
+</section>
+<section id="extension-version">
+<h3>Extension Version<a class="headerlink" href="#extension-version" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">version:</span></code></p>
+<p>The version field must be bumped every time the extension is uploaded to the environment.
+Otherwise an error will be thrown. The environment does not accept the same version twice.
+Each uploaded version must always be unique for the audit tracking purposes.</p>
+</section>
+<section id="minimal-dynatrace-version">
+<h3>Minimal Dynatrace Version<a class="headerlink" href="#minimal-dynatrace-version" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">minDynatraceVersion:</span></code></p>
+<p>The minDynatraceVersion field specifies the minimal Dynatrace version that is required
+to run the extension. If the ActiveGate or OneAgent version is lower than the
+specified one, then the extension will not be activated on that agent.</p>
+<p>This is useful when the extension uses some of the new features that are not yet
+available in the older versions of Dynatrace environment or extension execution controller.</p>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">python:</span></code></p>
+<p>This is a specification of datasource that Extension Framework understands. There are
+different datasources that can be used to collect data from the multitude of sources.</p>
+<div class="seealso admonition">
+<p class="admonition-title">Datasources</p>
+<p>Other datasources include <a class="reference external" href="https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/data-sources/snmp-extensions">snmp</a>, <a class="reference external" href="https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/data-sources/jmx">jmx</a>, <a class="reference external" href="https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/data-sources/prometheus-extensions">prometheus</a>, <a class="reference external" href="https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/data-sources/sql">sql</a>, <a class="reference external" href="https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/data-sources/wmi-extensions">wmi</a>.</p>
+</div>
+<p>They can’t be used within the same extension, but all EF2.0 extensions follow the same
+format, where there is the <code class="docutils literal notranslate"><span class="pre">extension.yaml</span></code> file, which contains the required
+definition of the datasource.</p>
+</section>
+<section id="python-runtime">
+<h3>Python Runtime<a class="headerlink" href="#python-runtime" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">runtime:</span></code></p>
+<p>Here we can specify which minimal version of Python is required to run the extension.
+This does not play a big role, since the version of Python is determined by what
+is received from ActiveGate or OneAgent. This field is mandatory.</p>
+<div class="warning admonition">
+<p class="admonition-title">Don’t bring your own Python</p>
+<p>Custom Python runtime is not supported. ActiveGate and OneAgent supply the Python
+interpreter for the extension to be able to run. It is impossible to specify a
+custom Python interpreter or use one that is installed on the system.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">module</span></code> field specifies the name of the main Python module that contains the
+extension logic. This module must be importable by the Python interpreter, thus it
+must always contain the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file to be considered a valid Python module.</p>
+</section>
+<section id="datasource-activation">
+<h3>Datasource Activation<a class="headerlink" href="#datasource-activation" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">activation:</span></code></p>
+<p>This is a specification of the datasource activation. It might contain <code class="docutils literal notranslate"><span class="pre">local:</span></code> and
+<code class="docutils literal notranslate"><span class="pre">remote:</span></code> sections or only one of them.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">local:</span></code> means the extension can run on OneAgent. When you deploy the extension,
+the environment will automatically read this value and will understand that an active
+OneAgent is required to run this extension.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remote:</span></code> means the extension can run on ActiveGate. When you deploy the extension,
+the environment will automatically read this value and will understand that an active
+ActiveGate is required to run this extension.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">path:</span></code> within the activation section contains a path to the configuration
+that specifies a full definition of the monitoring configuration. What fields must be
+there? Of what type? Does it contain lists? What are the possible values? All of these
+can be describied in the <code class="docutils literal notranslate"><span class="pre">activationSchema.json</span></code> file.</p>
+</section>
+</section>
+<section id="activation-schema">
+<h2>Activation Schema<a class="headerlink" href="#activation-schema" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">activationSchema.json</span></code></p>
+<p>This is a schema file that describes the structure of the monitoring configuration.</p>
+<p>For the purposes of giving an example, here is a very simple schema with a single
+field that will run on ActiveGate. The schema generated by the <a class="reference internal" href="../cli/create.html"><span class="doc">Create</span></a>
+command is much larger and contains more fields, passwords, list items, and so on.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;pythonRemote&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Host&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;nullable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;dynatrace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Extension configuration&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;schemaId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python-extension.activation&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Extension configuration&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ownerProductManagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Albus Dumbledore&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ownerDevelopment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Peter Parker&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;maturity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GENERAL_AVAILABILITY&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;allowedScopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;environment&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;multiObject&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;pythonRemote&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Python Remote Extension&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/types/pythonRemote&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="activation-config">
+<h2>Activation Config<a class="headerlink" href="#activation-config" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">activation.json</span></code></p>
+<p>This is a config file that can be used for local testing, when extension instance
+is launched using the <a class="reference internal" href="../cli/run.html"><span class="doc">Run</span></a> command. It must contain all of the mandatory
+fields as defined in the <a class="reference internal" href="#activation-schema">Activation Schema</a>.</p>
+<p>When extension is deployed to the Dynatrace environment and monitoring configuration
+is created, then the environment provides an individual activation config for each
+instance of the extension.</p>
+<p>Here is what a sample activation config looks like:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my_extension activation&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;activationContext&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REMOTE&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;pythonRemote&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:15672&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;guest&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;guest&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="setup-py">
+<h2>Setup.py<a class="headerlink" href="#setup-py" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setup.py</span></code></p>
+<p>This is a standard Python setup file that is used to package the extension and
+is used by the extension execution controller to install the extension on the
+ActiveGate or OneAgent along with the required dependencies.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">find_packages</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_extension&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;My_extension python EF2 extension&quot;</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Dynatrace&quot;</span><span class="p">,</span>
+    <span class="n">packages</span><span class="o">=</span><span class="n">find_packages</span><span class="p">(),</span>
+    <span class="n">python_requires</span><span class="o">=</span><span class="s2">&quot;&gt;=3.10&quot;</span><span class="p">,</span>
+    <span class="n">include_package_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dt-extensions-sdk&quot;</span><span class="p">],</span>
+    <span class="n">extras_require</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;dev&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dt-extensions-sdk[cli]&quot;</span><span class="p">]},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="important admonition">
+<p class="admonition-title">Dependencies</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file is the place where any dependencies must be specified
+in the <code class="docutils literal notranslate"><span class="pre">install_requires</span></code> section.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dt-extensions-sdk</span></code> package must always be specified as a dependency. However,
+theoretically, it is possible to write a Python code that will be capable of
+communication with the extension execution controller without using the SDK.</p>
+<p>We do not recommend doing that, since the SDK provides everything that is needed
+and getting rid of it is an equivalent of reinventing the wheel.</p>
+</div>
+<div class="important admonition">
+<p class="admonition-title">Bumping version</p>
+<p>When bumping the version of the extension in the <code class="docutils literal notranslate"><span class="pre">extension.yaml</span></code>,
+the <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file must be updated as well. The two versions must match.</p>
+</div>
+<div class="danger admonition">
+<p class="admonition-title">Extension size</p>
+<p>Be careful when adding dependencies to the extension. The size of the extension
+must not exceed 15MB. If it does, then the extension will not be accepted by
+the environment.</p>
+<p>When building the extension using the <a class="reference internal" href="../cli/build.html"><span class="doc">Build</span></a> command, the dependencies
+can be downloaded for all target platforms (Linux, Windows) and the size of the
+dependencies for some of them might be quite large.</p>
+</div>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="installation.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Installation
+    </a>
+    <a class="float-right" href="building.html" title="Next">
+        Building Extensions <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Extension Structure</a><ul>
+<li><a class="reference internal" href="#extension-definition">Extension Definition</a><ul>
+<li><a class="reference internal" href="#extension-name">Extension Name</a></li>
+<li><a class="reference internal" href="#extension-version">Extension Version</a></li>
+<li><a class="reference internal" href="#minimal-dynatrace-version">Minimal Dynatrace Version</a></li>
+<li><a class="reference internal" href="#python">Python</a></li>
+<li><a class="reference internal" href="#python-runtime">Python Runtime</a></li>
+<li><a class="reference internal" href="#datasource-activation">Datasource Activation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#activation-schema">Activation Schema</a></li>
+<li><a class="reference internal" href="#activation-config">Activation Config</a></li>
+<li><a class="reference internal" href="#setup-py">Setup.py</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://dynatrace.com/">Dynatrace</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="mailto:extenions@dynatrace.com">Extensions Team</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center">
+                <p style="display: none">
+                    <a class="text-light" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Wagtail Sphinx Theme 6.3.0
+                    </a>
+                </p>
+            </div>
+            <div class="text-center">
+                    &copy; Copyright 2023–2024, Dynatrace LLC
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

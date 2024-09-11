@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>&lt;no title&gt; &mdash; dt-sdk 1.0.0 documentation</title>
+    
+        <link rel="shortcut icon" href="../_static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=ea6a6c20" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="dt-sdk 1.0.0 documentation" href="#" />
+            <link rel="next" title="Events" href="events/index.html" />
+            <link rel="prev" title="Wheel" href="../cli/wheel.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="/"
+                        title="dt-sdk"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/dt-sdk-logo.png" width="45" height="59" alt="dt-sdk"
+                            class="logo-img"
+                        />
+                        dt-sdk
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/extension_structure.html">Extension Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/building.html">Building Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/migration.html">Migrating EF1 Extensions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">All Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/create.html">Create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/upload.html">Upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/help.html">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/assemble.html">Assemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/gencerts.html">Generate Certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/sign.html">Sign</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli/wheel.html">Wheel</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="events/index.html">Events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="events/event_severity.html">Event Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="events/event_type.html">Event Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metrics/index.html">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metrics/metric.html">Metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics/metric_type.html">Metric Type</a></li>
+</ul>
+</li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">&lt;no title&gt;</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/dynatrace-extensions/dt-extensions-python-sdk/tree/main/docs/api/extension.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/api/extension.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <blockquote>
+<div><p>pExtension</p>
+</div></blockquote>
+<hr class="docutils" />
+<dl class="py class">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynatrace_extension.</span></span><span class="sig-name descname"><span class="pre">Extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for Python extensions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#dynatrace_extension.Extension.logger" title="Link to this definition">¶</a></dt>
+<dd><p>Embedded logger object for the extension.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.schedule_decorators">
+<span class="sig-name descname"><span class="pre">schedule_decorators</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#dynatrace_extension.Extension.schedule_decorators" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.is_helper">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_helper</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#dynatrace_extension.Extension.is_helper" title="Link to this definition">¶</a></dt>
+<dd><p>Internal property used by the EEC.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.task_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#dynatrace_extension.Extension.task_id" title="Link to this definition">¶</a></dt>
+<dd><p>Internal property used by the EEC.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.monitoring_config_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitoring_config_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#dynatrace_extension.Extension.monitoring_config_id" title="Link to this definition">¶</a></dt>
+<dd><p>Internal property used by the EEC.</p>
+<p>Represents a unique identifier of the monitoring configuration.
+that is assigned to this particular extension instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.run" title="Link to this definition">¶</a></dt>
+<dd><p>Launch the extension instance.</p>
+<p>Calling this method starts the main loop of the extension.</p>
+<p>This method must be invoked once to start the extension,</p>
+<p>if <cite>–fastcheck</cite> is set, the extension will run in fastcheck mode,
+otherwise the main loop is started, which periodically runs:</p>
+<ul class="simple">
+<li><p>The scheduled callbacks</p></li>
+<li><p>The heartbeat method</p></li>
+<li><p>The metrics publisher method</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.on_shutdown">
+<span class="sig-name descname"><span class="pre">on_shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.on_shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.on_shutdown" title="Link to this definition">¶</a></dt>
+<dd><p>Callback method to be invoked when the extension is shutting down.</p>
+<p>Called when extension exits after it has received shutdown signal from EEC
+This is executed before metrics are flushed to EEC</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.schedule">
+<span class="sig-name descname"><span class="pre">schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ActivationType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.schedule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.schedule" title="Link to this definition">¶</a></dt>
+<dd><p>Schedule a method to be executed periodically.</p>
+<p>The callback method will be periodically invoked in a separate thread.
+The callback method is always immediately scheduled for execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>callback</strong> – The callback method to be invoked</p></li>
+<li><p><strong>interval</strong> – The time interval between invocations, can be a timedelta object,
+or an int representing the number of seconds</p></li>
+<li><p><strong>args</strong> – Arguments to the callback, if any</p></li>
+<li><p><strong>activation_type</strong> – Optional activation type when this callback should run,
+can be ‘ActivationType.LOCAL’ or ‘ActivationType.REMOTE’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.query" title="Link to this definition">¶</a></dt>
+<dd><p>Callback to be executed every minute by default.</p>
+<p>Optional method that can be implemented by subclasses.
+The query method is always scheduled to run every minute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>Callback to be executed when the extension starts.</p>
+<p>Called once after the extension starts and the processes arguments are parsed.
+Sometimes there are tasks the user needs to do that must happen before runtime,
+but after the activation config has been received, example: Setting the schedule frequency
+based on the user input on the monitoring configuration, this can be done on this method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.fastcheck">
+<span class="sig-name descname"><span class="pre">fastcheck</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Status</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.fastcheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.fastcheck" title="Link to this definition">¶</a></dt>
+<dd><p>Callback executed when extension is launched.</p>
+<p>Called if the extension is run in the <cite>fastcheck</cite> mode. Only invoked for remote
+extensions.
+This method is not called if fastcheck callback was already registered with
+Extension.register_fastcheck().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Status with optional message whether the fastcheck succeed or failed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.register_fastcheck">
+<span class="sig-name descname"><span class="pre">register_fastcheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fast_check_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ActivationConfig</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Status</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.register_fastcheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.register_fastcheck" title="Link to this definition">¶</a></dt>
+<dd><p>Registers fastcheck callback that is executed in the <cite>fastcheck</cite> mode.</p>
+<p>Extension.fastcheck() is not called if fastcheck callback is registered with this method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fast_check_callback</strong> – callable called with ActivationConfig and</p></li>
+<li><p><strong>message</strong> (<em>extension_config arguments. Must return the Status with optional</em>)</p></li>
+<li><p><strong>failed.</strong> (<em>whether the fastcheck succeed or</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_metric">
+<span class="sig-name descname"><span class="pre">report_metric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SummaryStat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">techrule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="metrics/metric_type.html#dynatrace_extension.MetricType" title="dynatrace_extension.sdk.metric.MetricType"><span class="pre">MetricType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MetricType.GAUGE</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_metric" title="Link to this definition">¶</a></dt>
+<dd><p>Report a metric.</p>
+<p>Metric is sent to EEC using an HTTP request and MINT protocol. EEC then
+sends the metrics to the tenant.</p>
+<p>By default, it reports a gauge metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – The metric key, must follow the MINT specification</p></li>
+<li><p><strong>value</strong> – The metric value, can be a simple value or a SummaryStat</p></li>
+<li><p><strong>dimensions</strong> – A dictionary of dimensions</p></li>
+<li><p><strong>techrule</strong> – The technology rule string set by self.techrule setter.</p></li>
+<li><p><strong>timestamp</strong> – The timestamp of the metric, defaults to the current time</p></li>
+<li><p><strong>metric_type</strong> – The type of the metric, defaults to MetricType.GAUGE</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_mint_lines">
+<span class="sig-name descname"><span class="pre">report_mint_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_mint_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_mint_lines" title="Link to this definition">¶</a></dt>
+<dd><p>Report mint lines using the MINT protocol</p>
+<p class="rubric">Examples</p>
+<p>Metric lines must comply with the MINT format.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">report_mint_lines</span><span class="p">([</span><span class="s2">&quot;my_metric 1&quot;</span><span class="p">,</span> <span class="s2">&quot;my_other_metric 2&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lines</strong> – A list of mint lines</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_event">
+<span class="sig-name descname"><span class="pre">report_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="events/event_severity.html#dynatrace_extension.Severity" title="dynatrace_extension.sdk.event.Severity"><span class="pre">Severity</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Severity.INFO</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_event" title="Link to this definition">¶</a></dt>
+<dd><p>Report an event using log ingest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the event</p></li>
+<li><p><strong>description</strong> – The description of the event</p></li>
+<li><p><strong>properties</strong> – A dictionary of extra event properties</p></li>
+<li><p><strong>timestamp</strong> – The timestamp of the event, defaults to the current time</p></li>
+<li><p><strong>severity</strong> – The severity of the event, defaults to Severity.INFO</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_dt_event">
+<span class="sig-name descname"><span class="pre">report_dt_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="events/event_type.html#dynatrace_extension.DtEventType" title="dynatrace_extension.sdk.extension.DtEventType"><span class="pre">DtEventType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_dt_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_dt_event" title="Link to this definition">¶</a></dt>
+<dd><p>Reports an event using the v2 event ingest API.</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">report_event</span></code>, this directly raises an event or even a problem
+based on the specified <code class="docutils literal notranslate"><span class="pre">event_type</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For reference see: <a class="reference external" href="https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event">https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> – The event type chosen from type Enum (required)</p></li>
+<li><p><strong>title</strong> – The title of the event (required)</p></li>
+<li><p><strong>start_time</strong> – The start time of event in UTC ms, if not set, current timestamp (optional)</p></li>
+<li><p><strong>end_time</strong> – The end time of event in UTC ms, if not set, current timestamp + timeout (optional)</p></li>
+<li><p><strong>timeout</strong> – The timeout of event in minutes, if not set, 15 (optional)</p></li>
+<li><p><strong>entity_selector</strong> – The entity selector, if not set, the event is associated with environment entity (optional)</p></li>
+<li><p><strong>properties</strong> – A map of event properties (optional)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_dt_event_dict">
+<span class="sig-name descname"><span class="pre">report_dt_event_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_dt_event_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_dt_event_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Report an event using event ingest API with provided dictionary.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For reference see: <a class="reference external" href="https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event">https://www.dynatrace.com/support/help/dynatrace-api/environment-api/events-v2/post-event</a></p>
+</div>
+<p>Format of the event dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;eventType&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;eventType&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;CUSTOM_INFO&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;CUSTOM_ANNOTATION&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;CUSTOM_CONFIGURATION&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;CUSTOM_DEPLOYMENT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;MARKED_FOR_TERMINATION&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ERROR_EVENT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;AVAILABILITY_EVENT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;PERFORMANCE_EVENT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;RESOURCE_CONTENTION_EVENT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;CUSTOM_ALERT&quot;</span>
+            <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;minLength&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;startTime&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;entitySelector&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patternProperties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;^.*$&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_log_event">
+<span class="sig-name descname"><span class="pre">report_log_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_log_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_log_event" title="Link to this definition">¶</a></dt>
+<dd><p>Report a custom log event using log ingest.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See reference: <a class="reference external" href="https://www.dynatrace.com/support/help/shortlink/log-monitoring-log-data-ingestion">https://www.dynatrace.com/support/help/shortlink/log-monitoring-log-data-ingestion</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_event</strong> – The log event dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_log_events">
+<span class="sig-name descname"><span class="pre">report_log_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_log_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_log_events" title="Link to this definition">¶</a></dt>
+<dd><p>Report a list of custom log events using log ingest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_events</strong> – The list of log events</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.report_log_lines">
+<span class="sig-name descname"><span class="pre">report_log_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.report_log_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.report_log_lines" title="Link to this definition">¶</a></dt>
+<dd><p>Report a list of log lines using log ingest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_lines</strong> – The list of log lines</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.enabled_feature_sets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enabled_feature_sets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dynatrace_extension.Extension.enabled_feature_sets" title="Link to this definition">¶</a></dt>
+<dd><p>Map of enabled feautre sets and corresponding metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing enabled feature sets with corresponding
+metrics defined in <code class="docutils literal notranslate"><span class="pre">extension.yaml</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.enabled_feature_sets_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enabled_feature_sets_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dynatrace_extension.Extension.enabled_feature_sets_names" title="Link to this definition">¶</a></dt>
+<dd><p>Names of enabled feature sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List containing names of enabled feature sets.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.enabled_feature_sets_metrics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enabled_feature_sets_metrics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dynatrace_extension.Extension.enabled_feature_sets_metrics" title="Link to this definition">¶</a></dt>
+<dd><p>Enabled metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of all metric keys from enabled feature sets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.get_version">
+<span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.get_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.get_version" title="Link to this definition">¶</a></dt>
+<dd><p>Return the extension version.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.techrule">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">techrule</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#dynatrace_extension.Extension.techrule" title="Link to this definition">¶</a></dt>
+<dd><p>Internal property used by the EEC.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.get_activation_config">
+<span class="sig-name descname"><span class="pre">get_activation_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ActivationConfig</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.get_activation_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.get_activation_config" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the activation config.</p>
+<p>Represents activation configuration assigned to this particular
+extension instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ActivationConfig object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynatrace_extension.Extension.get_snapshot">
+<span class="sig-name descname"><span class="pre">get_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Snapshot</span></span></span><a class="reference internal" href="../_modules/dynatrace_extension/sdk/extension.html#Extension.get_snapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynatrace_extension.Extension.get_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves an oneagent snapshot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot_file</strong> – Optional path to the snapshot file, only used when running from dt-sdk run</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Snapshot object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../cli/wheel.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Wheel
+    </a>
+    <a class="float-right" href="events/index.html" title="Next">
+        Events <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">Extension</span></code></a><ul>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.logger"><code class="docutils literal notranslate"><span class="pre">Extension.logger</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.schedule_decorators"><code class="docutils literal notranslate"><span class="pre">Extension.schedule_decorators</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.is_helper"><code class="docutils literal notranslate"><span class="pre">Extension.is_helper</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.task_id"><code class="docutils literal notranslate"><span class="pre">Extension.task_id</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.monitoring_config_id"><code class="docutils literal notranslate"><span class="pre">Extension.monitoring_config_id</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.run"><code class="docutils literal notranslate"><span class="pre">Extension.run()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.on_shutdown"><code class="docutils literal notranslate"><span class="pre">Extension.on_shutdown()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.schedule"><code class="docutils literal notranslate"><span class="pre">Extension.schedule()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.query"><code class="docutils literal notranslate"><span class="pre">Extension.query()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.initialize"><code class="docutils literal notranslate"><span class="pre">Extension.initialize()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.fastcheck"><code class="docutils literal notranslate"><span class="pre">Extension.fastcheck()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.register_fastcheck"><code class="docutils literal notranslate"><span class="pre">Extension.register_fastcheck()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_metric"><code class="docutils literal notranslate"><span class="pre">Extension.report_metric()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_mint_lines"><code class="docutils literal notranslate"><span class="pre">Extension.report_mint_lines()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_event"><code class="docutils literal notranslate"><span class="pre">Extension.report_event()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_dt_event"><code class="docutils literal notranslate"><span class="pre">Extension.report_dt_event()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_dt_event_dict"><code class="docutils literal notranslate"><span class="pre">Extension.report_dt_event_dict()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_log_event"><code class="docutils literal notranslate"><span class="pre">Extension.report_log_event()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_log_events"><code class="docutils literal notranslate"><span class="pre">Extension.report_log_events()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.report_log_lines"><code class="docutils literal notranslate"><span class="pre">Extension.report_log_lines()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.enabled_feature_sets"><code class="docutils literal notranslate"><span class="pre">Extension.enabled_feature_sets</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.enabled_feature_sets_names"><code class="docutils literal notranslate"><span class="pre">Extension.enabled_feature_sets_names</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.enabled_feature_sets_metrics"><code class="docutils literal notranslate"><span class="pre">Extension.enabled_feature_sets_metrics</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.get_version"><code class="docutils literal notranslate"><span class="pre">Extension.get_version()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.techrule"><code class="docutils literal notranslate"><span class="pre">Extension.techrule</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.get_activation_config"><code class="docutils literal notranslate"><span class="pre">Extension.get_activation_config()</span></code></a></li>
+<li><a class="reference internal" href="#dynatrace_extension.Extension.get_snapshot"><code class="docutils literal notranslate"><span class="pre">Extension.get_snapshot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://dynatrace.com/">Dynatrace</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="mailto:extenions@dynatrace.com">Extensions Team</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center">
+                <p style="display: none">
+                    <a class="text-light" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Wagtail Sphinx Theme 6.3.0
+                    </a>
+                </p>
+            </div>
+            <div class="text-center">
+                    &copy; Copyright 2023–2024, Dynatrace LLC
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
