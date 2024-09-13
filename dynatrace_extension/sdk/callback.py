@@ -89,13 +89,13 @@ class WrappedCallback:
     def initial_wait_time(self) -> float:
         if not self.running_in_sim:
             """
-            Here we chose a random second between 1 and 59 to start the callback
+            Here we chose a random second between 5 and 55 to start the callback
             This is to distribute load for extension running on this host
             When running from the simulator, this is not done
             """
 
             now = self.get_current_time_with_cluster_diff()
-            random_second = random.randint(1, 59)  # noqa: S311
+            random_second = random.randint(5, 55)  # noqa: S311
             next_execution = datetime.now().replace(second=random_second, microsecond=0)
             if next_execution <= now:
                 # The random chosen second already passed this minute
