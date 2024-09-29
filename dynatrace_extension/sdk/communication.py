@@ -397,17 +397,18 @@ class DebugClient(CommunicationClient):
 
         batches = divide_into_batches(mint_lines, MAX_METRIC_REQUEST_SIZE)
         for batch in batches:
+            lines = json.loads(batch)
             if self.local_ingest:
                 response = request(
                     "POST",
                     f"http://localhost:{self.local_ingest_port}/metrics/ingest",
-                    body=batch,
+                    body='\n'.join(lines).encode(),
                     headers={"Content-Type": CONTENT_TYPE_PLAIN},
                 ).json()
                 mint_response = MintResponse.from_json(response)
                 responses.append(mint_response)
             elif self.print_metrics:
-                for line in mint_lines:
+                for line in lines:
                     self.logger.info(f"send_metric: {line}")
 
         return responses
