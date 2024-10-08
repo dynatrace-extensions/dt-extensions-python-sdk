@@ -402,7 +402,7 @@ class DebugClient(CommunicationClient):
                 response = request(
                     "POST",
                     f"http://localhost:{self.local_ingest_port}/metrics/ingest",
-                    body='\n'.join(lines).encode(),
+                    body="\n".join(lines).encode(),
                     headers={"Content-Type": CONTENT_TYPE_PLAIN},
                 ).json()
                 mint_response = MintResponse.from_json(response)

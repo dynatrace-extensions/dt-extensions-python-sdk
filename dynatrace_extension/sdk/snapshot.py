@@ -194,7 +194,11 @@ def find_log_dir() -> Path:
             if line.startswith("LogDir"):
                 log_dir = line.split("=")[1].strip()
                 if not log_dir:
-                    return Path(os.path.expandvars("%PROGRAMDATA%") + "/dynatrace/oneagent/log") if os.name == "nt" else Path("/var/log/dynatrace/oneagent")
+                    return (
+                        Path(os.path.expandvars("%PROGRAMDATA%") + "/dynatrace/oneagent/log")
+                        if os.name == "nt"
+                        else Path("/var/log/dynatrace/oneagent")
+                    )
                 return Path(log_dir)
     msg = f"Could not find LogDir in {installation_conf}"
     raise Exception(msg)
