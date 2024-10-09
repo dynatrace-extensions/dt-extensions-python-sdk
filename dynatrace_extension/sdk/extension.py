@@ -748,6 +748,7 @@ class Extension:
 
         if not self._is_fastcheck:
             try:
+                self._heartbeat_iteration()
                 self.initialize()
                 if not self.is_helper:
                     self.schedule(self.query, timedelta(minutes=1))
@@ -813,7 +814,6 @@ class Extension:
         # These were scheduled before the extension started, schedule them now
         for callback in self._scheduled_callbacks_before_run:
             self._schedule_callback(callback)
-        self._heartbeat_iteration()
         self._metrics_iteration()
         self._sfm_metrics_iteration()
         self._timediff_iteration()
