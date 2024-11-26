@@ -19,7 +19,7 @@ from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional, Un
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue
+from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue, MultiStatus
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
@@ -974,7 +974,9 @@ class Extension:
             if callback.status.is_error():
                 overall_status.status = callback.status.status
                 messages.append(f"{callback}: {callback.status.message}")
-
+                continue
+            if callback.status.message is not None and callback.status.message != "":
+                messages.append(f"{callback}: {callback.status.message}")
         overall_status.message = "\n".join(messages)
         return overall_status
 

@@ -59,6 +59,29 @@ class Status:
         return self.status not in (StatusValue.OK, StatusValue.EMPTY)
 
 
+class MultiStatus:
+
+    def __init__(self):
+        self.statuses = []
+
+    def add_status(self, status: StatusValue, message):
+        self.statuses.append(Status(status, message))
+
+    def build(self) -> Status:
+        ret = Status(StatusValue.OK)
+        if len(self.statuses) == 0:
+            return ret
+
+        messages = []
+        for stored_status in self.statuses:
+            print(stored_status)
+            if stored_status.is_error():
+                ret.status = stored_status.status
+            messages.append(stored_status.message)
+        ret.message = "\n".join(messages)
+        return ret
+
+
 class CommunicationClient(ABC):
     """
     Abstract class for extension communication
