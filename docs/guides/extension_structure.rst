@@ -195,7 +195,8 @@ Activation Config
 
 This is a config file that can be used for local testing, when extension instance
 is launched using the :doc:`/cli/run` command. It must contain all of the mandatory
-fields as defined in the `Activation Schema`_.
+fields as defined in the `Activation Schema`_. This file also supports using secrets
+from the ``secrets.json`` file.
 
 When extension is deployed to the Dynatrace environment and monitoring configuration
 is created, then the environment provides an individual activation config for each
@@ -215,11 +216,31 @@ Here is what a sample activation config looks like:
                 {
                     "url": "http://127.0.0.1:15672",
                     "user": "guest",
-                    "password": "guest"
+                    "password": "{{myPassword}}"
                 }
             ]
         }
     }
+
+
+Secrets
+-----------------
+
+``secrets.json``
+
+This file defines the secrets that can be used in ``activation.json``. Specify 
+each secret as key-value pair and then use ``{{key}}`` in the activation config 
+file to use the corresponding secret's value. Only secrets of type ``string`` 
+are supported.
+
+This file is by default in ``.gitignore``.
+
+.. code:: json
+
+    {
+        "myPassword": "secretPassword"
+    }
+
 
 Setup.py
 --------
