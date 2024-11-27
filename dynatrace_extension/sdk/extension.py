@@ -715,6 +715,7 @@ class Extension:
         # Debug parameters, these are used when running the extension locally
         parser.add_argument("--extensionconfig", required=False, default=None)
         parser.add_argument("--activationconfig", required=False, default="activation.json")
+        parser.add_argument("--secrets", required=False, default="secrets.json")
         parser.add_argument("--no-print-metrics", required=False, action="store_true")
 
         args, unknown = parser.parse_known_args()
@@ -725,6 +726,7 @@ class Extension:
             print_metrics = not args.no_print_metrics
             self._client = DebugClient(
                 activation_config_path=args.activationconfig,
+                secrets_path=args.secrets,
                 extension_config_path=args.extensionconfig,
                 logger=api_logger,
                 local_ingest=args.local_ingest,

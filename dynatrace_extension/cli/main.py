@@ -40,6 +40,7 @@ def version():
 def run(
     extension_dir: Path = typer.Argument("."),
     activation_config: str = "activation.json",
+    secrets: str = "secrets.json",
     fast_check: bool = typer.Option(False, "--fastcheck"),
     local_ingest: bool = typer.Option(False, "--local-ingest"),
     local_ingest_port: int = typer.Option(14499, "--local-ingest-port"),
@@ -50,6 +51,7 @@ def run(
 
     :param extension_dir: The directory of the extension, by default this is the current directory
     :param activation_config: The activation config file, by default this is activation.json
+    :param secrets: The secrets file to be used to enrich the activation config, by default this is secrets.json
     :param fast_check: If true, run a fastcheck and exits
     :param local_ingest: If true, send metrics to localhost:14499 on top of printing them
     :param local_ingest_port: The port to send metrics to, by default this is 14499
@@ -59,7 +61,15 @@ def run(
     # This parses the yaml, which validates it before running
     extension_yaml = ExtensionYaml(extension_dir / "extension/extension.yaml")
     try:
-        command = [sys.executable, "-m", extension_yaml.python.runtime.module, "--activationconfig", activation_config]
+        command = [
+            sys.executable,
+            "-m",
+            extension_yaml.python.runtime.module,
+            "--activationconfig",
+            activation_config,
+            "--secrets",
+            secrets,
+        ]
         if fast_check:
             command.append("--fastcheck")
         if local_ingest:

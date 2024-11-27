@@ -322,16 +322,26 @@ class DebugClient(CommunicationClient):
     def __init__(
         self,
         activation_config_path: str,
+        secrets_path: str,
         extension_config_path: str,
         logger: logging.Logger,
         local_ingest: bool = False,
         local_ingest_port: int = 14499,
         print_metrics: bool = True,
     ):
+
+        self.secrets = {}
+        if secrets_path and Path(secrets_path).exists():
+            with open(secrets_path) as f:
+                self.secrets = json.load(f)
+
         self.activation_config = {}
         if activation_config_path and Path(activation_config_path).exists():
             with open(activation_config_path) as f:
-                self.activation_config = json.load(f)
+                raw_activation_config = f.read()
+                self.activation_config = json.loads(
+                    self.replace_secrets_in_activation_config(self.secrets, raw_activation_config)
+                )
 
         self.extension_config = ""
         if not extension_config_path:
@@ -429,6 +439,12 @@ class DebugClient(CommunicationClient):
 
     def get_cluster_time_diff(self) -> int:
         return 0
+
+    def replace_secrets_in_activation_config(self, secrets: dict, activation_config_string: str) -> str:
+        for secret_name, secret_value in secrets.items():
+            activation_config_string = activation_config_string.replace(f"{{{{{secret_name}}}}}", str(secret_value))
+
+        return activation_config_string
 
 
 def divide_into_batches(
