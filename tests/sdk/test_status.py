@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from dynatrace_extension import Extension
 from dynatrace_extension.sdk.communication import DebugClient
-from dynatrace_extension.sdk.extension import Status, StatusValue
+from dynatrace_extension.sdk.extension import Status, StatusValue, MultiStatus
 
 
 class TestStatus(unittest.TestCase):
@@ -52,7 +52,7 @@ class TestStatus(unittest.TestCase):
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
         self.assertIn("something went wrong", status.message)
 
-    def test_mutiple_bad_status(self):
+    def test_multiple_bad_status(self):
         ext = Extension()
         ext.logger = MagicMock()
         ext._running_in_sim = True
@@ -70,7 +70,7 @@ class TestStatus(unittest.TestCase):
         ext.schedule(bad_method_1, timedelta(seconds=1))
         ext.schedule(bad_method_2, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        time.sleep(1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -93,3 +93,66 @@ class TestStatus(unittest.TestCase):
 
         self.assertTrue(extension._scheduled_callbacks[1].status.is_error())
         self.assertIn("longer than the interval", extension._scheduled_callbacks[1].status.message)
+
+    def test_direct_status_return(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            return Status(StatusValue.OK, "foo1")
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.OK)
+        self.assertIn("foo1", status.message)
+
+    def test_direct_statuses_return(self):
+
+        def callback():
+            return Status(StatusValue.OK, "foo1")
+
+        def custom_query():
+            return Status(StatusValue.EMPTY, "foo2")
+
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext.schedule(custom_query, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.OK)
+        self.assertIn("foo1", status.message)
+        self.assertIn("foo2", status.message)
+
+    def test_multistatus(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            ret = MultiStatus()
+            ret.add_status(StatusValue.OK, "foo1")
+            ret.add_status(StatusValue.UNKNOWN_ERROR, "foo2")
+            return ret
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(1)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.UNKNOWN_ERROR)
+        self.assertIn("foo1", status.message)

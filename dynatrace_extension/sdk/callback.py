@@ -9,7 +9,7 @@ from timeit import default_timer as timer
 from typing import Callable, Dict, Optional, Tuple
 
 from .activation import ActivationType
-from .communication import Status, StatusValue
+from .communication import Status, StatusValue, MultiStatus
 
 
 class WrappedCallback:
@@ -60,8 +60,13 @@ class WrappedCallback:
         start_time = timer()
         failed = False
         try:
-            self.callback(*self.callback_args, **self.callback_kwargs)
-            self.status = Status(StatusValue.OK)
+            ret = self.callback(*self.callback_args, **self.callback_kwargs)
+            if isinstance(ret, Status):
+                self.status = ret
+            elif isinstance(ret, MultiStatus):
+                self.status = ret.build()
+            else:
+                self.status = Status(StatusValue.OK)
         except Exception as e:
             failed = True
             self.logger.exception(f"Error running callback {self}: {e!r}")
