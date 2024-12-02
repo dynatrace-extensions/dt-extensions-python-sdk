@@ -726,9 +726,9 @@ class Extension:
             print_metrics = not args.no_print_metrics
             self._client = DebugClient(
                 activation_config_path=args.activationconfig,
-                secrets_path=args.secrets,
                 extension_config_path=args.extensionconfig,
                 logger=api_logger,
+                secrets_path=args.secrets,
                 local_ingest=args.local_ingest,
                 local_ingest_port=args.local_ingest_port,
                 print_metrics=print_metrics,

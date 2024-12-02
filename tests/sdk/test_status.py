@@ -25,7 +25,7 @@ class TestStatus(unittest.TestCase):
         ext = Extension()
         ext.logger = MagicMock()
         ext._running_in_sim = True
-        ext._client = DebugClient("", "", "", MagicMock())
+        ext._client = DebugClient("", "", MagicMock())
         ext._is_fastcheck = False
         ext.schedule(callback, timedelta(seconds=1))
         status = ext._build_current_status()
@@ -37,7 +37,7 @@ class TestStatus(unittest.TestCase):
         ext = Extension()
         ext.logger = MagicMock()
         ext._running_in_sim = True
-        ext._client = DebugClient("", "", "", MagicMock())
+        ext._client = DebugClient("", "", MagicMock())
         ext._is_fastcheck = False
 
         def bad_method():
@@ -56,7 +56,7 @@ class TestStatus(unittest.TestCase):
         ext = Extension()
         ext.logger = MagicMock()
         ext._running_in_sim = True
-        ext._client = DebugClient("", "", "", MagicMock())
+        ext._client = DebugClient("", "", MagicMock())
         ext._is_fastcheck = False
 
         def bad_method_1():

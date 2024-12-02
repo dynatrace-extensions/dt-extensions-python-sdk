@@ -322,9 +322,9 @@ class DebugClient(CommunicationClient):
     def __init__(
         self,
         activation_config_path: str,
-        secrets_path: str,
         extension_config_path: str,
         logger: logging.Logger,
+        secrets_path: str = "secrets.json",
         local_ingest: bool = False,
         local_ingest_port: int = 14499,
         print_metrics: bool = True,
