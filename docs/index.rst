@@ -78,6 +78,7 @@ structure:
    ├── my_extension
    │   ├── __init__.py
    │   └── __main__.py
+   ├── secrets.json
    └── setup.py
 
 .. admonition:: What do these files mean?
