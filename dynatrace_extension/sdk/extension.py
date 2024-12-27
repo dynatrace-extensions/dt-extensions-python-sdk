@@ -32,6 +32,7 @@ TIME_DIFF_INTERVAL = timedelta(seconds=60)
 
 CALLBACKS_THREAD_POOL_SIZE = 100
 INTERNAL_THREAD_POOL_SIZE = 20
+HEARTBEAT_THREAD_POOL_SIZE = 10
 
 RFC_3339_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 DATASOURCE_TYPE = "python"
@@ -220,6 +221,7 @@ class Extension:
         # Executors for the callbacks and internal methods
         self._callbacks_executor = ThreadPoolExecutor(max_workers=CALLBACKS_THREAD_POOL_SIZE)
         self._internal_executor = ThreadPoolExecutor(max_workers=INTERNAL_THREAD_POOL_SIZE)
+        self._heartbeat_executor = ThreadPoolExecutor(max_workers=HEARTBEAT_THREAD_POOL_SIZE)
 
         # Extension metrics
         self._metrics_lock = RLock()
@@ -827,7 +829,7 @@ class Extension:
         self._scheduler.enterabs(next_timestamp, 1, self._timediff_iteration)
 
     def _heartbeat_iteration(self):
-        self._internal_executor.submit(self._heartbeat)
+        self._heartbeat_executor.submit(self._heartbeat)
         next_timestamp = self._get_and_set_next_internal_callback_timestamp("heartbeat", HEARTBEAT_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 2, self._heartbeat_iteration)
 
