@@ -9,7 +9,7 @@ from timeit import default_timer as timer
 from typing import Callable, Dict, Optional, Tuple
 
 from .activation import ActivationType
-from .communication import Status, StatusValue, MultiStatus
+from .communication import MultiStatus, Status, StatusValue
 
 
 class WrappedCallback:

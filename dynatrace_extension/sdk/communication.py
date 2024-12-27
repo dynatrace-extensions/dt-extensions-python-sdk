@@ -74,7 +74,7 @@ class MultiStatus:
 
         messages = []
         for stored_status in self.statuses:
-            print(stored_status)
+            print(stored_status)  # noqa: T201
             if stored_status.is_error():
                 ret.status = stored_status.status
             messages.append(stored_status.message)
