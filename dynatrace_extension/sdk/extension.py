@@ -215,6 +215,7 @@ class Extension:
             "timediff": datetime.now() + TIME_DIFF_INTERVAL,
             "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
             "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
+            "events": datetime.now() + METRIC_SENDING_INTERVAL,
             "sfm_metrics": datetime.now() + SFM_METRIC_SENDING_INTERVAL,
         }
 
@@ -226,6 +227,10 @@ class Extension:
         # Extension metrics
         self._metrics_lock = RLock()
         self._metrics: List[str] = []
+
+        # Extension logs
+        self._logs_lock = RLock()
+        self._logs: List[dict] = []
 
         # Self monitoring metrics
         self._sfm_metrics_lock = Lock()
@@ -505,6 +510,7 @@ class Extension:
         properties: Optional[dict] = None,
         timestamp: Optional[datetime] = None,
         severity: Union[Severity, str] = Severity.INFO,
+        send_immediately: bool = False,
     ) -> None:
         """Report an event using log ingest.
 
@@ -514,6 +520,7 @@ class Extension:
             properties: A dictionary of extra event properties
             timestamp: The timestamp of the event, defaults to the current time
             severity: The severity of the event, defaults to Severity.INFO
+            send_immediately: Option to directly schedule log to be sent without batching
         """
         if timestamp is None:
             timestamp = datetime.now(tz=timezone.utc)
@@ -530,7 +537,7 @@ class Extension:
             **self._metadata,
             **properties,
         }
-        self._send_events(event)
+        self._send_events(event, send_immediately=send_immediately)
 
     def report_dt_event(
         self,
@@ -635,7 +642,7 @@ class Extension:
                         raise ValueError(msg)
         self._send_dt_event(event)
 
-    def report_log_event(self, log_event: dict):
+    def report_log_event(self, log_event: dict, send_immediately: bool = False):
         """Report a custom log event using log ingest.
 
         Note:
@@ -643,25 +650,28 @@ class Extension:
 
         Args:
             log_event: The log event dictionary.
+            send_immediately: Option to directly schedule log to be sent without batching
         """
-        self._send_events(log_event)
+        self._send_events(log_event, send_immediately=send_immediately)
 
-    def report_log_events(self, log_events: List[dict]):
+    def report_log_events(self, log_events: List[dict], send_immediately: bool = False):
         """Report a list of custom log events using log ingest.
 
         Args:
             log_events: The list of log events
+            send_immediately: Option to directly schedule log to be sent without batching
         """
-        self._send_events(log_events)
+        self._send_events(log_events, send_immediately=send_immediately)
 
-    def report_log_lines(self, log_lines: List[Union[str, bytes]]):
+    def report_log_lines(self, log_lines: List[Union[str, bytes]], send_immediately: bool = False):
         """Report a list of log lines using log ingest
 
         Args:
             log_lines: The list of log lines
+            send_immediately: Option to directly schedule log to be sent without batching
         """
         events = [{"content": line} for line in log_lines]
-        self._send_events(events)
+        self._send_events(events, send_immediately=send_immediately)
 
     @property
     def enabled_feature_sets(self) -> dict[str, list[str]]:
@@ -819,6 +829,7 @@ class Extension:
         for callback in self._scheduled_callbacks_before_run:
             self._schedule_callback(callback)
         self._metrics_iteration()
+        self._events_iteration()
         self._sfm_metrics_iteration()
         self._timediff_iteration()
         self._scheduler.run()
@@ -837,6 +848,11 @@ class Extension:
         self._internal_executor.submit(self._send_metrics)
         next_timestamp = self._get_and_set_next_internal_callback_timestamp("metrics", METRIC_SENDING_INTERVAL)
         self._scheduler.enterabs(next_timestamp, 1, self._metrics_iteration)
+
+    def _events_iteration(self):
+        self._internal_executor.submit(self._send_buffered_events)
+        next_timestamp = self._get_and_set_next_internal_callback_timestamp("events", METRIC_SENDING_INTERVAL)
+        self._scheduler.enterabs(next_timestamp, 1, self._events_iteration)
 
     def _sfm_metrics_iteration(self):
         self._internal_executor.submit(self._send_sfm_metrics)
@@ -1044,8 +1060,23 @@ class Extension:
             with self._internal_callbacks_results_lock:
                 self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
 
-    def _send_events(self, events: Union[dict, List[dict]]):
-        self._internal_executor.submit(self._send_events_internal, events)
+    def _send_events(self, events: Union[dict, List[dict]], send_immediately: bool = False):
+        if send_immediately:
+            self._internal_executor.submit(self._send_events_internal, events)
+            return
+        with self._logs_lock:
+            if isinstance(events, dict):
+                self._logs.append(events)
+            elif isinstance(events, list):
+                self._logs.extend(events)
+            else:
+                self.logger.error(f'Invalid log format: {events}')
+
+    def _send_buffered_events(self):
+        with self._logs_lock:
+            if len(self._logs) > 0:
+                self._send_events_internal(self._logs)
+                self._logs = []
 
     def _send_dt_event(self, event: dict[str, str | int | dict[str, str]]):
         self._client.send_dt_event(event)

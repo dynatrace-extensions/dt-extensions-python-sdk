@@ -60,6 +60,50 @@ class TestExtension(unittest.TestCase):
         with extension._metrics_lock:
             self.assertEqual(len(extension._metrics), 0)
 
+    def test_add_event(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_event("my_event1", "my_description")
+        extension.report_event("my_event1", "my_description")
+        self.assertEqual(len(extension._logs), 2)
+        self.assertEqual(extension._logs[0].get("content", "not_good"), f"my_event1\nmy_description")
+
+    def test_send_event_immediately(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_event("my_event1", "my_description", send_immediately=True)
+        extension.report_event("my_event1", "my_description", send_immediately=True)
+        self.assertEqual(len(extension._logs), 0)
+
+    def test_add_log_events(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_log_events([{"my_event": "hello there!"}, {"my_event": "hello there!"}])
+        self.assertEqual(len(extension._logs), 2)
+        self.assertEqual(extension._logs[0].get("my_event", "not_good"), "hello there!")
+
+    def test_send_log_events_immediately(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_log_events([{"my_event": "hello there!"}, {"my_event": "hello there!"}], send_immediately=True)
+        self.assertEqual(len(extension._logs), 0)
+
+    def test_flush_events(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_event("my_event1", "my_description")
+        extension.report_event("my_event1", "my_description")
+        self.assertEqual(len(extension._logs), 2)
+        extension._events_iteration()
+        time.sleep(0.01)
+        with extension._logs_lock:
+            self.assertEqual(len(extension._logs), 0)
+
     def test_callback(self):
         extension = Extension()
         extension.logger = MagicMock()
@@ -453,6 +497,7 @@ class TestExtension(unittest.TestCase):
         extension._running_in_sim = True
         extension._is_fastcheck = False
         extension._client = MagicMock()
+
         # extension._run_callback = MagicMock()
 
         def callback():
