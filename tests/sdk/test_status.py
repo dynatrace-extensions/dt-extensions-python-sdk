@@ -4,8 +4,9 @@ from datetime import timedelta
 from unittest.mock import MagicMock
 
 from dynatrace_extension import Extension
+
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
-from dynatrace_extension.sdk.extension import Status, StatusValue
+from dynatrace_extension.sdk.extension import Status, StatusValue, EndpointStatuses, EndpointStatus, EndpointSeverity
 
 
 class TestStatus(unittest.TestCase):
@@ -155,3 +156,79 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.UNKNOWN_ERROR)
         self.assertIn("foo1", status.message)
+
+    def test_endpoint_status_all_ok(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(10)
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.OK)
+        self.assertIn("All 10 endpoints are OK", status.message)
+
+    def test_endpoint_status_all_ok_metrics(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(10)
+            statuses.add_reported_metrics(20)
+            statuses.add_reported_metrics(40)
+            statuses.add_reported_metrics(40)
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.OK)
+        self.assertIn("All 10 endpoints are OK and returned 100 metrics", status.message)
+
+    def test_endpoint_status_faulty_endpoints(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(10)
+            statuses.add_endpoint_error(
+                EndpointStatus("1.2.3.4:80",
+                               EndpointSeverity.error,
+                               StatusValue.AUTHENTICATION_ERROR,
+                               "Invalid authorization scheme"))
+            statuses.add_endpoint_error(
+                EndpointStatus("4.5.6.7:80",
+                               EndpointSeverity.error,
+                               StatusValue.DEVICE_CONNECTION_ERROR,
+                               "Invalid authorization scheme"))
+            statuses.add_endpoint_error(
+                EndpointStatus("6.7.8.9:80",
+                               EndpointSeverity.error,
+                               StatusValue.DEVICE_CONNECTION_ERROR,
+                               "Invalid authorization scheme"))
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        self.assertIn("3 out of 10 work incorrectly, example errors: 1.2.3.4:80: AUTHENTICATION_ERROR, 4.5.6.7:80: DEVICE_CONNECTION_ERROR, 6.7.8.9:80: DEVICE_CONNECTION_ERROR", status.message)
+

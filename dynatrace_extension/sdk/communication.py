@@ -41,6 +41,12 @@ class StatusValue(Enum):
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 
 
+class EndpointSeverity:
+    info = "INFO"
+    warning = "WARNING"
+    error = "ERROR"
+
+
 class Status:
     def __init__(self, status: StatusValue = StatusValue.EMPTY, message: str = "", timestamp: int | None = None):
         self.status = status
@@ -80,6 +86,59 @@ class MultiStatus:
             messages.append(stored_status.message)
         ret.message = "\n".join(messages)
         return ret
+
+
+class EndpointStatus:
+    def __init__(self, endpoint_hint: str, severity: EndpointSeverity, short_status: StatusValue, message: str):
+        self.endpoint = endpoint_hint
+        self.severity: EndpointSeverity = severity
+        self.short_status: StatusValue = short_status
+        self.message = message
+
+
+class EndpointStatuses:
+    def __init__(self, num_endpoints: int):
+        self._faulty_endpoints: {str: EndpointStatus} = {}
+        self._num_endpoints = num_endpoints
+        self._added_reported_metrics = False
+        self._reported_metrics = 0
+        self._summarized_severity = EndpointSeverity.info
+
+    def add_reported_metrics(self, reported_metrics: int):
+        self._added_reported_metrics = True
+        self._reported_metrics += reported_metrics
+
+    def add_endpoint_error(self, status: EndpointStatus):
+        self._faulty_endpoints[status.endpoint] = status
+
+        if self._summarized_severity == EndpointSeverity.error:
+            pass
+        elif self._summarized_severity == EndpointSeverity.warning:
+            if status.severity == EndpointSeverity.error:
+                self._summarized_severity = status.severity
+        else:
+            self._summarized_severity = status.severity
+
+    def get_message(self):
+        if len(self._faulty_endpoints) == 0:
+            output = f"All {self._num_endpoints} endpoints are OK"
+            if self._added_reported_metrics:
+                return f"{output} and returned {self._reported_metrics} metrics"
+            return output
+
+        reasons = ", ".join([f"{item.endpoint}: {item.short_status.value}" for key, item in self._faulty_endpoints.items()])
+
+        return (f"{len(self._faulty_endpoints)} out of {self._num_endpoints} work incorrectly, example errors: "
+                f"{reasons}")
+
+    def get_status_value(self):
+        #TBD: currently it returns either OK or GENERIC_ERROR
+        if len(self._faulty_endpoints) == 0:
+            return StatusValue.OK
+        return StatusValue.GENERIC_ERROR
+
+    def get_summarized_severity(self):
+        return self._summarized_severity
 
 
 class CommunicationClient(ABC):
