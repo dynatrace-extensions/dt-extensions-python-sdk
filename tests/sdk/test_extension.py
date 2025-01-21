@@ -67,7 +67,7 @@ class TestExtension(unittest.TestCase):
         extension.report_event("my_event1", "my_description")
         extension.report_event("my_event1", "my_description")
         self.assertEqual(len(extension._logs), 2)
-        self.assertEqual(extension._logs[0].get("content", "not_good"), f"my_event1\nmy_description")
+        self.assertEqual(extension._logs[0].get("content", "not_good"), "my_event1\nmy_description")
 
     def test_send_event_immediately(self):
         extension = Extension()
