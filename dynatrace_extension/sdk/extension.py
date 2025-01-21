@@ -1070,7 +1070,7 @@ class Extension:
             elif isinstance(events, list):
                 self._logs.extend(events)
             else:
-                self.logger.error(f'Invalid log format: {events}')
+                self.logger.error(f"Invalid log format: {events}")
 
     def _send_buffered_events(self):
         with self._logs_lock:
