@@ -212,11 +212,11 @@ class Extension:
 
         # Timestamps for scheduling of internal callbacks
         self._next_internal_callbacks_timestamps: Dict[str, datetime] = {
-            "timediff": datetime.now() + TIME_DIFF_INTERVAL,
-            "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
-            "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
-            "events": datetime.now() + METRIC_SENDING_INTERVAL,
-            "sfm_metrics": datetime.now() + SFM_METRIC_SENDING_INTERVAL,
+            "timediff": datetime.now(timezone.utc) + TIME_DIFF_INTERVAL,
+            "heartbeat": datetime.now(timezone.utc) + HEARTBEAT_INTERVAL,
+            "metrics": datetime.now(timezone.utc) + METRIC_SENDING_INTERVAL,
+            "events": datetime.now(timezone.utc) + METRIC_SENDING_INTERVAL,
+            "sfm_metrics": datetime.now(timezone.utc) + SFM_METRIC_SENDING_INTERVAL,
         }
 
         # Executors for the callbacks and internal methods
@@ -485,7 +485,7 @@ class Extension:
 
         if metric_type == MetricType.COUNT and timestamp is None:
             # We must report a timestamp for count metrics
-            timestamp = datetime.now()
+            timestamp = datetime.now(timezone.utc)
 
         metric = Metric(key=key, value=value, dimensions=dimensions, metric_type=metric_type, timestamp=timestamp)
         self._add_metric(metric)

@@ -4,7 +4,7 @@
 
 import logging
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from timeit import default_timer as timer
 from typing import Callable, Dict, Optional, Tuple
 
@@ -48,7 +48,7 @@ class WrappedCallback:
         self.iterations = 0  # how many times we ran the callback iterator for this callback
 
     def get_current_time_with_cluster_diff(self):
-        return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
+        return datetime.now(timezone.utc) + timedelta(milliseconds=self.cluster_time_diff)
 
     def __call__(self):
         self.logger.debug(f"Running scheduled callback {self}")
@@ -101,7 +101,7 @@ class WrappedCallback:
 
             now = self.get_current_time_with_cluster_diff()
             random_second = random.randint(5, 55)  # noqa: S311
-            next_execution = datetime.now().replace(second=random_second, microsecond=0)
+            next_execution = datetime.now(timezone.utc).replace(second=random_second, microsecond=0)
             if next_execution <= now:
                 # The random chosen second already passed this minute
                 next_execution += timedelta(minutes=1)
