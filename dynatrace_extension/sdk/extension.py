@@ -19,7 +19,7 @@ from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional, Un
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue
+from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue, MultiStatus, EndpointStatus, EndpointStatuses, EndpointSeverity
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
