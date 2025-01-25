@@ -2,7 +2,6 @@ from dynatrace_extension import Extension, Status, StatusValue
 
 
 class ExtensionImpl(Extension):
-
     def query(self):
         """
         The query method is automatically scheduled to run every minute
@@ -11,22 +10,24 @@ class ExtensionImpl(Extension):
 
         for endpoint in self.activation_config["endpoints"]:
             url = endpoint["url"]
-            user = endpoint["user"]
-            password = endpoint["password"]
+            # user = endpoint["user"]
+            # password = endpoint["password"]
             self.logger.debug(f"Running endpoint with url '{url}'")
 
             # Your extension code goes here, e.g.
             # response = requests.get(url, auth=(user, password))
 
             # Report metrics with
-            self.report_metric("my_metric", 1, dimensions={"my_dimension": "dimension1"})
+            self.report_metric("metric_key", 1, dimensions={"key": "value"})
 
         self.logger.info("query method ended for %extension_name%.")
 
     def fastcheck(self) -> Status:
         """
-        This is called when the extension runs for the first time.
-        If this AG cannot run this extension, raise an Exception or return StatusValue.ERROR!
+        Use to check if the extension can run.
+        If this Activegate cannot run this extension, you can
+        raise an Exception or return StatusValue.ERROR.
+        This does not run for OneAgent extensions.
         """
         return Status(StatusValue.OK)
 
@@ -35,6 +36,5 @@ def main():
     ExtensionImpl(name="%extension_name%").run()
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

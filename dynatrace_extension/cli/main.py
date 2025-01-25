@@ -425,6 +425,51 @@ def create(extension_name: str, output: Path = typer.Option(None, "--output", "-
     console.print(f"Extension created at {extension_path}", style="bold green")
 
 
+@app.command("format", help="Runs ruff format on the extension code", )
+def fmt(extension_dir: Path = typer.Argument(".", help="Path to the python extension")):
+    """
+    Runs ruff format on the extension code
+
+    :param extension_dir: The directory of the extension, by default this is the current directory
+    """
+    run_process(["ruff", "format", str(extension_dir.resolve())])
+
+
+@app.command(help="Runs ruff check on the extension code")
+def lint(extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
+         fix: bool = typer.Option(False, "--fix", "-f", help="Fix linting issues")):
+    """
+    Runs ruff lint on the extension code
+
+    :param extension_dir: The directory of the extension, by default this is the current directory
+    :param fix: If true, ask ruff to also fix the linting issues
+    """
+    command = ["ruff", "check", "--exit-zero"]
+    if fix:
+        command.append("--fix")
+    command.append(str(extension_dir.resolve()))
+    run_process(command)
+
+
+@app.command(help="Adds ruff rules if they don't exist already")
+def ruff_init(extension_dir: Path = typer.Argument(".", help="Path to the python extension")):
+    """
+    Adds ruff rules if they don't exist already
+
+    :param extension_dir: The directory of the extension, by default this is the current directory
+    """
+
+    if (extension_dir / "ruff.toml").exists():
+        console.print(f"ruff.toml already exists in {extension_dir.resolve()}, skipping", style="bold yellow")
+        return
+    else:
+        # create\extension_template\ruff.toml.template -> extension\ruff.toml
+        ruff_template = Path(__file__).parent / "create" / "extension_template" / "ruff.toml.template"
+        ruff_file = extension_dir / "ruff.toml"
+        shutil.copy(ruff_template, ruff_file)
+        console.print(f"Added ruff.toml to {extension_dir.resolve()}", style="bold green")
+
+
 def run_process(
     command: List[str], cwd: Optional[Path] = None, env: Optional[dict] = None, print_message: Optional[str] = None
 ):
