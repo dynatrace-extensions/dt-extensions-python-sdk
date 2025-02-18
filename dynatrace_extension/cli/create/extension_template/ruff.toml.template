@@ -36,8 +36,7 @@ exclude = [
     "lib" # some extensions commit a lib folder
 ]
 
-# Same as Black.
-line-length = 88
+line-length = 110
 indent-width = 4
 
 # Assume Python 3.10
