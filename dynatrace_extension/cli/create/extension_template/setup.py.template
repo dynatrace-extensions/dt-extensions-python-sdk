@@ -1,5 +1,6 @@
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def find_version() -> str:
@@ -9,20 +10,21 @@ def find_version() -> str:
         with open(extension_yaml_path, encoding="utf-8") as f:
             for line in f:
                 if line.startswith("version"):
-                    version = line.split(" ")[-1].strip("\"")
+                    version = line.split(" ")[-1].strip('"')
                     break
     except Exception:
         pass
     return version
 
 
-setup(name="%extension_name%",
-      version=find_version(),
-      description="%Extension_Name% python EF2 extension",
-      author="Dynatrace",
-      packages=find_packages(),
-      python_requires=">=3.10",
-      include_package_data=True,
-      install_requires=["dt-extensions-sdk"],
-      extras_require={"dev": ["dt-extensions-sdk[cli]"]},
-      )
+setup(
+    name="%extension_name%",
+    version=find_version(),
+    description="%Extension_Name% python EF2 extension",
+    author="Dynatrace",
+    packages=find_packages(),
+    python_requires=">=3.10",
+    include_package_data=True,
+    install_requires=["dt-extensions-sdk"],
+    extras_require={"dev": ["dt-extensions-sdk[cli]"]},
+)
