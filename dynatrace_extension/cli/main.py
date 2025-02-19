@@ -425,7 +425,10 @@ def create(extension_name: str, output: Path = typer.Option(None, "--output", "-
     console.print(f"Extension created at {extension_path}", style="bold green")
 
 
-@app.command("format", help="Runs ruff format on the extension code", )
+@app.command(
+    "format",
+    help="Runs ruff format on the extension code",
+)
 def fmt(extension_dir: Path = typer.Argument(".", help="Path to the python extension")):
     """
     Runs ruff format on the extension code
@@ -436,8 +439,10 @@ def fmt(extension_dir: Path = typer.Argument(".", help="Path to the python exten
 
 
 @app.command(help="Runs ruff check on the extension code")
-def lint(extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
-         fix: bool = typer.Option(False, "--fix", "-f", help="Fix linting issues")):
+def lint(
+    extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
+    fix: bool = typer.Option(False, "--fix", "-f", help="Fix linting issues"),
+):
     """
     Runs ruff lint on the extension code
 
