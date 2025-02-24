@@ -18,7 +18,7 @@ class ExtensionImpl(Extension):
             # response = requests.get(url, auth=(user, password))
 
             # Report metrics with
-            self.report_metric("metric_key", 1, dimensions={"key": "value"})
+            self.report_device_metric("metric_key", 1, device_address=url, dimensions={"key": "value"})
 
         self.logger.info("query method ended for %extension_name%.")
 
