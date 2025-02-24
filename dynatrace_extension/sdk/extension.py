@@ -452,6 +452,51 @@ class Extension:
                 metric_key for metric_key in self._delta_signal_buffer if metric_key not in metric_keys
             }
 
+    def report_device_metric(
+        self,
+        key: str,
+        value: Union[float, str, int, SummaryStat],
+        device_address: Optional[str],
+        dimensions: Optional[Dict[str, str]] = None,
+        techrule: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
+        metric_type: MetricType = MetricType.GAUGE,
+    ) -> None:
+        """Report a metric.
+
+        Metric is sent to EEC using an HTTP request and MINT protocol. EEC then
+        sends the metrics to the tenant.
+
+        By default, it reports a gauge metric.
+
+        Args:
+            key: The metric key, must follow the MINT specification
+            value: The metric value, can be a simple value or a SummaryStat
+            device_address: The address of a monitored device/endpoint, which produced the metric
+            dimensions: A dictionary of dimensions
+            techrule: The technology rule string set by self.techrule setter.
+            timestamp: The timestamp of the metric, defaults to the current time
+            metric_type: The type of the metric, defaults to MetricType.GAUGE
+        """
+
+        if techrule:
+            if not dimensions:
+                dimensions = {}
+            if "dt.techrule.id" not in dimensions:
+                dimensions["dt.techrule.id"] = techrule
+
+        if metric_type == MetricType.COUNT and timestamp is None:
+            # We must report a timestamp for count metrics
+            timestamp = datetime.now()
+
+        if device_address:
+            if not dimensions:
+                dimensions = {}
+            dimensions['device.address'] = device_address
+
+        metric = Metric(key=key, value=value, dimensions=dimensions, metric_type=metric_type, timestamp=timestamp)
+        self._add_metric(metric)
+
     def report_metric(
         self,
         key: str,
@@ -461,7 +506,9 @@ class Extension:
         timestamp: Optional[datetime] = None,
         metric_type: MetricType = MetricType.GAUGE,
     ) -> None:
-        """Report a metric.
+        """**Deprecated method** - please use `report_device_metric` as the preferred method for sending metrics.
+
+        Report a metric.
 
         Metric is sent to EEC using an HTTP request and MINT protocol. EEC then
         sends the metrics to the tenant.
