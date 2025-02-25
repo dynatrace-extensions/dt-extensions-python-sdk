@@ -163,7 +163,8 @@ def assemble(
 
     # Checks that the module name is valid and exists in the filesystem
     module_folder = Path(extension_dir) / extension_yaml.python.runtime.module
-    if not module_folder.exists():
+    src_module_folder = Path('src') / module_folder
+    if not module_folder.exists() and not src_module_folder.exists():
         msg = f"Extension module folder {module_folder} not found"
         raise FileNotFoundError(msg)
 
