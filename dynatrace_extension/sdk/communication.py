@@ -12,7 +12,8 @@ from collections.abc import Generator, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Generator, List, Sequence, TypeVar
+from threading import RLock
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
@@ -41,10 +42,19 @@ class StatusValue(Enum):
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 
 
-class EndpointSeverity:
-    info = "INFO"
-    warning = "WARNING"
-    error = "ERROR"
+class EndpointSeverity(Enum):
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+
+    def __lt__(self, other):
+        SEVERITY_ORDER = {
+            EndpointSeverity.INFO: 1,
+            EndpointSeverity.WARNING: 2,
+            EndpointSeverity.ERROR: 3
+        }
+
+        return SEVERITY_ORDER[self] < SEVERITY_ORDER[other]
 
 
 class Status:
@@ -97,48 +107,54 @@ class EndpointStatus:
 
 
 class EndpointStatuses:
+    class TooManyEndpointStatuses(Exception):
+        pass
+
     def __init__(self, num_endpoints: int):
+        self._lock = RLock()
         self._faulty_endpoints: {str: EndpointStatus} = {}
         self._num_endpoints = num_endpoints
-        self._added_reported_metrics = False
         self._reported_metrics = 0
-        self._summarized_severity = EndpointSeverity.info
+        self._summarized_severity = EndpointSeverity.INFO
 
     def add_reported_metrics(self, reported_metrics: int):
-        self._added_reported_metrics = True
-        self._reported_metrics += reported_metrics
+        with self._lock:
+            if reported_metrics > 0:
+                self._reported_metrics += reported_metrics
 
-    def add_endpoint_error(self, status: EndpointStatus):
-        self._faulty_endpoints[status.endpoint] = status
+    def add_endpoint_status(self, status: EndpointStatus):
+        with self._lock:
+            if status.short_status == StatusValue.OK:
+                self.clear_endpoint_error(status.endpoint)
+            else:
+                if len(self._faulty_endpoints) == self._num_endpoints:
+                    raise EndpointStatuses.TooManyEndpointStatuses(f"Cannot add another endpoint status. The number of reported statuses already has reached preconfigured maximum of {self._num_endpoints} endpoints.")
+                
+                self._faulty_endpoints[status.endpoint] = status
+                self._summarized_severity = max(self._summarized_severity, status.severity)
 
-        if self._summarized_severity == EndpointSeverity.error:
-            pass
-        elif self._summarized_severity == EndpointSeverity.warning:
-            if status.severity == EndpointSeverity.error:
-                self._summarized_severity = status.severity
-        else:
-            self._summarized_severity = status.severity
-
-    def get_message(self):
-        if len(self._faulty_endpoints) == 0:
-            output = f"All {self._num_endpoints} endpoints are OK"
-            if self._added_reported_metrics:
-                return f"{output} and returned {self._reported_metrics} metrics"
-            return output
-
-        reasons = ", ".join([f"{item.endpoint}: {item.short_status.value}" for key, item in self._faulty_endpoints.items()])
-
-        return (f"{len(self._faulty_endpoints)} out of {self._num_endpoints} work incorrectly, example errors: "
-                f"{reasons}")
-
-    def get_status_value(self):
-        #TBD: currently it returns either OK or GENERIC_ERROR
-        if len(self._faulty_endpoints) == 0:
-            return StatusValue.OK
-        return StatusValue.GENERIC_ERROR
+    def clear_endpoint_error(self, endpoint_hint: str):
+        with self._lock:
+            del self._faulty_endpoints[endpoint_hint]
+            self._summarized_severity = max([status.severity for status in self._faulty_endpoints.values()])
 
     def get_summarized_severity(self):
-        return self._summarized_severity
+        with self._lock:
+            return self._summarized_severity
+    
+    def build_common_status(self) -> Status:
+        with self._lock:
+            self._faulty_endpoints = dict(filter(lambda item: item[1].short_status != StatusValue.OK, self._faulty_endpoints.items()))
+
+            if len(self._faulty_endpoints) == 0:
+                status = Status(StatusValue.OK, f"All {self._num_endpoints} endpoints are OK and returned {self._reported_metrics} metrics.")
+            else:
+                reasons = ", ".join([f"{item.endpoint}: {item.short_status.value}" for _, item in self._faulty_endpoints.items()])
+                status = Status(StatusValue.GENERIC_ERROR,
+                    f"{len(self._faulty_endpoints)} out of {self._num_endpoints} endpoints work incorrectly. Returned {self._reported_metrics} metrics. Malfunctioning endpoints: {reasons}")
+                
+            self._reported_metrics = 0
+            return status
 
 
 class CommunicationClient(ABC):

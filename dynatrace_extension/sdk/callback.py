@@ -66,7 +66,7 @@ class WrappedCallback:
             elif isinstance(ret, MultiStatus):
                 self.status = ret.build()
             elif isinstance(ret, EndpointStatuses):
-                self.status = Status(ret.get_status_value(), ret.get_message())
+                self.status = ret.build_common_status()
             else:
                 self.status = Status(StatusValue.OK)
         except Exception as e:

@@ -166,6 +166,7 @@ class TestStatus(unittest.TestCase):
 
         def callback():
             statuses = EndpointStatuses(10)
+            assert statuses.get_summarized_severity() == EndpointSeverity.INFO
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
@@ -174,7 +175,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("All 10 endpoints are OK", status.message)
+        self.assertIn("All 10 endpoints are OK and returned 0 metrics.", status.message)
 
     def test_endpoint_status_all_ok_metrics(self):
         ext = Extension()
@@ -186,8 +187,13 @@ class TestStatus(unittest.TestCase):
         def callback():
             statuses = EndpointStatuses(10)
             statuses.add_reported_metrics(20)
+            statuses.add_reported_metrics(40)            
             statuses.add_reported_metrics(40)
-            statuses.add_reported_metrics(40)
+            statuses.add_reported_metrics(-1)
+            statuses.add_reported_metrics(0)
+
+            assert statuses.get_summarized_severity() == EndpointSeverity.INFO
+
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
@@ -207,21 +213,27 @@ class TestStatus(unittest.TestCase):
 
         def callback():
             statuses = EndpointStatuses(10)
-            statuses.add_endpoint_error(
+            statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.error,
+                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme"))
-            statuses.add_endpoint_error(
+            statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.error,
+                               EndpointSeverity.ERROR,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme"))
-            statuses.add_endpoint_error(
+                        
+            statuses.add_reported_metrics(20)
+
+            statuses.add_endpoint_status(
                 EndpointStatus("6.7.8.9:80",
-                               EndpointSeverity.error,
+                               EndpointSeverity.WARNING,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme"))
+            
+            assert statuses.get_summarized_severity() == EndpointSeverity.ERROR
+
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
@@ -230,5 +242,139 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("3 out of 10 work incorrectly, example errors: 1.2.3.4:80: AUTHENTICATION_ERROR, 4.5.6.7:80: DEVICE_CONNECTION_ERROR, 6.7.8.9:80: DEVICE_CONNECTION_ERROR", status.message)
+        self.assertIn("3 out of 10 endpoints work incorrectly. Returned 20 metrics. Malfunctioning endpoints: 1.2.3.4:80: AUTHENTICATION_ERROR, 4.5.6.7:80: DEVICE_CONNECTION_ERROR, 6.7.8.9:80: DEVICE_CONNECTION_ERROR", status.message)
 
+    def test_endpoint_status_clearing_the_status(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(10)
+            statuses.add_endpoint_status(
+                EndpointStatus("1.2.3.4:80",
+                               EndpointSeverity.INFO,
+                               StatusValue.AUTHENTICATION_ERROR,
+                               "Invalid authorization scheme"))
+            
+            statuses.add_endpoint_status(
+                EndpointStatus("4.5.6.7:80",
+                               EndpointSeverity.WARNING,
+                               StatusValue.DEVICE_CONNECTION_ERROR,
+                               "Invalid authorization scheme"))
+
+            statuses.add_endpoint_status(
+                EndpointStatus("6.7.8.9:80",
+                               EndpointSeverity.ERROR,
+                               StatusValue.DEVICE_CONNECTION_ERROR,
+                               "Invalid authorization scheme"))
+                       
+            statuses.add_endpoint_status(
+                EndpointStatus("4.5.6.7:80",
+                               EndpointSeverity.ERROR,
+                               StatusValue.OK,
+                               "Invalid authorization scheme"))
+            
+            statuses.clear_endpoint_error("6.7.8.9:80")
+
+            assert statuses.get_summarized_severity() == EndpointSeverity.INFO
+
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        self.assertIn("1 out of 10 endpoints work incorrectly. Returned 0 metrics. Malfunctioning endpoints: 1.2.3.4:80: AUTHENTICATION_ERROR", status.message)
+
+
+    def test_endpoint_status_corrupted(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(10)
+            statuses.add_endpoint_status(
+                EndpointStatus("1.2.3.4:80",
+                               EndpointSeverity.WARNING,
+                               StatusValue.AUTHENTICATION_ERROR,
+                               "Invalid authorization scheme"))
+            statuses._faulty_endpoints["4.5.6.7:80"] = EndpointStatus("4.5.6.7:80",
+                                                            EndpointSeverity.ERROR,
+                                                            StatusValue.OK, "")
+            
+            assert statuses.get_summarized_severity() == EndpointSeverity.WARNING
+
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        self.assertIn("1 out of 10 endpoints work incorrectly. Returned 0 metrics. Malfunctioning endpoints: 1.2.3.4:80: AUTHENTICATION_ERROR", status.message)
+
+
+    def test_endpoint_status_max(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        def callback():
+            statuses = EndpointStatuses(2)
+            statuses.add_endpoint_status(
+                EndpointStatus("1.2.3.4:80",
+                               EndpointSeverity.INFO,
+                               StatusValue.AUTHENTICATION_ERROR,
+                               "Invalid authorization scheme"))
+            
+            statuses.add_endpoint_status(
+                EndpointStatus("4.5.6.7:80",
+                               EndpointSeverity.WARNING,
+                               StatusValue.DEVICE_CONNECTION_ERROR,
+                               "Invalid authorization scheme"))
+
+            with self.assertRaises(EndpointStatuses.TooManyEndpointStatuses):
+                statuses.add_endpoint_status(
+                    EndpointStatus("6.7.8.9:80",
+                                   EndpointSeverity.ERROR,
+                                   StatusValue.DEVICE_CONNECTION_ERROR,
+                                   "Invalid authorization scheme"))
+            
+            assert statuses.get_summarized_severity() == EndpointSeverity.WARNING
+            return statuses
+
+        ext.schedule(callback, timedelta(seconds=1))
+        ext._scheduler.run(blocking=False)
+        time.sleep(0.01)
+
+        status = ext._build_current_status()
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        self.assertIn("2 out of 2 endpoints work incorrectly. Returned 0 metrics. Malfunctioning endpoints: 1.2.3.4:80: AUTHENTICATION_ERROR, 4.5.6.7:80: DEVICE_CONNECTION_ERROR", status.message)
+
+
+    def test_endpoint_severity_order(self):
+        assert max([EndpointSeverity.WARNING, EndpointSeverity.INFO, EndpointSeverity.ERROR]) == EndpointSeverity.ERROR
+        
+        assert max(EndpointSeverity.INFO, EndpointSeverity.INFO) == EndpointSeverity.INFO
+        assert max(EndpointSeverity.WARNING, EndpointSeverity.WARNING) == EndpointSeverity.WARNING
+        assert max(EndpointSeverity.ERROR, EndpointSeverity.ERROR) == EndpointSeverity.ERROR
+
+        assert max(EndpointSeverity.INFO, EndpointSeverity.WARNING) == EndpointSeverity.WARNING
+        assert max(EndpointSeverity.INFO, EndpointSeverity.ERROR) == EndpointSeverity.ERROR
+
+        assert max(EndpointSeverity.WARNING, EndpointSeverity.INFO) == EndpointSeverity.WARNING
+        assert max(EndpointSeverity.WARNING, EndpointSeverity.ERROR) == EndpointSeverity.ERROR
+        
+        assert max(EndpointSeverity.ERROR, EndpointSeverity.INFO) == EndpointSeverity.ERROR
+        assert max(EndpointSeverity.ERROR, EndpointSeverity.WARNING) == EndpointSeverity.ERROR
