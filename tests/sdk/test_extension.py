@@ -48,6 +48,15 @@ class TestExtension(unittest.TestCase):
         self.assertEqual(len(extension._metrics), 1)
         self.assertTrue(extension._metrics[0].startswith("my_metric gauge,1"))
 
+    def test_add_metric_with_device_address(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension.report_metric("my_metric", 1, device_address="10.10.10.10")
+        print(extension._metrics[0])
+        self.assertEqual(len(extension._metrics), 1)
+        self.assertTrue(extension._metrics[0].startswith('my_metric,device.address="10.10.10.10" gauge,1'))
+
     def test_metrics_flushed(self):
         extension = Extension()
         extension._running_in_sim = True
