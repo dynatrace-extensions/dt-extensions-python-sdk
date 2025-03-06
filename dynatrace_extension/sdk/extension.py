@@ -457,6 +457,7 @@ class Extension:
         key: str,
         value: Union[float, str, int, SummaryStat],
         dimensions: Optional[Dict[str, str]] = None,
+        device_address: Optional[str] = None,
         techrule: Optional[str] = None,
         timestamp: Optional[datetime] = None,
         metric_type: MetricType = MetricType.GAUGE,
@@ -472,6 +473,7 @@ class Extension:
             key: The metric key, must follow the MINT specification
             value: The metric value, can be a simple value or a SummaryStat
             dimensions: A dictionary of dimensions
+            device_address: The address of a monitored device/endpoint which produced the metric
             techrule: The technology rule string set by self.techrule setter.
             timestamp: The timestamp of the metric, defaults to the current time
             metric_type: The type of the metric, defaults to MetricType.GAUGE
@@ -482,6 +484,12 @@ class Extension:
                 dimensions = {}
             if "dt.techrule.id" not in dimensions:
                 dimensions["dt.techrule.id"] = techrule
+
+        if device_address:
+            if not dimensions:
+                dimensions = {}
+            if "device.address" not in dimensions:
+                dimensions["device.address"] = device_address
 
         if metric_type == MetricType.COUNT and timestamp is None:
             # We must report a timestamp for count metrics
