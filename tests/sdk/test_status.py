@@ -113,7 +113,6 @@ class TestStatus(unittest.TestCase):
         self.assertIn("foo1", status.message)
 
     def test_direct_statuses_return(self):
-
         def callback():
             return Status(StatusValue.OK, "foo1")
 

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-from typing import ClassVar, List, NamedTuple
+from typing import ClassVar, NamedTuple
 
 
 class DefaultLogLevel(NamedTuple):
@@ -25,7 +25,7 @@ class RuntimeProperties:
         self.userconfig: str = json_response.get("userconfig", "")
         self.debugmode: bool = json_response.get("debugmode", "0") == "1"
         self.runtime: dict = json_response.get("runtime", {})
-        self.tasks: List[str] = json_response.get("tasks", [])
+        self.tasks: list[str] = json_response.get("tasks", [])
 
     @classmethod
     def set_default_log_level(cls, value: str):

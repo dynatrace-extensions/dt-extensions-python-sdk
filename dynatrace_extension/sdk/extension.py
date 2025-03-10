@@ -9,13 +9,14 @@ import sys
 import threading
 import time
 from argparse import ArgumentParser
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from itertools import chain
 from pathlib import Path
 from threading import Lock, RLock, active_count
-from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional, Union
+from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
@@ -99,7 +100,7 @@ class CountMetricRegistrationEntry(NamedTuple):
     dimensions_list: list[str]
 
     @staticmethod
-    def make_list(metric_key: str, dimensions_list: List[str]):
+    def make_list(metric_key: str, dimensions_list: list[str]):
         """Build an entry that uses defined list of dimensions for aggregation.
 
         Args:
@@ -135,7 +136,7 @@ class CountMetricRegistrationEntry(NamedTuple):
             return result
 
 
-def _add_sfm_metric(metric: Metric, sfm_metrics: Optional[List[Metric]] = None):
+def _add_sfm_metric(metric: Metric, sfm_metrics: list[Metric] | None = None):
     if sfm_metrics is None:
         sfm_metrics = []
     metric.validate()
@@ -194,24 +195,24 @@ class Extension:
         self._cluster_time_diff: int = 0
 
         # Optional callback to be invoked during the fastcheck
-        self._fast_check_callback: Optional[Callable[[ActivationConfig, str], Status]] = None
+        self._fast_check_callback: Callable[[ActivationConfig, str], Status] | None = None
 
         # List of all scheduled callbacks we must run
-        self._scheduled_callbacks: List[WrappedCallback] = []
-        self._scheduled_callbacks_before_run: List[WrappedCallback] = []
+        self._scheduled_callbacks: list[WrappedCallback] = []
+        self._scheduled_callbacks_before_run: list[WrappedCallback] = []
 
         # Internal callbacks results, used to report statuses
-        self._internal_callbacks_results: Dict[str, Status] = {}
+        self._internal_callbacks_results: dict[str, Status] = {}
         self._internal_callbacks_results_lock: Lock = Lock()
 
         # Running callbacks, used to get the callback info when reporting metrics
-        self._running_callbacks: Dict[int, WrappedCallback] = {}
+        self._running_callbacks: dict[int, WrappedCallback] = {}
         self._running_callbacks_lock: Lock = Lock()
 
         self._scheduler = sched.scheduler(time.time, time.sleep)
 
         # Timestamps for scheduling of internal callbacks
-        self._next_internal_callbacks_timestamps: Dict[str, datetime] = {
+        self._next_internal_callbacks_timestamps: dict[str, datetime] = {
             "timediff": datetime.now() + TIME_DIFF_INTERVAL,
             "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
             "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
@@ -226,15 +227,15 @@ class Extension:
 
         # Extension metrics
         self._metrics_lock = RLock()
-        self._metrics: List[str] = []
+        self._metrics: list[str] = []
 
         # Extension logs
         self._logs_lock = RLock()
-        self._logs: List[dict] = []
+        self._logs: list[dict] = []
 
         # Self monitoring metrics
         self._sfm_metrics_lock = Lock()
-        self._callbackSfmReport: Dict[str, WrappedCallback] = {}
+        self._callbackSfmReport: dict[str, WrappedCallback] = {}
 
         # Count metric delta signals
         self._delta_signal_buffer: set[str] = set()
@@ -342,9 +343,9 @@ class Extension:
     def schedule(
         self,
         callback: Callable,
-        interval: Union[timedelta, int],
-        args: Optional[tuple] = None,
-        activation_type: Optional[ActivationType] = None,
+        interval: timedelta | int,
+        args: tuple | None = None,
+        activation_type: ActivationType | None = None,
     ) -> None:
         """Schedule a method to be executed periodically.
 
@@ -455,11 +456,11 @@ class Extension:
     def report_metric(
         self,
         key: str,
-        value: Union[float, str, int, SummaryStat],
-        dimensions: Optional[Dict[str, str]] = None,
-        device_address: Optional[str] = None,
-        techrule: Optional[str] = None,
-        timestamp: Optional[datetime] = None,
+        value: float | str | int | SummaryStat,
+        dimensions: dict[str, str] | None = None,
+        device_address: str | None = None,
+        techrule: str | None = None,
+        timestamp: datetime | None = None,
         metric_type: MetricType = MetricType.GAUGE,
     ) -> None:
         """Report a metric.
@@ -498,7 +499,7 @@ class Extension:
         metric = Metric(key=key, value=value, dimensions=dimensions, metric_type=metric_type, timestamp=timestamp)
         self._add_metric(metric)
 
-    def report_mint_lines(self, lines: List[str]) -> None:
+    def report_mint_lines(self, lines: list[str]) -> None:
         """Report mint lines using the MINT protocol
 
         Examples:
@@ -515,9 +516,9 @@ class Extension:
         self,
         title: str,
         description: str,
-        properties: Optional[dict] = None,
-        timestamp: Optional[datetime] = None,
-        severity: Union[Severity, str] = Severity.INFO,
+        properties: dict | None = None,
+        timestamp: datetime | None = None,
+        severity: Severity | str = Severity.INFO,
         send_immediately: bool = False,
     ) -> None:
         """Report an event using log ingest.
@@ -551,11 +552,11 @@ class Extension:
         self,
         event_type: DtEventType,
         title: str,
-        start_time: Optional[int] = None,
-        end_time: Optional[int] = None,
-        timeout: Optional[int] = None,
-        entity_selector: Optional[str] = None,
-        properties: Optional[dict[str, str]] = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        timeout: int | None = None,
+        entity_selector: str | None = None,
+        properties: dict[str, str] | None = None,
     ) -> None:
         """
         Reports an event using the v2 event ingest API.
@@ -575,7 +576,7 @@ class Extension:
             entity_selector: The entity selector, if not set, the event is associated with environment entity (optional)
             properties: A map of event properties (optional)
         """
-        event: Dict[str, Any] = {"eventType": event_type, "title": title}
+        event: dict[str, Any] = {"eventType": event_type, "title": title}
         if start_time:
             event["startTime"] = start_time
         if end_time:
@@ -662,7 +663,7 @@ class Extension:
         """
         self._send_events(log_event, send_immediately=send_immediately)
 
-    def report_log_events(self, log_events: List[dict], send_immediately: bool = False):
+    def report_log_events(self, log_events: list[dict], send_immediately: bool = False):
         """Report a list of custom log events using log ingest.
 
         Args:
@@ -671,7 +672,7 @@ class Extension:
         """
         self._send_events(log_events, send_immediately=send_immediately)
 
-    def report_log_lines(self, log_lines: List[Union[str, bytes]], send_immediately: bool = False):
+    def report_log_lines(self, log_lines: list[str | bytes], send_immediately: bool = False):
         """Report a list of log lines using log ingest
 
         Args:
@@ -885,13 +886,13 @@ class Extension:
                     api_logger.info(f"Sent {number_of_metrics} metric lines to EEC: {responses}")
                     self._metrics = []
 
-    def _prepare_sfm_metrics(self) -> List[str]:
+    def _prepare_sfm_metrics(self) -> list[str]:
         """Prepare self monitoring metrics.
 
         Builds the list of mint metric lines to send as self monitoring metrics.
         """
 
-        sfm_metrics: List[Metric] = []
+        sfm_metrics: list[Metric] = []
         sfm_dimensions = {"dt.extension.config.id": self.monitoring_config_id}
         _add_sfm_metric(
             SfmMetric("threads", active_count(), sfm_dimensions, client_facing=True, metric_type=MetricType.DELTA),
@@ -1047,11 +1048,11 @@ class Extension:
         with self._metrics_lock:
             self._metrics.append(metric.to_mint_line())
 
-    def _add_mint_lines(self, lines: List[str]):
+    def _add_mint_lines(self, lines: list[str]):
         with self._metrics_lock:
             self._metrics.extend(lines)
 
-    def _send_events_internal(self, events: Union[dict, List[dict]]):
+    def _send_events_internal(self, events: dict | list[dict]):
         try:
             responses = self._client.send_events(events, self.log_event_enrichment)
 
@@ -1068,7 +1069,7 @@ class Extension:
             with self._internal_callbacks_results_lock:
                 self._internal_callbacks_results[self._send_events.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
 
-    def _send_events(self, events: Union[dict, List[dict]], send_immediately: bool = False):
+    def _send_events(self, events: dict | list[dict], send_immediately: bool = False):
         if send_immediately:
             self._internal_executor.submit(self._send_events_internal, events)
             return

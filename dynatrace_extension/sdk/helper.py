@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Callable, Dict, List, Optional, Union
 
 from .activation import ActivationConfig, ActivationType
 from .communication import Status
@@ -20,10 +20,10 @@ class _HelperExtension(Extension):
 
 def report_metric(
     key: str,
-    value: Union[float, str, int, SummaryStat],
-    dimensions: Optional[Dict[str, str]] = None,
-    techrule: Optional[str] = None,
-    timestamp: Optional[datetime] = None,
+    value: float | str | int | SummaryStat,
+    dimensions: dict[str, str] | None = None,
+    techrule: str | None = None,
+    timestamp: datetime | None = None,
     metric_type: MetricType = MetricType.GAUGE,
 ) -> None:
     """Reports a metric using the MINT protocol
@@ -37,10 +37,10 @@ def report_metric(
     :param timestamp: The timestamp of the metric, defaults to the current time
     :param metric_type: The type of the metric, defaults to MetricType.GAUGE
     """
-    _HelperExtension().report_metric(key, value, dimensions, techrule, timestamp, metric_type)
+    _HelperExtension().report_metric(key, value, dimensions, techrule, timestamp, metric_type)  # type: ignore
 
 
-def report_mint_lines(lines: List[str]) -> None:
+def report_mint_lines(lines: list[str]) -> None:
     """Reports mint lines using the MINT protocol.
     These lines are not validated before being sent.
 
@@ -52,11 +52,11 @@ def report_mint_lines(lines: List[str]) -> None:
 def report_dt_event(
     event_type: DtEventType,
     title: str,
-    start_time: Optional[int] = None,
-    end_time: Optional[int] = None,
-    timeout: Optional[int] = None,
-    entity_selector: Optional[str] = None,
-    properties: Optional[dict[str, str]] = None,
+    start_time: int | None = None,
+    end_time: int | None = None,
+    timeout: int | None = None,
+    entity_selector: str | None = None,
+    properties: dict[str, str] | None = None,
 ) -> None:
     """
     Reports a custom event v2 using event ingest
@@ -85,9 +85,9 @@ def report_dt_event_dict(event: dict):
 
 def schedule(
     callback: Callable,
-    interval: Union[timedelta, int],
-    args: Optional[tuple] = None,
-    activation_type: Optional[ActivationType] = None,
+    interval: timedelta | int,
+    args: tuple | None = None,
+    activation_type: ActivationType | None = None,
 ) -> None:
     """Schedules a callback to be called periodically
 
@@ -101,7 +101,7 @@ def schedule(
 
 
 def schedule_function(
-    interval: Union[timedelta, int], args: Optional[tuple] = None, activation_type: Optional[ActivationType] = None
+    interval: timedelta | int, args: tuple | None = None, activation_type: ActivationType | None = None
 ):
     def decorator(function):
         schedule(function, interval, args=args, activation_type=activation_type)
@@ -110,7 +110,7 @@ def schedule_function(
 
 
 def schedule_method(
-    interval: Union[timedelta, int], args: Optional[tuple] = None, activation_type: Optional[ActivationType] = None
+    interval: timedelta | int, args: tuple | None = None, activation_type: ActivationType | None = None
 ):
     def decorator(function):
         Extension.schedule_decorators.append((function, interval, args, activation_type))
@@ -121,9 +121,9 @@ def schedule_method(
 def report_event(
     title: str,
     description: str,
-    properties: Optional[dict] = None,
-    timestamp: Optional[datetime] = None,
-    severity: Union[Severity, str] = Severity.INFO,
+    properties: dict | None = None,
+    timestamp: datetime | None = None,
+    severity: Severity | str = Severity.INFO,
 ) -> None:
     """Reports an event using the MINT protocol
 
@@ -144,7 +144,7 @@ def report_log_event(log_event: dict):
     _HelperExtension().report_log_event(log_event)
 
 
-def report_log_events(log_events: List[dict]):
+def report_log_events(log_events: list[dict]):
     """Reports a list of custom log events using log ingest
 
     :param log_events: The list of log events
@@ -152,7 +152,7 @@ def report_log_events(log_events: List[dict]):
     _HelperExtension().report_log_events(log_events)
 
 
-def report_log_lines(log_lines: List[Union[str, bytes]]):
+def report_log_lines(log_lines: list[str | bytes]):
     """Reports a list of log lines using log ingest
 
     :param log_lines: The list of log lines
