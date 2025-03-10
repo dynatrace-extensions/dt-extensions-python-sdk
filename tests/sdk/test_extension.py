@@ -53,7 +53,6 @@ class TestExtension(unittest.TestCase):
         extension.logger = MagicMock()
         extension._running_in_sim = True
         extension.report_metric("my_metric", 1, device_address="10.10.10.10")
-        print(extension._metrics[0])
         self.assertEqual(len(extension._metrics), 1)
         self.assertTrue(extension._metrics[0].startswith('my_metric,device.address="10.10.10.10" gauge,1'))
 

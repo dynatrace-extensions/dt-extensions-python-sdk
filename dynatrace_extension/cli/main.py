@@ -4,7 +4,6 @@ import stat
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 import typer
 from dtcli.server_api import upload as dt_cli_upload  # type: ignore
@@ -91,17 +90,17 @@ def build(
         "-k",
         help="Path to the dev fused key-certificate",
     ),
-    target_directory: Optional[Path] = typer.Option(None, "--target-directory", "-t"),
-    extra_platforms: Optional[list[str]] = typer.Option(
+    target_directory: Path | None = typer.Option(None, "--target-directory", "-t"),
+    extra_platforms: list[str] | None = typer.Option(
         None, "--extra-platform", "-e", help="Download wheels for an extra platform"
     ),
-    extra_index_url: Optional[str] = typer.Option(
+    extra_index_url: str | None = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
-    find_links: Optional[str] = typer.Option(
+    find_links: str | None = typer.Option(
         None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
     ),
-    only_extra_platforms: Optional[bool] = typer.Option(
+    only_extra_platforms: bool | None = typer.Option(
         False,
         "--only-extra-platforms",
         "-o",
@@ -163,7 +162,7 @@ def assemble(
 
     # Checks that the module name is valid and exists in the filesystem
     module_folder = Path(extension_dir) / extension_yaml.python.runtime.module
-    src_module_folder = Path('src') / module_folder
+    src_module_folder = Path("src") / module_folder
     if not module_folder.exists() and not src_module_folder.exists():
         msg = f"Extension module folder {module_folder} not found"
         raise FileNotFoundError(msg)
@@ -188,16 +187,16 @@ def assemble(
 @app.command(help="Downloads the dependencies of the extension to the lib folder")
 def wheel(
     extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
-    extra_platforms: Optional[list[str]] = typer.Option(
+    extra_platforms: list[str] | None = typer.Option(
         None, "--extra-platform", "-e", help="Download wheels for an extra platform"
     ),
-    extra_index_url: Optional[str] = typer.Option(
+    extra_index_url: str | None = typer.Option(
         None, "--extra-index-url", "-i", help="Extra index url to use when downloading dependencies"
     ),
-    find_links: Optional[str] = typer.Option(
+    find_links: str | None = typer.Option(
         None, "--find-links", "-f", help="Extra index url to use when downloading dependencies"
     ),
-    only_extra_platforms: Optional[bool] = typer.Option(
+    only_extra_platforms: bool | None = typer.Option(
         False,
         "--only-extra-platforms",
         "-o",
@@ -476,9 +475,7 @@ def ruff_init(extension_dir: Path = typer.Argument(".", help="Path to the python
         console.print(f"Added ruff.toml to {extension_dir.resolve()}", style="bold green")
 
 
-def run_process(
-    command: List[str], cwd: Optional[Path] = None, env: Optional[dict] = None, print_message: Optional[str] = None
-):
+def run_process(command: list[str], cwd: Path | None = None, env: dict | None = None, print_message: str | None = None):
     friendly_command = " ".join(command)
     if print_message is not None:
         console.print(print_message, style="cyan")

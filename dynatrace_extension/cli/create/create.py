@@ -2,7 +2,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Final, List, NamedTuple, Tuple
+from typing import Final, NamedTuple
 
 output_mode_folder: Final = 0o755
 output_mode_file: Final = 0o644
@@ -14,7 +14,7 @@ class ReplaceString(NamedTuple):
     replace: str
 
 
-def replace_placeholders(file: Path, replaces: List[Tuple[str, str]]):
+def replace_placeholders(file: Path, replaces: list[tuple[str, str]]):
     with open(file) as f:
         contents = f.read()
     for replace in replaces:

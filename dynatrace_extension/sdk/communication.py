@@ -8,16 +8,17 @@ import json
 import logging
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Generator, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Generator, List, Sequence, TypeVar
+from typing import Any, TypeVar
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
 CONTENT_TYPE_JSON = "application/json;charset=utf-8"
 CONTENT_TYPE_PLAIN = "text/plain;charset=utf-8"
-COUNT_METRIC_ITEMS_DICT = TypeVar("COUNT_METRIC_ITEMS_DICT", str, List[str])
+COUNT_METRIC_ITEMS_DICT = TypeVar("COUNT_METRIC_ITEMS_DICT", str, list[str])
 
 # TODO - I believe these can be adjusted via RuntimeConfig, they can't be constants
 MAX_MINT_LINES_PER_REQUEST = 1000
@@ -60,7 +61,6 @@ class Status:
 
 
 class MultiStatus:
-
     def __init__(self):
         self.statuses = []
 
@@ -352,7 +352,6 @@ class DebugClient(CommunicationClient):
         local_ingest_port: int = 14499,
         print_metrics: bool = True,
     ):
-
         self.secrets = {}
         if secrets_path and Path(secrets_path).exists():
             with open(secrets_path) as f:

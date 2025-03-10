@@ -14,10 +14,10 @@ PREFIX_PGI = "PROCESS_GROUP_INSTANCE"
 class EntryProperties:
     technologies: list[str]
     pg_technologies: list[str]
-    extra_properties: dict[str,str]
+    extra_properties: dict[str, str]
 
     @staticmethod
-    def from_json(json_data: dict[str,str]) -> EntryProperties:
+    def from_json(json_data: dict[str, str]) -> EntryProperties:
         technologies = json_data.get("Technologies", "").split(",")
         pg_technologies = json_data.get("pgTechnologies", "").split(",")
         extra_properties = {k: v for k, v in json_data.items() if k not in ["Technologies", "pgTechnologies"]}
@@ -113,7 +113,7 @@ class Entry:
         processes = [Process.from_json(p) for p in json_data.get("processes", [])]
 
         # The structure here was never thought out, so we have to check for both keys and merge them into one object
-        properties_list: list[dict[str,str]] = json_data.get("properties", [])
+        properties_list: list[dict[str, str]] = json_data.get("properties", [])
         technologies = []
         pg_technologies = []
         # There may be other useful properties included such as: mssql_instance_name.
@@ -123,9 +123,9 @@ class Entry:
             for key, value in prop.items():
                 match key:
                     case "Technologies":
-                            technologies.extend(value.split(","))
+                        technologies.extend(value.split(","))
                     case "pgTechnologies":
-                            pg_technologies.extend(value.split(","))
+                        pg_technologies.extend(value.split(","))
                     case _:
                         extra_properties[key] = value
 
@@ -135,7 +135,6 @@ class Entry:
 
 
 @dataclass
-
 class Snapshot:
     host_id: str
     entries: list[Entry]

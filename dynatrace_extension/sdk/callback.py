@@ -4,9 +4,9 @@
 
 import logging
 import random
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from timeit import default_timer as timer
-from typing import Callable, Dict, Optional, Tuple
 
 from .activation import ActivationType
 from .communication import MultiStatus, Status, StatusValue
@@ -18,10 +18,10 @@ class WrappedCallback:
         interval: timedelta,
         callback: Callable,
         logger: logging.Logger,
-        args: Optional[Tuple] = None,
-        kwargs: Optional[Dict] = None,
+        args: tuple | None = None,
+        kwargs: dict | None = None,
         running_in_sim=False,
-        activation_type: Optional[ActivationType] = None,
+        activation_type: ActivationType | None = None,
     ):
         self.callback: Callable = callback
         if args is None:

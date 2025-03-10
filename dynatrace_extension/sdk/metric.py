@@ -4,7 +4,6 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional, Union
 
 # https://bitbucket.lab.dynatrace.org/projects/ONE/repos/schemaless-metrics-spec/browse/limits.md
 LIMIT_DIMENSIONS_COUNT = 50
@@ -41,18 +40,18 @@ class Metric:
     def __init__(
         self,
         key: str,
-        value: Union[float, int, str, SummaryStat],
-        dimensions: Optional[Dict[str, str]] = None,
+        value: float | int | str | SummaryStat,
+        dimensions: dict[str, str] | None = None,
         metric_type: MetricType = MetricType.GAUGE,
-        timestamp: Optional[datetime] = None,
+        timestamp: datetime | None = None,
     ):
         self.key: str = key
-        self.value: Union[float, int, str, SummaryStat] = value
+        self.value: float | int | str | SummaryStat = value
         if dimensions is None:
             dimensions = {}
-        self.dimensions: Dict[str, str] = dimensions
+        self.dimensions: dict[str, str] = dimensions
         self.metric_type: MetricType = metric_type
-        self.timestamp: Optional[datetime] = timestamp
+        self.timestamp: datetime | None = timestamp
 
     def __hash__(self):
         return hash(self._key_and_dimensions())
@@ -103,10 +102,10 @@ class SfmMetric(Metric):
     def __init__(
         self,
         key: str,
-        value: Union[float, int, str, SummaryStat],
-        dimensions: Optional[Dict[str, str]] = None,
+        value: float | int | str | SummaryStat,
+        dimensions: dict[str, str] | None = None,
         metric_type: MetricType = MetricType.GAUGE,
-        timestamp: Optional[datetime] = None,
+        timestamp: datetime | None = None,
         client_facing: bool = False,
     ):
         key = create_sfm_metric_key(key, client_facing)

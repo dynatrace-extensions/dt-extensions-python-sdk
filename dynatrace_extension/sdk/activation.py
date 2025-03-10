@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from enum import Enum
-from typing import List
 
 
 class ActivationType(Enum):
@@ -17,7 +16,7 @@ class ActivationConfig(dict):
         self.version: str = self._activation_context_json.get("version", "")
         self.enabled: bool = self._activation_context_json.get("enabled", True)
         self.description: str = self._activation_context_json.get("description", "")
-        self.feature_sets: List[str] = self._activation_context_json.get("featureSets", [])
+        self.feature_sets: list[str] = self._activation_context_json.get("featureSets", [])
         self.type: ActivationType = ActivationType.REMOTE if self.remote else ActivationType.LOCAL
         super().__init__()
 

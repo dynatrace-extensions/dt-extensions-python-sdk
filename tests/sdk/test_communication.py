@@ -28,7 +28,6 @@ class TestCommunication(unittest.TestCase):
         self.assertEqual(len(responses), 0)
 
     def test_large_log_chunk(self):
-
         # This is 14_660_000 bytes
         events = []
         for _ in range(5000):
@@ -58,7 +57,6 @@ class TestCommunication(unittest.TestCase):
         self.assertEqual(len(chunks[0]), 1720)
 
     def test_large_metric_chunk(self):
-
         metrics = ['my.metric,dim="dim" 10'] * 500 * 100
 
         # it needs to be divided into 2 lists, each with 650_000 bytes
@@ -81,7 +79,6 @@ class TestCommunication(unittest.TestCase):
         self.assertEqual(len(chunks), 0)
 
     def test_large_log_chunk_valid_json(self):
-
         events = []
         for _ in range(5000):
             attributes = {}
