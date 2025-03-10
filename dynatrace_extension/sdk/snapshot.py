@@ -14,12 +14,14 @@ PREFIX_PGI = "PROCESS_GROUP_INSTANCE"
 class EntryProperties:
     technologies: list[str]
     pg_technologies: list[str]
+    extra_properties: dict[str,str]
 
     @staticmethod
-    def from_json(json_data: dict) -> EntryProperties:
+    def from_json(json_data: dict[str,str]) -> EntryProperties:
         technologies = json_data.get("Technologies", "").split(",")
         pg_technologies = json_data.get("pgTechnologies", "").split(",")
-        return EntryProperties(technologies, pg_technologies)
+        extra_properties = {k: v for k, v in json_data.items() if k not in ["Technologies", "pgTechnologies"]}
+        return EntryProperties(technologies, pg_technologies, extra_properties)
 
 
 @dataclass
@@ -111,20 +113,29 @@ class Entry:
         processes = [Process.from_json(p) for p in json_data.get("processes", [])]
 
         # The structure here was never thought out, so we have to check for both keys and merge them into one object
-        properties_list = json_data.get("properties", [])
-        technologies = [p for p in properties_list if "Technologies" in p]
-        if technologies:
-            technologies = technologies[0]["Technologies"].split(",")
+        properties_list: list[dict[str,str]] = json_data.get("properties", [])
+        technologies = []
+        pg_technologies = []
+        # There may be other useful properties included such as: mssql_instance_name.
+        extra_properties = {}
 
-        pg_technologies = [p for p in properties_list if "pgTechnologies" in p]
-        if pg_technologies:
-            pg_technologies = pg_technologies[0]["pgTechnologies"].split(",")
-        properties = EntryProperties(technologies or [], pg_technologies or [])
+        for prop in properties_list:
+            for key, value in prop.items():
+                match key:
+                    case "Technologies":
+                            technologies.extend(value.split(","))
+                    case "pgTechnologies":
+                            pg_technologies.extend(value.split(","))
+                    case _:
+                        extra_properties[key] = value
+
+        properties = EntryProperties(technologies, pg_technologies, extra_properties)
 
         return Entry(group_id, node_id, group_instance_id, process_type, group_name, processes, properties)
 
 
 @dataclass
+
 class Snapshot:
     host_id: str
     entries: list[Entry]
