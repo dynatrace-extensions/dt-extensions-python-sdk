@@ -70,7 +70,7 @@ detached = true
 dependencies = [
     "black>=23.1.0",
     "mypy>=1.0.0",
-    "ruff>=0.0.243",
+    "ruff>=0.9.10",
     "typer[all]",
     "pyyaml",
     "pytest"
