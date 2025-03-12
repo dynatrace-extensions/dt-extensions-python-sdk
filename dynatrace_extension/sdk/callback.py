@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from timeit import default_timer as timer
 
 from .activation import ActivationType
-from .communication import EndpointStatuses, MultiStatus, Status, StatusValue
+from .communication import EndpointStatuses, MultiStatus, Status, StatusValue, IgnoreStatus
 
 
 class WrappedCallback:
@@ -66,7 +66,9 @@ class WrappedCallback:
             elif isinstance(ret, MultiStatus):
                 self.status = ret.build()
             elif isinstance(ret, EndpointStatuses):
-                self.status = ret.build_common_status()
+                self.status = ret
+            elif isinstance(ret, IgnoreStatus):
+                self.status = ret
             else:
                 self.status = Status(StatusValue.OK)
         except Exception as e:

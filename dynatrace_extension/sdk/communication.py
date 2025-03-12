@@ -12,7 +12,7 @@ from collections.abc import Generator, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Generator, List, Sequence, TypeVar
+from typing import Any, Generator, List, Sequence, TypeVar, Dict
 from threading import RLock
 
 from .vendor.mureq.mureq import HTTPException, Response, request
@@ -39,6 +39,7 @@ class StatusValue(Enum):
     INVALID_CONFIG_ERROR = "INVALID_CONFIG_ERROR"
     AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR"
     DEVICE_CONNECTION_ERROR = "DEVICE_CONNECTION_ERROR"
+    WARNING = "WARNING"
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 
 
@@ -47,15 +48,9 @@ class EndpointSeverity(Enum):
     WARNING = "WARNING"
     ERROR = "ERROR"
 
-    def __lt__(self, other):
-        SEVERITY_ORDER = {
-            EndpointSeverity.INFO: 1,
-            EndpointSeverity.WARNING: 2,
-            EndpointSeverity.ERROR: 3
-        }
 
-        return SEVERITY_ORDER[self] < SEVERITY_ORDER[other]
-
+class IgnoreStatus:
+    pass
 
 class Status:
     def __init__(self, status: StatusValue = StatusValue.EMPTY, message: str = "", timestamp: int | None = None):
@@ -74,11 +69,14 @@ class Status:
 
     def is_error(self) -> bool:
         return self.status not in (StatusValue.OK, StatusValue.EMPTY)
+    
+    def is_warning(self) -> bool:
+        return self.status == StatusValue.WARNING
 
 
 class MultiStatus:
     def __init__(self):
-        self.statuses = []
+        self.statuses: List[StatusValue] = []
 
     def add_status(self, status: StatusValue, message):
         self.statuses.append(Status(status, message))
@@ -89,12 +87,33 @@ class MultiStatus:
             return ret
 
         messages = []
+        all_ok = True
+        all_err = True
+        warning_occured = False
+
         for stored_status in self.statuses:
-            print(stored_status)  # noqa: T201
+            if stored_status.message != "":
+                messages.append(stored_status.message)
+
+            if stored_status.is_warning():
+                warning_occured = True
+
             if stored_status.is_error():
-                ret.status = stored_status.status
-            messages.append(stored_status.message)
+                all_ok = False
+            else:
+                all_err = False
+
         ret.message = "\n".join(messages)
+
+        if warning_occured:
+            ret.status = StatusValue.WARNING
+        elif all_ok:
+            ret.status = StatusValue.OK
+        elif all_err:
+            ret.status = StatusValue.GENERIC_ERROR
+        else:
+            ret.status = StatusValue.WARNING
+        
         return ret
 
 
@@ -105,22 +124,22 @@ class EndpointStatus:
         self.short_status: StatusValue = short_status
         self.message = message
 
+    def __str__(self):
+        return str(self.__dict__)
+
 
 class EndpointStatuses:
     class TooManyEndpointStatuses(Exception):
         pass
 
-    def __init__(self, num_endpoints: int):
-        self._lock = RLock()
-        self._faulty_endpoints: {str: EndpointStatus} = {}
-        self._num_endpoints = num_endpoints
-        self._reported_metrics = 0
-        self._summarized_severity = EndpointSeverity.INFO
+    class MergeConflict(Exception):
+        def __init__(self, first: EndpointStatus, second: EndpointStatus):
+            super().__init__(f"Endpoint Statuses conflict while merging - first: {first}; second: {second}")
 
-    def add_reported_metrics(self, reported_metrics: int):
-        with self._lock:
-            if reported_metrics > 0:
-                self._reported_metrics += reported_metrics
+    def __init__(self, total_endpoints_number: int):
+        self._lock = RLock()
+        self._faulty_endpoints: Dict[str, EndpointStatus] = {}
+        self._num_endpoints = total_endpoints_number
 
     def add_endpoint_status(self, status: EndpointStatus):
         with self._lock:
@@ -131,29 +150,38 @@ class EndpointStatuses:
                     raise EndpointStatuses.TooManyEndpointStatuses(f"Cannot add another endpoint status. The number of reported statuses already has reached preconfigured maximum of {self._num_endpoints} endpoints.")
                 
                 self._faulty_endpoints[status.endpoint] = status
-                self._summarized_severity = max(self._summarized_severity, status.severity)
 
     def clear_endpoint_error(self, endpoint_hint: str):
         with self._lock:
-            del self._faulty_endpoints[endpoint_hint]
-            self._summarized_severity = max([status.severity for status in self._faulty_endpoints.values()])
-
-    def get_summarized_severity(self):
+            try:
+                del self._faulty_endpoints[endpoint_hint]
+            except KeyError:
+                pass
+        
+    def merge(self, other: EndpointStatuses):
         with self._lock:
-            return self._summarized_severity
-    
+            with other._lock:
+                self._num_endpoints += other._num_endpoints
+
+                for endpoint, status in other._faulty_endpoints.items():
+                    if endpoint not in self._faulty_endpoints.keys():
+                        self._faulty_endpoints[endpoint] = status
+                    else:
+                        self._num_endpoints -= 1
+                        raise EndpointStatuses.MergeConflict(self._faulty_endpoints[endpoint], other._faulty_endpoints[endpoint])
+                    
     def build_common_status(self) -> Status:
         with self._lock:
-            self._faulty_endpoints = dict(filter(lambda item: item[1].short_status != StatusValue.OK, self._faulty_endpoints.items()))
-
             if len(self._faulty_endpoints) == 0:
-                status = Status(StatusValue.OK, f"All {self._num_endpoints} endpoints are OK and returned {self._reported_metrics} metrics.")
+                status = Status(StatusValue.OK, f"Endpoints OK: {self._num_endpoints} NOK: 0")
             else:
-                reasons = ", ".join([f"{item.endpoint}: {item.short_status.value}" for _, item in self._faulty_endpoints.items()])
-                status = Status(StatusValue.GENERIC_ERROR,
-                    f"{len(self._faulty_endpoints)} out of {self._num_endpoints} endpoints work incorrectly. Returned {self._reported_metrics} metrics. Malfunctioning endpoints: {reasons}")
+                common_msg = ", ".join([f"{ep_status.endpoint} - {ep_status.short_status.value} {ep_status.message}" for ep_status in self._faulty_endpoints.values()])
                 
-            self._reported_metrics = 0
+                status = Status(
+                    status = StatusValue.GENERIC_ERROR if len(self._faulty_endpoints) == self._num_endpoints and StatusValue.WARNING not in [ep_status.short_status for ep_status in self._faulty_endpoints.values()] else StatusValue.WARNING,
+                    message = f"Endpoints OK: {self._num_endpoints - len(self._faulty_endpoints)} NOK: {len(self._faulty_endpoints)} NOK_reported_errors: {common_msg}"
+                )
+
             return status
 
 
