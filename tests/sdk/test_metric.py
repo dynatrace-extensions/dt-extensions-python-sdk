@@ -24,7 +24,7 @@ class TestMetric(unittest.TestCase):
         self.assertEqual(metric.to_mint_line(), f"myMetric gauge,101 {int(timestamp.timestamp() * 1000)}")
 
     def test_too_many_dimensions(self):
-        dimensions = {k: "value" for k in range(0, 51)}
+        dimensions = dict.fromkeys(range(0, 51), "value")
         metric = Metric("myMetric", 101, dimensions=dimensions)
         self.assertRaises(ValueError, metric.validate)
 
