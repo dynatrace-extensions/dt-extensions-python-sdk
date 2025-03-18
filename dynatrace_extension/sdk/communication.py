@@ -62,6 +62,7 @@ class Status:
         return json.dumps(self.to_json())
 
     def is_error(self) -> bool:
+        # WARNING is treated as an error
         return self.status not in (StatusValue.OK, StatusValue.EMPTY)
     
     def is_warning(self) -> bool:
@@ -114,7 +115,7 @@ class MultiStatus:
 class EndpointStatus:
     def __init__(self, endpoint_hint: str, short_status: StatusValue, message: str):
         self.endpoint = endpoint_hint
-        self.short_status: StatusValue = short_status
+        self.status: StatusValue = short_status
         self.message = message
 
     def __str__(self):
@@ -136,7 +137,7 @@ class EndpointStatuses:
 
     def add_endpoint_status(self, status: EndpointStatus):
         with self._lock:
-            if status.short_status == StatusValue.OK:
+            if status.status == StatusValue.OK:
                 self.clear_endpoint_error(status.endpoint)
             else:
                 if len(self._faulty_endpoints) == self._num_endpoints:
@@ -168,10 +169,10 @@ class EndpointStatuses:
             if len(self._faulty_endpoints) == 0:
                 status = Status(StatusValue.OK, f"Endpoints OK: {self._num_endpoints} NOK: 0")
             else:
-                common_msg = ", ".join([f"{ep_status.endpoint} - {ep_status.short_status.value} {ep_status.message}" for ep_status in self._faulty_endpoints.values()])
+                common_msg = ", ".join([f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}" for ep_status in self._faulty_endpoints.values()])
                 
                 status = Status(
-                    status = StatusValue.GENERIC_ERROR if len(self._faulty_endpoints) == self._num_endpoints and StatusValue.WARNING not in [ep_status.short_status for ep_status in self._faulty_endpoints.values()] else StatusValue.WARNING,
+                    status = StatusValue.GENERIC_ERROR if len(self._faulty_endpoints) == self._num_endpoints and StatusValue.WARNING not in [ep_status.status for ep_status in self._faulty_endpoints.values()] else StatusValue.WARNING,
                     message = f"Endpoints OK: {self._num_endpoints - len(self._faulty_endpoints)} NOK: {len(self._faulty_endpoints)} NOK_reported_errors: {common_msg}"
                 )
 
