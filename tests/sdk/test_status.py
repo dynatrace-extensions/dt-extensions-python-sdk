@@ -652,7 +652,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("callback_multistatus: GENERIC_ERROR - MULTI MSG\nMethod=callback_status: EEC_CONNECTION_ERROR - STATUS MSG\nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG", status.message)
+        self.assertIn("callback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG\nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG", status.message)
 
     def test_overall_status_ok(self):
         def callback_ep_status():
@@ -759,4 +759,4 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("callback_multistatus: GENERIC_ERROR - \nMethod=callback_status: WARNING - \nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR", status.message)
+        self.assertIn("callback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - \nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR", status.message)

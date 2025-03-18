@@ -1026,7 +1026,7 @@ class Extension:
                 all_err = False
 
             if callback.status.is_error() or (callback.status.message is not None and callback.status.message != ""):
-                messages.append(f"{callback}: {callback.status.status.value} - {callback.status.message}")
+                messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
         if ep_status_merged._num_endpoints > 0:
