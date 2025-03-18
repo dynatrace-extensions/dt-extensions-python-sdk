@@ -43,12 +43,6 @@ class StatusValue(Enum):
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 
 
-class EndpointSeverity(Enum):
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-
-
 class IgnoreStatus:
     pass
 
@@ -118,9 +112,8 @@ class MultiStatus:
 
 
 class EndpointStatus:
-    def __init__(self, endpoint_hint: str, severity: EndpointSeverity, short_status: StatusValue, message: str):
+    def __init__(self, endpoint_hint: str, short_status: StatusValue, message: str):
         self.endpoint = endpoint_hint
-        self.severity: EndpointSeverity = severity
         self.short_status: StatusValue = short_status
         self.message = message
 

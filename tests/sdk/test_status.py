@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from dynatrace_extension import Extension
 
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
-from dynatrace_extension.sdk.extension import Status, StatusValue, EndpointStatuses, EndpointStatus, EndpointSeverity
+from dynatrace_extension.sdk.extension import Status, StatusValue, EndpointStatuses, EndpointStatus
 
 
 class TestStatus(unittest.TestCase):
@@ -313,18 +313,15 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(10)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.OK,
                                "Invalid authorization scheme 1"))
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.ERROR,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 2"))
 
             statuses.add_endpoint_status(
                 EndpointStatus("6.7.8.9:80",
-                               EndpointSeverity.WARNING,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 3"))
 
@@ -350,18 +347,15 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(3)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme 4"))
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.ERROR,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 5"))
 
             statuses.add_endpoint_status(
                 EndpointStatus("6.7.8.9:80",
-                               EndpointSeverity.WARNING,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 6"))
 
@@ -387,25 +381,21 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(10)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme 7"))
             
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.WARNING,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 8"))
 
             statuses.add_endpoint_status(
                 EndpointStatus("6.7.8.9:80",
-                               EndpointSeverity.ERROR,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 9"))
                        
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.ERROR,
                                StatusValue.OK,
                                "Invalid authorization scheme 10"))
             
@@ -433,20 +423,17 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(2)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme A"))
             
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
-                               EndpointSeverity.WARNING,
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme B"))
 
             with self.assertRaises(EndpointStatuses.TooManyEndpointStatuses):
                 statuses.add_endpoint_status(
                     EndpointStatus("6.7.8.9:80",
-                                   EndpointSeverity.ERROR,
                                    StatusValue.DEVICE_CONNECTION_ERROR,
                                    "Invalid authorization scheme C"))
             return statuses
@@ -489,7 +476,6 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(1)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.WARNING,
                                "Invalid authorization scheme A"))
             return statuses
@@ -513,7 +499,6 @@ class TestStatus(unittest.TestCase):
             statuses = EndpointStatuses(1)
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80",
-                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme"))
             return statuses
@@ -555,7 +540,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT_1",
-                               EndpointSeverity.INFO,
                                StatusValue.AUTHENTICATION_ERROR,
                                "EP1 MSG"))
             return status
@@ -564,7 +548,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT_2",
-                               EndpointSeverity.INFO,
                                StatusValue.INVALID_CONFIG_ERROR,
                                "EP2 MSG"))
             return status
@@ -590,7 +573,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT_1",
-                               EndpointSeverity.INFO,
                                StatusValue.OK,
                                "EP1 MSG"))
             return status
@@ -599,7 +581,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT_2",
-                               EndpointSeverity.INFO,
                                StatusValue.WARNING,
                                "EP2 MSG"))
             return status
@@ -624,7 +605,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT",
-                               EndpointSeverity.INFO,
                                StatusValue.UNKNOWN_ERROR,
                                "EP MSG"))
             return status
@@ -659,7 +639,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT",
-                               EndpointSeverity.INFO,
                                StatusValue.OK,
                                "EP MSG"))
             return status
@@ -695,7 +674,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT",
-                               EndpointSeverity.INFO,
                                StatusValue.WARNING,
                                "EP MSG"))
             return status
@@ -731,7 +709,6 @@ class TestStatus(unittest.TestCase):
             status = EndpointStatuses(1)
             status.add_endpoint_status(
                 EndpointStatus("EP_HINT",
-                               EndpointSeverity.INFO,
                                StatusValue.INVALID_CONFIG_ERROR,
                                ""))
             return status
