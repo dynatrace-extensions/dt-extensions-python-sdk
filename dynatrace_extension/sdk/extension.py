@@ -985,7 +985,6 @@ class Extension:
 
         messages = []
 
-        # TODO: separate
         # Check for internal errors
         with self._internal_callbacks_results_lock:            
             overall_status_value = Status(StatusValue.OK)
@@ -1003,10 +1002,9 @@ class Extension:
 
         # Handle regular statuses, merge all EndpointStatuses
         ep_status_merged = EndpointStatuses(0)
-        # TODO: what if all are WARNINGs? Or there's only a single warning status (eg from MultiStatsu)
         all_ok = True
         all_err = True
-        warning_occured = False
+        any_warning = False
 
         for callback in self._scheduled_callbacks:
             if isinstance(callback.status, IgnoreStatus):
@@ -1020,15 +1018,15 @@ class Extension:
                 continue
 
             if callback.status.is_warning():
-                warning_occured = True
+                any_warning = True
 
             if callback.status.is_error():
                 all_ok = False
             else:
                 all_err = False
 
-            if callback.status.is_error() or (callback.status.message is not None and callback.status.message != ""):                
-                messages.append(f"{callback}: {callback.status.status.value} - {callback.status.message}")        
+            if callback.status.is_error() or (callback.status.message is not None and callback.status.message != ""):
+                messages.append(f"{callback}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
         if ep_status_merged._num_endpoints > 0:
@@ -1036,7 +1034,7 @@ class Extension:
             messages.append(ep_status_merged.message)
             
             if ep_status_merged.is_warning():
-                warning_occured = True
+                any_warning = True
 
             if ep_status_merged.is_error():
                 all_ok = False
@@ -1045,7 +1043,7 @@ class Extension:
 
         # Build overall status
         overall_status = Status(StatusValue.OK, "\n".join(messages))
-        if warning_occured:
+        if any_warning:
             overall_status.status = StatusValue.WARNING
         elif all_ok:
             overall_status.status = StatusValue.OK

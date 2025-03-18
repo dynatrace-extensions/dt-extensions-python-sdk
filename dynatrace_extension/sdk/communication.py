@@ -89,14 +89,14 @@ class MultiStatus:
         messages = []
         all_ok = True
         all_err = True
-        warning_occured = False
+        any_warning = False
 
         for stored_status in self.statuses:
             if stored_status.message != "":
                 messages.append(stored_status.message)
 
             if stored_status.is_warning():
-                warning_occured = True
+                any_warning = True
 
             if stored_status.is_error():
                 all_ok = False
@@ -105,7 +105,7 @@ class MultiStatus:
 
         ret.message = "\n".join(messages)
 
-        if warning_occured:
+        if any_warning:
             ret.status = StatusValue.WARNING
         elif all_ok:
             ret.status = StatusValue.OK
