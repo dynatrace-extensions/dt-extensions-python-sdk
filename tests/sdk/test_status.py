@@ -632,7 +632,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("callback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG\nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG", status.message)
+        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG\ncallback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG", status.message)
 
     def test_overall_status_ok(self):
         def callback_ep_status():
@@ -666,7 +666,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("callback_status: OK - STATUS MSG\nEndpoints OK: 1 NOK: 0", status.message)
+        self.assertIn("Endpoints OK: 1 NOK: 0\ncallback_status: OK - STATUS MSG", status.message)
 
 
     def test_overall_status_warning_1(self):
@@ -701,7 +701,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("callback_multistatus: OK - MULTI MSG\nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - WARNING EP MSG", status.message)
+        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - WARNING EP MSG\ncallback_multistatus: OK - MULTI MSG", status.message)
 
 
     def test_overall_status_warning_2(self):
@@ -736,4 +736,4 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("callback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - \nEndpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR", status.message)
+        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR \ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ", status.message)

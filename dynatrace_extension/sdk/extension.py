@@ -1031,7 +1031,7 @@ class Extension:
         # Handle merged EndpointStatuses
         if ep_status_merged._num_endpoints > 0:
             ep_status_merged = ep_status_merged.build_common_status()
-            messages.append(ep_status_merged.message)
+            messages.insert(0, ep_status_merged.message)
             
             if ep_status_merged.is_warning():
                 any_warning = True

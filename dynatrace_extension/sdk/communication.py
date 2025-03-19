@@ -98,7 +98,7 @@ class MultiStatus:
             else:
                 all_err = False
 
-        ret.message = "\n".join(messages)
+        ret.message = ", ".join(messages)
 
         if any_warning:
             ret.status = StatusValue.WARNING
