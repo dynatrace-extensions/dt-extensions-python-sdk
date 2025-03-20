@@ -458,10 +458,10 @@ class Extension:
         key: str,
         value: float | str | int | SummaryStat,
         dimensions: dict[str, str] | None = None,
-        device_address: str | None = None,
         techrule: str | None = None,
         timestamp: datetime | None = None,
         metric_type: MetricType = MetricType.GAUGE,
+        device_address: str | None = None,
     ) -> None:
         """Report a metric.
 
