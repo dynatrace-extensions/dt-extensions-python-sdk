@@ -1014,7 +1014,7 @@ class Extension:
                 try:
                     ep_status_merged.merge(callback.status)
                 except EndpointStatuses.MergeConflictError as e:
-                    self.logger(e)
+                    self.logger.exception(e)
                 continue
 
             if callback.status.is_warning():

@@ -3,9 +3,8 @@ import unittest
 from datetime import timedelta
 from unittest.mock import MagicMock
 
-from dynatrace_extension import Extension
+from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Status, StatusValue
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
-from dynatrace_extension.sdk.extension import EndpointStatus, EndpointStatuses, Status, StatusValue
 
 
 class TestStatus(unittest.TestCase):
