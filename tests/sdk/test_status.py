@@ -4,9 +4,8 @@ from datetime import timedelta
 from unittest.mock import MagicMock
 
 from dynatrace_extension import Extension
-
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
-from dynatrace_extension.sdk.extension import Status, StatusValue, EndpointStatuses, EndpointStatus
+from dynatrace_extension.sdk.extension import EndpointStatus, EndpointStatuses, Status, StatusValue
 
 
 class TestStatus(unittest.TestCase):
@@ -333,9 +332,10 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("OK: 8 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3", status.message)
+        self.assertIn("OK: 8 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
+                      "Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3", status.message)
 
-    
+
     def test_endpoint_status_all_faulty_endpoints(self):
         ext = Extension()
         ext.logger = MagicMock()
@@ -367,7 +367,9 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("OK: 0 NOK: 3 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme 4, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 5, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 6", status.message)
+        self.assertIn("OK: 0 NOK: 3 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR "
+                      "Invalid authorization scheme 4, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
+                      "Invalid authorization scheme 5, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 6", status.message)
 
 
     def test_endpoint_status_clearing_the_status(self):
@@ -383,7 +385,7 @@ class TestStatus(unittest.TestCase):
                 EndpointStatus("1.2.3.4:80",
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme 7"))
-            
+
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
                                StatusValue.DEVICE_CONNECTION_ERROR,
@@ -393,12 +395,12 @@ class TestStatus(unittest.TestCase):
                 EndpointStatus("6.7.8.9:80",
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme 9"))
-                       
+
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
                                StatusValue.OK,
                                "Invalid authorization scheme 10"))
-            
+
             statuses.clear_endpoint_error("6.7.8.9:80")
 
             return statuses
@@ -425,13 +427,13 @@ class TestStatus(unittest.TestCase):
                 EndpointStatus("1.2.3.4:80",
                                StatusValue.AUTHENTICATION_ERROR,
                                "Invalid authorization scheme A"))
-            
+
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80",
                                StatusValue.DEVICE_CONNECTION_ERROR,
                                "Invalid authorization scheme B"))
 
-            with self.assertRaises(EndpointStatuses.TooManyEndpointStatuses):
+            with self.assertRaises(EndpointStatuses.TooManyEndpointStatusesError):
                 statuses.add_endpoint_status(
                     EndpointStatus("6.7.8.9:80",
                                    StatusValue.DEVICE_CONNECTION_ERROR,
@@ -444,7 +446,8 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("OK: 0 NOK: 2 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme A, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme B", status.message)
+        self.assertIn("OK: 0 NOK: 2 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR "
+                      "Invalid authorization scheme A, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme B", status.message)
 
     def test_endpoint_empty(self):
         ext = Extension()
@@ -515,7 +518,7 @@ class TestStatus(unittest.TestCase):
         def callback_ep_status_1():
             status = EndpointStatuses(1)
             return status
-        
+
         def callback_ep_status_2():
             status = EndpointStatuses(2)
             return status
@@ -543,7 +546,7 @@ class TestStatus(unittest.TestCase):
                                StatusValue.AUTHENTICATION_ERROR,
                                "EP1 MSG"))
             return status
-        
+
         def callback_ep_status_2():
             status = EndpointStatuses(1)
             status.add_endpoint_status(
@@ -576,7 +579,7 @@ class TestStatus(unittest.TestCase):
                                StatusValue.OK,
                                "EP1 MSG"))
             return status
-        
+
         def callback_ep_status_2():
             status = EndpointStatuses(1)
             status.add_endpoint_status(
@@ -608,12 +611,12 @@ class TestStatus(unittest.TestCase):
                                StatusValue.UNKNOWN_ERROR,
                                "EP MSG"))
             return status
-        
+
         def callback_multistatus():
             status = MultiStatus()
             status.add_status(StatusValue.INVALID_ARGS_ERROR, "MULTI MSG")
             return status
-        
+
         def callback_status():
             status = Status(StatusValue.EEC_CONNECTION_ERROR, "STATUS MSG")
             return status
@@ -632,7 +635,8 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG\ncallback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG", status.message)
+        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG"
+                      "\ncallback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG", status.message)
 
     def test_overall_status_ok(self):
         def callback_ep_status():
@@ -642,12 +646,12 @@ class TestStatus(unittest.TestCase):
                                StatusValue.OK,
                                "EP MSG"))
             return status
-        
+
         def callback_multistatus():
             status = MultiStatus()
             status.add_status(StatusValue.OK, "")
             return status
-        
+
         def callback_status():
             status = Status(StatusValue.OK, "STATUS MSG")
             return status
@@ -677,12 +681,12 @@ class TestStatus(unittest.TestCase):
                                StatusValue.WARNING,
                                "EP MSG"))
             return status
-        
+
         def callback_multistatus():
             status = MultiStatus()
             status.add_status(StatusValue.OK, "MULTI MSG")
             return status
-        
+
         def callback_status():
             status = Status(StatusValue.OK, "")
             return status
@@ -712,12 +716,12 @@ class TestStatus(unittest.TestCase):
                                StatusValue.INVALID_CONFIG_ERROR,
                                ""))
             return status
-        
+
         def callback_multistatus():
             status = MultiStatus()
             status.add_status(StatusValue.INVALID_ARGS_ERROR, "")
             return status
-        
+
         def callback_status():
             status = Status(StatusValue.WARNING, "")
             return status
@@ -736,4 +740,5 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR \ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ", status.message)
+        self.assertIn("Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR "
+                      "\ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ", status.message)

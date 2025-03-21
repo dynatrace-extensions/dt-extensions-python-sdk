@@ -12,8 +12,8 @@ from collections.abc import Generator, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Generator, List, Sequence, TypeVar, Dict
 from threading import RLock
+from typing import Any, TypeVar
 
 from .vendor.mureq.mureq import HTTPException, Response, request
 
@@ -64,14 +64,14 @@ class Status:
     def is_error(self) -> bool:
         # WARNING is treated as an error
         return self.status not in (StatusValue.OK, StatusValue.EMPTY)
-    
+
     def is_warning(self) -> bool:
         return self.status == StatusValue.WARNING
 
 
 class MultiStatus:
     def __init__(self):
-        self.statuses: List[StatusValue] = []
+        self.statuses: list[StatusValue] = []
 
     def add_status(self, status: StatusValue, message):
         self.statuses.append(Status(status, message))
@@ -108,7 +108,7 @@ class MultiStatus:
             ret.status = StatusValue.GENERIC_ERROR
         else:
             ret.status = StatusValue.WARNING
-        
+
         return ret
 
 
@@ -123,26 +123,28 @@ class EndpointStatus:
 
 
 class EndpointStatuses:
-    class TooManyEndpointStatuses(Exception):
+    class TooManyEndpointStatusesError(Exception):
         pass
 
-    class MergeConflict(Exception):
+    class MergeConflictError(Exception):
         def __init__(self, first: EndpointStatus, second: EndpointStatus):
             super().__init__(f"Endpoint Statuses conflict while merging - first: {first}; second: {second}")
 
     def __init__(self, total_endpoints_number: int):
         self._lock = RLock()
-        self._faulty_endpoints: Dict[str, EndpointStatus] = {}
+        self._faulty_endpoints: dict[str, EndpointStatus] = {}
         self._num_endpoints = total_endpoints_number
 
     def add_endpoint_status(self, status: EndpointStatus):
-        with self._lock:
+        with (self._lock):
             if status.status == StatusValue.OK:
                 self.clear_endpoint_error(status.endpoint)
             else:
                 if len(self._faulty_endpoints) == self._num_endpoints:
-                    raise EndpointStatuses.TooManyEndpointStatuses(f"Cannot add another endpoint status. The number of reported statuses already has reached preconfigured maximum of {self._num_endpoints} endpoints.")
-                
+                    message = "Cannot add another endpoint status. \
+                    The number of reported statuses already has reached preconfigured maximum of {self._num_endpoints} endpoints."
+                    raise EndpointStatuses.TooManyEndpointStatusesError(message)
+
                 self._faulty_endpoints[status.endpoint] = status
 
     def clear_endpoint_error(self, endpoint_hint: str):
@@ -151,7 +153,7 @@ class EndpointStatuses:
                 del self._faulty_endpoints[endpoint_hint]
             except KeyError:
                 pass
-        
+
     def merge(self, other: EndpointStatuses):
         with self._lock:
             with other._lock:
@@ -162,21 +164,36 @@ class EndpointStatuses:
                         self._faulty_endpoints[endpoint] = status
                     else:
                         self._num_endpoints -= 1
-                        raise EndpointStatuses.MergeConflict(self._faulty_endpoints[endpoint], other._faulty_endpoints[endpoint])
-                    
+                        raise EndpointStatuses.MergeConflictError(self._faulty_endpoints[endpoint], other._faulty_endpoints[endpoint])
+
     def build_common_status(self) -> Status:
         with self._lock:
-            if len(self._faulty_endpoints) == 0:
-                status = Status(StatusValue.OK, f"Endpoints OK: {self._num_endpoints} NOK: 0")
-            else:
-                common_msg = ", ".join([f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}" for ep_status in self._faulty_endpoints.values()])
-                
-                status = Status(
-                    status = StatusValue.GENERIC_ERROR if len(self._faulty_endpoints) == self._num_endpoints and StatusValue.WARNING not in [ep_status.status for ep_status in self._faulty_endpoints.values()] else StatusValue.WARNING,
-                    message = f"Endpoints OK: {self._num_endpoints - len(self._faulty_endpoints)} NOK: {len(self._faulty_endpoints)} NOK_reported_errors: {common_msg}"
-                )
+            ok_count = self._num_endpoints - len(self._faulty_endpoints)
+            nok_count = len(self._faulty_endpoints)
 
-            return status
+            if nok_count == 0:
+                return Status(StatusValue.OK, f"Endpoints OK: {self._num_endpoints} NOK: 0")
+
+            error_messages = []
+            for ep_status in self._faulty_endpoints.values():
+                error_messages.append(
+                    f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}"
+                )
+            common_msg = ", ".join(error_messages)
+
+            # Determine status value
+            all_endpoints_faulty = nok_count == self._num_endpoints
+            has_warning_status = StatusValue.WARNING in [
+                ep_status.status for ep_status in self._faulty_endpoints.values()
+            ]
+
+            if all_endpoints_faulty and not has_warning_status:
+                status_value = StatusValue.GENERIC_ERROR
+            else:
+                status_value = StatusValue.WARNING
+
+            message = f"Endpoints OK: {ok_count} NOK: {nok_count} NOK_reported_errors: {common_msg}"
+            return Status(status=status_value, message=message)
 
 
 class CommunicationClient(ABC):

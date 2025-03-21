@@ -20,7 +20,7 @@ from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue, MultiStatus, EndpointStatus, EndpointStatuses, IgnoreStatus
+from .communication import CommunicationClient, DebugClient, EndpointStatuses, HttpClient, IgnoreStatus, Status, StatusValue
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
@@ -986,16 +986,16 @@ class Extension:
         messages = []
 
         # Check for internal errors
-        with self._internal_callbacks_results_lock:            
+        with self._internal_callbacks_results_lock:
             overall_status_value = Status(StatusValue.OK)
             internal_callback_error = False
-            
+
             for callback, result in self._internal_callbacks_results.items():
                 if result.is_error():
                     internal_callback_error = True
                     overall_status_value = result.status
                     messages.append(f"{callback}: {result.status} - {result.message}")
-            
+
             if internal_callback_error:
                 return Status(overall_status_value, "\n".join(messages))
 
@@ -1013,7 +1013,7 @@ class Extension:
             if isinstance(callback.status, EndpointStatuses):
                 try:
                     ep_status_merged.merge(callback.status)
-                except EndpointStatuses.MergeConflict as e:
+                except EndpointStatuses.MergeConflictError as e:
                     self.logger(e)
                 continue
 
@@ -1032,7 +1032,7 @@ class Extension:
         if ep_status_merged._num_endpoints > 0:
             ep_status_merged = ep_status_merged.build_common_status()
             messages.insert(0, ep_status_merged.message)
-            
+
             if ep_status_merged.is_warning():
                 any_warning = True
 

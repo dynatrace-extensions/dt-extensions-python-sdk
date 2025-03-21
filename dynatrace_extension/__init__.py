@@ -6,7 +6,7 @@
 # ruff: noqa: F401
 
 from .sdk.activation import ActivationConfig, ActivationType
-from .sdk.communication import Status, StatusValue, EndpointStatuses, EndpointStatus, IgnoreStatus, MultiStatus
+from .sdk.communication import EndpointStatus, EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue
 from .sdk.event import Severity
 from .sdk.extension import DtEventType, Extension
 from .sdk.helper import (
