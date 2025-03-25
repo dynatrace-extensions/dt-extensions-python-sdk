@@ -46,6 +46,7 @@ class StatusValue(Enum):
 class IgnoreStatus:
     pass
 
+
 class Status:
     def __init__(self, status: StatusValue = StatusValue.EMPTY, message: str = "", timestamp: int | None = None):
         self.status = status
@@ -71,7 +72,7 @@ class Status:
 
 class MultiStatus:
     def __init__(self):
-        self.statuses: list[StatusValue] = []
+        self.statuses: list[Status] = []
 
     def add_status(self, status: StatusValue, message):
         self.statuses.append(Status(status, message))
@@ -136,7 +137,7 @@ class EndpointStatuses:
         self._num_endpoints = total_endpoints_number
 
     def add_endpoint_status(self, status: EndpointStatus):
-        with (self._lock):
+        with self._lock:
             if status.status == StatusValue.OK:
                 self.clear_endpoint_error(status.endpoint)
             else:
@@ -164,7 +165,9 @@ class EndpointStatuses:
                         self._faulty_endpoints[endpoint] = status
                     else:
                         self._num_endpoints -= 1
-                        raise EndpointStatuses.MergeConflictError(self._faulty_endpoints[endpoint], other._faulty_endpoints[endpoint])
+                        raise EndpointStatuses.MergeConflictError(
+                            self._faulty_endpoints[endpoint], other._faulty_endpoints[endpoint]
+                        )
 
     def build_common_status(self) -> Status:
         with self._lock:
@@ -176,9 +179,7 @@ class EndpointStatuses:
 
             error_messages = []
             for ep_status in self._faulty_endpoints.values():
-                error_messages.append(
-                    f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}"
-                )
+                error_messages.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
             common_msg = ", ".join(error_messages)
 
             # Determine status value

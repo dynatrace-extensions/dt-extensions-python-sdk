@@ -20,7 +20,15 @@ from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, EndpointStatuses, HttpClient, IgnoreStatus, Status, StatusValue
+from .communication import (
+    CommunicationClient,
+    DebugClient,
+    EndpointStatuses,
+    HttpClient,
+    IgnoreStatus,
+    Status,
+    StatusValue,
+)
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
@@ -998,7 +1006,6 @@ class Extension:
 
             if internal_callback_error:
                 return Status(overall_status_value, "\n".join(messages))
-
 
         # Handle regular statuses, merge all EndpointStatuses
         ep_status_merged = EndpointStatuses(0)
