@@ -33,6 +33,7 @@ from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 from .snapshot import Snapshot
+from .throttled_logger import StrictThrottledHandler, ThrottledHandler
 
 HEARTBEAT_INTERVAL = timedelta(seconds=50)
 METRIC_SENDING_INTERVAL = timedelta(seconds=30)
@@ -58,6 +59,33 @@ extension_logger = logging.getLogger(__name__)
 extension_logger.setLevel(logging.INFO)
 extension_logger.addHandler(error_handler)
 extension_logger.addHandler(std_handler)
+
+throttled_err_handler = ThrottledHandler(sys.stderr)
+throttled_err_handler.addFilter(lambda record: record.levelno >= logging.ERROR)
+throttled_err_handler.setFormatter(formatter)
+
+throttled_std_handler = ThrottledHandler(sys.stdout)
+throttled_std_handler.addFilter(lambda record: record.levelno < logging.ERROR)
+throttled_std_handler.setFormatter(formatter)
+
+throttled_logger = logging.getLogger(f"THROTTLED_{__name__}")
+throttled_logger.setLevel(logging.INFO)
+throttled_logger.addHandler(throttled_err_handler)
+throttled_logger.addHandler(throttled_std_handler)
+
+strict_throttled_err_handler = StrictThrottledHandler(sys.stderr)
+strict_throttled_err_handler.addFilter(lambda record: record.levelno >= logging.ERROR)
+strict_throttled_err_handler.setFormatter(formatter)
+
+strict_throttled_std_handler = StrictThrottledHandler(sys.stdout)
+strict_throttled_std_handler.addFilter(lambda record: record.levelno < logging.ERROR)
+strict_throttled_std_handler.setFormatter(formatter)
+
+strict_throttled_logger = logging.getLogger(f"STRICT_THROTTLED_{__name__}")
+strict_throttled_logger.setLevel(logging.INFO)
+strict_throttled_logger.addHandler(strict_throttled_err_handler)
+strict_throttled_logger.addHandler(strict_throttled_std_handler)
+
 
 api_logger = logging.getLogger("api")
 api_logger.setLevel(logging.INFO)
@@ -172,6 +200,8 @@ class Extension:
             return
 
         self.logger = extension_logger
+        self.throttled_logger = throttled_logger
+        self.strict_throttled_logger = strict_throttled_logger
         self.logger.name = name
 
         self.extension_config: str = ""
