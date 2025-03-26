@@ -20,7 +20,15 @@ from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, HttpClient, Status, StatusValue
+from .communication import (
+    CommunicationClient,
+    DebugClient,
+    EndpointStatuses,
+    HttpClient,
+    IgnoreStatus,
+    Status,
+    StatusValue,
+)
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
@@ -380,7 +388,7 @@ class Extension:
         Optional method that can be implemented by subclasses.
         The query method is always scheduled to run every minute.
         """
-        pass
+        return IgnoreStatus()
 
     def initialize(self):
         """Callback to be executed when the extension starts.
@@ -980,33 +988,77 @@ class Extension:
                 )
 
     def _build_current_status(self):
-        overall_status = Status(StatusValue.OK)
-
         if self._initialization_error:
-            overall_status.status = StatusValue.GENERIC_ERROR
-            overall_status.message = self._initialization_error
-            return overall_status
+            return Status(StatusValue.OK, self._initialization_error)
 
-        internal_callback_error = False
         messages = []
+
+        # Check for internal errors
         with self._internal_callbacks_results_lock:
+            overall_status_value = Status(StatusValue.OK)
+            internal_callback_error = False
+
             for callback, result in self._internal_callbacks_results.items():
                 if result.is_error():
                     internal_callback_error = True
-                    overall_status.status = result.status
-                    messages.append(f"{callback}: {result.message}")
+                    overall_status_value = result.status
+                    messages.append(f"{callback}: {result.status} - {result.message}")
+
             if internal_callback_error:
-                overall_status.message = "\n".join(messages)
-                return overall_status
+                return Status(overall_status_value, "\n".join(messages))
+
+        # Handle regular statuses, merge all EndpointStatuses
+        ep_status_merged = EndpointStatuses(0)
+        all_ok = True
+        all_err = True
+        any_warning = False
 
         for callback in self._scheduled_callbacks:
-            if callback.status.is_error():
-                overall_status.status = callback.status.status
-                messages.append(f"{callback}: {callback.status.message}")
+            if isinstance(callback.status, IgnoreStatus):
                 continue
-            if callback.status.message is not None and callback.status.message != "":
-                messages.append(f"{callback}: {callback.status.message}")
-        overall_status.message = "\n".join(messages)
+
+            if isinstance(callback.status, EndpointStatuses):
+                try:
+                    ep_status_merged.merge(callback.status)
+                except EndpointStatuses.MergeConflictError as e:
+                    self.logger.exception(e)
+                continue
+
+            if callback.status.is_warning():
+                any_warning = True
+
+            if callback.status.is_error():
+                all_ok = False
+            else:
+                all_err = False
+
+            if callback.status.is_error() or (callback.status.message is not None and callback.status.message != ""):
+                messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
+
+        # Handle merged EndpointStatuses
+        if ep_status_merged._num_endpoints > 0:
+            ep_status_merged = ep_status_merged.build_common_status()
+            messages.insert(0, ep_status_merged.message)
+
+            if ep_status_merged.is_warning():
+                any_warning = True
+
+            if ep_status_merged.is_error():
+                all_ok = False
+            else:
+                all_err = False
+
+        # Build overall status
+        overall_status = Status(StatusValue.OK, "\n".join(messages))
+        if any_warning:
+            overall_status.status = StatusValue.WARNING
+        elif all_ok:
+            overall_status.status = StatusValue.OK
+        elif all_err:
+            overall_status.status = StatusValue.GENERIC_ERROR
+        else:
+            overall_status.status = StatusValue.WARNING
+
         return overall_status
 
     def _update_cluster_time_diff(self):
