@@ -192,7 +192,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(1)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        
         self.assertIn("foo1", status.message)
         self.assertIn("foo2", status.message)
 
@@ -214,7 +218,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(1)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn("foo1", status.message)
         self.assertIn("foo2", status.message)
 
@@ -236,7 +244,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(1)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn("foo1", status.message)
         self.assertIn("foo2", status.message)
 
@@ -257,7 +269,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(1)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        
         self.assertIn("foo1", status.message)
 
     def test_multistatus_error(self):
@@ -325,7 +341,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn(
             "OK: 8 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
             "Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3",
@@ -401,7 +421,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)        
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        
         self.assertIn(
             "OK: 9 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme 7",
             status.message,
@@ -480,7 +504,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn(
             "OK: 0 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - WARNING Invalid authorization scheme A", status.message
         )
@@ -586,7 +614,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn("OK: 1 NOK: 1 NOK_reported_errors: EP_HINT_2 - WARNING EP2 MSG", status.message)
 
     def test_overall_status_error(self):
@@ -683,7 +715,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+
         self.assertIn(
             "Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - WARNING EP MSG\ncallback_multistatus: OK - MULTI MSG",
             status.message,
@@ -717,7 +753,11 @@ class TestStatus(unittest.TestCase):
         time.sleep(0.01)
 
         status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
+        
+        # TODO WARNING STATUS: to be restored after EEC 1.313 is released
+        # self.assertEqual(status.status, StatusValue.WARNING)
+        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+        
         self.assertIn(
             "Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR "
             "\ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ",
