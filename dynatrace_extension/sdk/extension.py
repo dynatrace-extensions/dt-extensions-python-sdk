@@ -1081,17 +1081,13 @@ class Extension:
         # Build overall status
         overall_status = Status(StatusValue.OK, "\n".join(messages))
         if any_warning:
-            # TODO WARNING STATUS: to be restored after EEC 1.313 is released
-            # overall_status.status = StatusValue.WARNING
-            overall_status.status = StatusValue.GENERIC_ERROR
+            overall_status.status = StatusValue.WARNING
         elif all_ok:
             overall_status.status = StatusValue.OK
         elif all_err:
             overall_status.status = StatusValue.GENERIC_ERROR
         else:
-            # TODO WARNING STATUS: to be restored after EEC 1.313 is released
-            # overall_status.status = StatusValue.WARNING
-            overall_status.status = StatusValue.GENERIC_ERROR
+            overall_status.status = StatusValue.WARNING
 
         return overall_status
 
