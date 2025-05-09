@@ -131,11 +131,17 @@ class EndpointStatuses:
         def __init__(self, first: EndpointStatus, second: EndpointStatus):
             super().__init__(f"Endpoint Statuses conflict while merging - first: {first}; second: {second}")
 
-    def __init__(self, total_endpoints_number: int):
+    def __init__(self, total_endpoints_number: int): # TODO: usunac total_endpoints_number i trzymac wszystko zraportowane w mapie; dostosowac implementacje i UT i powinno byc git; upewnic sie ze Noah jest z tym ok
         self._lock = RLock()
         self._faulty_endpoints: dict[str, EndpointStatus] = {}
         self._num_endpoints = total_endpoints_number
 
+    # TODO: ta implementacja to troche przypal jednak, bo jak nie meldujemy OK dla ep, a go usuwamy, to trudniej sledzic zmiany statusow. Wgl generuje to problem tego, ze jesli byl ERR, to jesli w nastepnej iteracjo nie ma statusu dla danego EP, to w sumie nie wiadomo, czy jest to juz OK, czy moze jeszcze nie zdazył sie zaktualizowac.
+    # przy tej konstrukcji meldowanie wszystkich OK, tez wcale nie oznacza, ze ta OK sie tam znajdzie, bo callbakc mogl sie po prostu nie wykoanc
+    # EndpointStatuses moze byc wolane co iteracje callbacka, wiec moze byc tak, ze po bledzie po prostu nigdy nie dostaniemy OK per endpoint
+    # damn
+    # idealnie byloby oczekiwac, ze dany ep zawsze zostanie zwrocony jesli pojawilo sie OK
+    # czy EP moze zniknac?
     def add_endpoint_status(self, status: EndpointStatus):
         with self._lock:
             if status.status == StatusValue.OK:
@@ -250,6 +256,10 @@ class CommunicationClient(ABC):
     def send_dt_event(self, event: dict) -> None:
         pass
 
+    @abstractmethod
+    def send_sfm_logs(self, sfm_logs: dict | list[dict]) -> list[dict | None]:
+        pass
+
 
 class HttpClient(CommunicationClient):
     """
@@ -261,6 +271,7 @@ class HttpClient(CommunicationClient):
         self._extension_config_url = f"{base_url}/extconfig/{datasource_id}"
         self._metric_url = f"{base_url}/mint/{datasource_id}"
         self._sfm_url = f"{base_url}/sfm/{datasource_id}"
+        self._sfm_logs_url = f"{base_url}/sfmlogs/{datasource_id}"
         self._keep_alive_url = f"{base_url}/alive/{datasource_id}"
         self._timediff_url = f"{base_url}/timediffms"
         self._events_url = f"{base_url}/logs/{datasource_id}"
@@ -417,7 +428,14 @@ class HttpClient(CommunicationClient):
 
     def send_events(self, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         self.logger.debug(f"Sending log events: {events}")
+        return self._send_events(self._events_url, events, eec_enrichment)
 
+    def send_sfm_logs(self, sfm_logs: dict | list[dict]):
+        self.logger.debug(f"Sending SFM logs: {sfm_logs}")
+        # TODO: eec_enrichment?
+        return self._send_events(self._sfm_logs_url, sfm_logs, eec_enrichment=True)
+    
+    def _send_events(self, url, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         responses = []
         if isinstance(events, dict):
             events = [events]
@@ -426,7 +444,7 @@ class HttpClient(CommunicationClient):
         for batch in batches:
             try:
                 eec_response = self._make_request(
-                    self._events_url,
+                    url,
                     "POST",
                     batch,
                     extra_headers={"Content-Type": CONTENT_TYPE_JSON, "eec-enrichment": str(eec_enrichment).lower()},
@@ -435,7 +453,7 @@ class HttpClient(CommunicationClient):
             except json.JSONDecodeError:
                 responses.append(None)
 
-        return responses
+        return responses 
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
         mint_data = "\n".join(mint_lines).encode("utf-8")
@@ -582,6 +600,17 @@ class DebugClient(CommunicationClient):
             activation_config_string = activation_config_string.replace(f"{{{{{secret_name}}}}}", str(secret_value))
 
         return activation_config_string
+    
+    def send_sfm_logs(self, sfm_logs: dict | list[dict]) -> list[dict | None]:
+        if isinstance(sfm_logs, dict):
+            sfm_logs = [sfm_logs]
+
+        self.logger.info(f"send_sfm_logs: {len(sfm_logs)} logs")
+
+        if self.print_metrics:
+            for log in sfm_logs:
+                self.logger.info(f"send_sfm_log: {log}")
+        return []
 
 
 def divide_into_batches(

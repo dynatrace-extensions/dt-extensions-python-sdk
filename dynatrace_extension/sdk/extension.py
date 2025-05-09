@@ -1221,3 +1221,25 @@ class Extension:
                 raise FileNotFoundError(msg)
 
         return Snapshot.parse_from_file(snapshot_file)
+
+    def _send_sfm_logs(self, logs: dict | list[dict]):
+        # TODO: build some async sender similar to events and sfm metrics?
+        self._client.send_sfm_logs(logs)
+
+    def _send_ep_status_log(self, endpoint_name: str, prefix: str, status_value: StatusValue, status_message: str):
+        # TODO: dont send/enqueue each logs separately?
+        level = Severity.ERROR.value
+        
+        if status_value == StatusValue.OK:  # TODO: what about other nonerror statuses?
+            level = Severity.INFO.value
+        elif status_value == StatusValue.WARNING:
+            level = Severity.WARN.value
+
+        ep_status_log = {
+            "device.address": endpoint_name,
+            "level": level,
+            "message": f"{endpoint_name}: {prefix} - {status_message}",
+            **self._metadata
+        }
+
+        self._send_sfm_logs(ep_status_log)
