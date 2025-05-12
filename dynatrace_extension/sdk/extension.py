@@ -11,12 +11,13 @@ import time
 from argparse import ArgumentParser
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, MINYEAR
 from enum import Enum
 from itertools import chain
 from pathlib import Path
 from threading import Lock, RLock, active_count
 from typing import Any, ClassVar, NamedTuple
+from dataclasses import dataclass
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
@@ -28,6 +29,7 @@ from .communication import (
     IgnoreStatus,
     Status,
     StatusValue,
+    EndpointStatus
 )
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
@@ -284,6 +286,9 @@ class Extension:
 
         # Error message from caught exception in self.initialize()
         self._initialization_error: str = ""
+
+        # Map of all Endpoint Statuses
+        self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
 
         self._parse_args()
 
@@ -1067,6 +1072,7 @@ class Extension:
 
         # Handle merged EndpointStatuses
         if ep_status_merged.contains_any_status():
+            self._ep_statuses.report_new_ep_statuses(ep_status_merged)
             ep_status_merged = ep_status_merged.build_common_status()
             messages.insert(0, ep_status_merged.message)
 
@@ -1221,25 +1227,103 @@ class Extension:
                 raise FileNotFoundError(msg)
 
         return Snapshot.parse_from_file(snapshot_file)
+    
+    def _send_sfm_logs_internal(self, events: dict | list[dict]):
+        try:
+            responses = self._client.send_sfm_logs(events)
+
+            for response in responses:
+                with self._internal_callbacks_results_lock:
+                    self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(StatusValue.OK)
+                    if not response or "error" not in response or "message" not in response["error"]:
+                        return
+                    self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(
+                        StatusValue.GENERIC_ERROR, response["error"]["message"]
+                    )
+        except Exception as e:
+            api_logger.error(f"Error sending SFM logs: {e!r}", exc_info=True)
+            with self._internal_callbacks_results_lock:
+                self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
+
 
     def _send_sfm_logs(self, logs: dict | list[dict]):
-        # TODO: build some async sender similar to events and sfm metrics?
-        self._client.send_sfm_logs(logs)
+        for log in logs:
+            log = {
+                **log,
+                **self._metadata,
+                "dt.extension.config.label": self.monitoring_config_name    # New attribiute name just for SFM logs. Could it replace "monitoring.configuration" in metadata?
+            }
+            log.pop("monitoring.configuration", None)
 
-    def _send_ep_status_log(self, endpoint_name: str, prefix: str, status_value: StatusValue, status_message: str):
-        # TODO: dont send/enqueue each logs separately?
+        self._internal_executor.submit(self._send_sfm_logs_internal, logs)
+
+
+class StatusState(Enum):
+    INITIAL = "INITIAL"
+    NEW = "NEW"
+    ONGOING = "ONGOING"
+
+
+@dataclass
+class EndpointStatusRecord:
+    ep_status: EndpointStatus
+    last_sent: datetime
+    state: StatusState
+
+
+class EndpointStatusesMap:
+    DEFAULT_LAST_SENT = datetime(year=1, month=1, day=1)
+    RESENDING_INTERVAL = timedelta(hours=2)
+
+    def __init__(self, send_sfm_logs_function):
+        self._lock = Lock()
+        self._ep_records: dict[str, EndpointStatusRecord] = {}
+        self._send_sfm_logs_function = send_sfm_logs_function
+
+    def report_new_ep_statuses(self, new_ep_statuses: EndpointStatuses):
+        logs_to_send = []
+
+        with self._lock:
+            self._update_map(new_ep_statuses)
+            
+            for ep_record in self._ep_records.values():
+                if self._should_be_reported(ep_record):
+                    logs_to_send.append(self._prepare_ep_status_log(ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
+                    ep_record.last_sent = datetime.now()
+                    ep_record.state = StatusState.ONGOING
+
+        self._send_sfm_logs_function(logs_to_send)
+
+    def _update_map(self, new_ep_statuses: EndpointStatuses):
+        with new_ep_statuses._lock:
+            for endpoint, ep_status in new_ep_statuses._endpoints_statuses.items():
+                if endpoint not in self._ep_records.keys():
+                    self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.INITIAL)
+                elif ep_status != self._ep_records[endpoint].ep_status:
+                    self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.NEW)
+
+    def _should_be_reported(self, ep_record: EndpointStatusRecord):
+        if ep_record.ep_status.status == StatusValue.OK:
+            return ep_record.state == StatusState.NEW
+        elif ep_record.state == StatusState.INITIAL or ep_record.state == StatusState.NEW:
+            return True
+        elif ep_record.state == StatusState.ONGOING and datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL:
+            return  True
+        else:
+            return False
+
+    def _prepare_ep_status_log(self, endpoint_name: str, prefix: StatusState, status_value: StatusValue, status_message: str) -> dict:
         level = Severity.ERROR.value
         
-        if status_value == StatusValue.OK:  # TODO: what about other nonerror statuses?
+        if status_value.is_error() == False:
             level = Severity.INFO.value
-        elif status_value == StatusValue.WARNING:
+        elif status_value.is_warning():
             level = Severity.WARN.value
 
         ep_status_log = {
             "device.address": endpoint_name,
             "level": level,
-            "message": f"{endpoint_name}: {prefix} - {status_message}",
-            **self._metadata
+            "message": f"{endpoint_name}: [{prefix.value}] - {status_value.value} {status_message}"
         }
 
-        self._send_sfm_logs(ep_status_log)
+        return ep_status_log

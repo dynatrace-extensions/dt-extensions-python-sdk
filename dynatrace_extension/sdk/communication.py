@@ -131,6 +131,10 @@ class EndpointStatus:
 
     def __str__(self):
         return str(self.__dict__)
+    
+    def __eq__(self, other):
+        return isinstance(other, EndpointStatus) and self.__dict__ == other.__dict__
+
 
 
 class EndpointStatuses:
@@ -140,7 +144,6 @@ class EndpointStatuses:
 
     def __init__(self, total_endpoints_number=None):
         if total_endpoints_number is not None:
-            # TODO: DeprecationWarning or a custom exception?
             raise DeprecationWarning("EndpointStatuses::__init__: usage of `total_endpoints_number` parameter is abandoned. Use other class methods to explicitly report all status changes for any endpoint.")
         
         self._lock = Lock()
@@ -431,8 +434,7 @@ class HttpClient(CommunicationClient):
 
     def send_sfm_logs(self, sfm_logs: dict | list[dict]):
         self.logger.debug(f"Sending SFM logs: {sfm_logs}")
-        # TODO: eec_enrichment?
-        return self._send_events(self._sfm_logs_url, sfm_logs, eec_enrichment=True)
+        return self._send_events(self._sfm_logs_url, sfm_logs)
     
     def _send_events(self, url, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         responses = []
