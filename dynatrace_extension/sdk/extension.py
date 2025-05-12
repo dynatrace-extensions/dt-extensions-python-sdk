@@ -1038,7 +1038,7 @@ class Extension:
                 return Status(overall_status_value, "\n".join(messages))
 
         # Handle regular statuses, merge all EndpointStatuses
-        ep_status_merged = EndpointStatuses(0)
+        ep_status_merged = EndpointStatuses()
         all_ok = True
         all_err = True
         any_warning = False
@@ -1066,7 +1066,7 @@ class Extension:
                 messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
-        if ep_status_merged._num_endpoints > 0:
+        if ep_status_merged.contains_any_status():
             ep_status_merged = ep_status_merged.build_common_status()
             messages.insert(0, ep_status_merged.message)
 
