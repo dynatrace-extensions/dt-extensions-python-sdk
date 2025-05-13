@@ -287,10 +287,12 @@ class Extension:
         # Error message from caught exception in self.initialize()
         self._initialization_error: str = ""
 
+        self._parse_args()
+
+        self._sfm_logs_allowed = not self._monitoring_config_id.startswith("custom:")
+
         # Map of all Endpoint Statuses
         self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
-
-        self._parse_args()
 
         for function, interval, args, activation_type in Extension.schedule_decorators:
             params = (self,)
@@ -1247,6 +1249,9 @@ class Extension:
 
 
     def _send_sfm_logs(self, logs: dict | list[dict]):
+        if not self._sfm_logs_allowed or not logs:
+            return
+        
         for log in logs:
             log = {
                 **log,
@@ -1292,7 +1297,8 @@ class EndpointStatusesMap:
                     ep_record.last_sent = datetime.now()
                     ep_record.state = StatusState.ONGOING
 
-        self._send_sfm_logs_function(logs_to_send)
+        if logs_to_send:
+            self._send_sfm_logs_function(logs_to_send)
 
     def _update_map(self, new_ep_statuses: EndpointStatuses):
         with new_ep_statuses._lock:
