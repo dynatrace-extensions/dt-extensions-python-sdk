@@ -129,7 +129,7 @@ class EndpointStatus:
         self.status: StatusValue = short_status
         self.message = message
 
-    def __str__(self):
+    def __repr__(self):
         return str(self.__dict__)
     
     def __eq__(self, other):

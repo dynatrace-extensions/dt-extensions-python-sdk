@@ -287,13 +287,12 @@ class Extension:
         # Error message from caught exception in self.initialize()
         self._initialization_error: str = ""
 
-        self._parse_args()
-
-        self._sfm_logs_allowed = not self._monitoring_config_id.startswith("custom:")
-
         # Map of all Endpoint Statuses
+        self._sfm_logs_allowed = not self.extension_name.startswith("custom:")
         self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
 
+        self._parse_args()
+        
         for function, interval, args, activation_type in Extension.schedule_decorators:
             params = (self,)
             if args is not None:
@@ -1073,9 +1072,9 @@ class Extension:
                 messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
+        self._ep_statuses.report_new_ep_statuses(ep_status_merged)
         if ep_status_merged.contains_any_status():
-            self._ep_statuses.report_new_ep_statuses(ep_status_merged)
-            ep_status_merged = ep_status_merged.build_common_status()
+            ep_status_merged = ep_status_merged.build_common_status() # TODO: shouldn't we build a status based on peristed map rather than on the last iteration?
             messages.insert(0, ep_status_merged.message)
 
             if ep_status_merged.is_warning():
@@ -1230,9 +1229,9 @@ class Extension:
 
         return Snapshot.parse_from_file(snapshot_file)
     
-    def _send_sfm_logs_internal(self, events: dict | list[dict]):
+    def _send_sfm_logs_internal(self, logs: dict | list[dict]):
         try:
-            responses = self._client.send_sfm_logs(events)
+            responses = self._client.send_sfm_logs(logs)
 
             for response in responses:
                 with self._internal_callbacks_results_lock:
@@ -1275,6 +1274,9 @@ class EndpointStatusRecord:
     last_sent: datetime
     state: StatusState
 
+    def __repr__(self):
+        return str(self.__dict__)
+
 
 class EndpointStatusesMap:
     DEFAULT_LAST_SENT = datetime(year=1, month=1, day=1)
@@ -1296,7 +1298,7 @@ class EndpointStatusesMap:
                     logs_to_send.append(self._prepare_ep_status_log(ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
                     ep_record.last_sent = datetime.now()
                     ep_record.state = StatusState.ONGOING
-
+        
         if logs_to_send:
             self._send_sfm_logs_function(logs_to_send)
 

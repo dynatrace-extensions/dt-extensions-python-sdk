@@ -1,7 +1,9 @@
 import time
 import unittest
-from datetime import timedelta
+from datetime import timedelta, datetime
 from unittest.mock import MagicMock
+import threading
+from freezegun import freeze_time
 
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Status, StatusValue
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
