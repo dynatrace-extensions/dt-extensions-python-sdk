@@ -11,26 +11,17 @@ import time
 from argparse import ArgumentParser
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone, MINYEAR
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from itertools import chain
 from pathlib import Path
 from threading import Lock, RLock, active_count
 from typing import Any, ClassVar, NamedTuple
-from dataclasses import dataclass
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import (
-    CommunicationClient,
-    DebugClient,
-    EndpointStatuses,
-    HttpClient,
-    IgnoreStatus,
-    Status,
-    StatusValue,
-    EndpointStatus
-)
+from .communication import CommunicationClient, DebugClient, EndpointStatus, EndpointStatuses, HttpClient, IgnoreStatus, Status, StatusValue
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
@@ -292,7 +283,7 @@ class Extension:
         self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
 
         self._parse_args()
-        
+
         for function, interval, args, activation_type in Extension.schedule_decorators:
             params = (self,)
             if args is not None:
@@ -1043,8 +1034,7 @@ class Extension:
             if internal_callback_error:
                 return Status(overall_status_value, "\n".join(messages))
 
-        # Handle regular statuses, merge all EndpointStatuses
-        ep_status_merged = EndpointStatuses()
+        # Handle regular statuses, report all EndpointStatuses
         all_ok = True
         all_err = True
         any_warning = False
@@ -1054,10 +1044,7 @@ class Extension:
                 continue
 
             if isinstance(callback.status, EndpointStatuses):
-                try:
-                    ep_status_merged.merge(callback.status)
-                except EndpointStatuses.MergeConflictError as e:
-                    self.logger.exception(e)
+                self._ep_statuses.update_ep_statuses(callback.status)
                 continue
 
             if callback.status.is_warning():
@@ -1072,9 +1059,9 @@ class Extension:
                 messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
-        self._ep_statuses.report_new_ep_statuses(ep_status_merged)
-        if ep_status_merged.contains_any_status():
-            ep_status_merged = ep_status_merged.build_common_status() # TODO: shouldn't we build a status based on peristed map rather than on the last iteration?
+        if self._ep_statuses.contains_any_status():
+            self._ep_statuses.send_ep_logs()
+            ep_status_merged = self._ep_statuses.build_common_status()
             messages.insert(0, ep_status_merged.message)
 
             if ep_status_merged.is_warning():
@@ -1228,7 +1215,7 @@ class Extension:
                 raise FileNotFoundError(msg)
 
         return Snapshot.parse_from_file(snapshot_file)
-    
+
     def _send_sfm_logs_internal(self, logs: dict | list[dict]):
         try:
             responses = self._client.send_sfm_logs(logs)
@@ -1250,13 +1237,10 @@ class Extension:
     def _send_sfm_logs(self, logs: dict | list[dict]):
         if not self._sfm_logs_allowed or not logs:
             return
-        
+
         for log in logs:
-            log = {
-                **log,
-                **self._metadata,
-                "dt.extension.config.label": self.monitoring_config_name    # New attribiute name just for SFM logs. Could it replace "monitoring.configuration" in metadata?
-            }
+            log.update(self._metadata)
+            log["dt.extension.config.label"] = self.monitoring_config_name
             log.pop("monitoring.configuration", None)
 
         self._internal_executor.submit(self._send_sfm_logs_internal, logs)
@@ -1286,34 +1270,38 @@ class EndpointStatusesMap:
         self._lock = Lock()
         self._ep_records: dict[str, EndpointStatusRecord] = {}
         self._send_sfm_logs_function = send_sfm_logs_function
+        self._logs_to_send = []
 
-    def report_new_ep_statuses(self, new_ep_statuses: EndpointStatuses):
+    def contains_any_status(self,) -> bool:
+        return len(self._ep_records) > 0
+
+    def update_ep_statuses(self, new_ep_statuses: EndpointStatuses):
+        with self._lock:
+            with new_ep_statuses._lock:
+                for endpoint, ep_status in new_ep_statuses._endpoints_statuses.items():
+                    if endpoint not in self._ep_records.keys():
+                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.INITIAL)
+                    elif ep_status != self._ep_records[endpoint].ep_status:
+                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.NEW)
+
+    def send_ep_logs(self):
         logs_to_send = []
 
         with self._lock:
-            self._update_map(new_ep_statuses)
-            
             for ep_record in self._ep_records.values():
                 if self._should_be_reported(ep_record):
-                    logs_to_send.append(self._prepare_ep_status_log(ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
+                    logs_to_send.append(self._prepare_ep_status_log(
+                        ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
                     ep_record.last_sent = datetime.now()
                     ep_record.state = StatusState.ONGOING
-        
+
         if logs_to_send:
             self._send_sfm_logs_function(logs_to_send)
-
-    def _update_map(self, new_ep_statuses: EndpointStatuses):
-        with new_ep_statuses._lock:
-            for endpoint, ep_status in new_ep_statuses._endpoints_statuses.items():
-                if endpoint not in self._ep_records.keys():
-                    self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.INITIAL)
-                elif ep_status != self._ep_records[endpoint].ep_status:
-                    self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.NEW)
 
     def _should_be_reported(self, ep_record: EndpointStatusRecord):
         if ep_record.ep_status.status == StatusValue.OK:
             return ep_record.state == StatusState.NEW
-        elif ep_record.state == StatusState.INITIAL or ep_record.state == StatusState.NEW:
+        elif ep_record.state in (StatusState.INITIAL, StatusState.NEW):
             return True
         elif ep_record.state == StatusState.ONGOING and datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL:
             return  True
@@ -1322,8 +1310,8 @@ class EndpointStatusesMap:
 
     def _prepare_ep_status_log(self, endpoint_name: str, prefix: StatusState, status_value: StatusValue, status_message: str) -> dict:
         level = Severity.ERROR.value
-        
-        if status_value.is_error() == False:
+
+        if status_value.is_error() is False:
             level = Severity.INFO.value
         elif status_value.is_warning():
             level = Severity.WARN.value
@@ -1335,3 +1323,38 @@ class EndpointStatusesMap:
         }
 
         return ep_status_log
+
+    def build_common_status(self) -> Status:
+        with self._lock:
+            # Summarize all statuses
+            ok_count = 0
+            nok_count = 0
+            error_messages = []
+            has_warning_status = False
+
+            for ep_record in self._ep_records.values():
+                ep_status = ep_record.ep_status
+                if ep_status.status.is_warning():
+                    has_warning_status = True
+
+                if ep_status.status.is_error():
+                    nok_count += 1
+                    error_messages.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
+                else:
+                    ok_count += 1
+
+            # Early return if all OK
+            if nok_count == 0:
+                return Status(StatusValue.OK, f"Endpoints OK: {ok_count} NOK: 0")
+
+            # Build final status if some errors present
+            common_msg = ", ".join(error_messages)
+            all_endpoints_faulty = ok_count == 0
+
+            if all_endpoints_faulty and not has_warning_status:
+                status_value = StatusValue.GENERIC_ERROR
+            else:
+                status_value = StatusValue.WARNING
+
+            message = f"Endpoints OK: {ok_count} NOK: {nok_count} NOK_reported_errors: {common_msg}"
+            return Status(status=status_value, message=message)

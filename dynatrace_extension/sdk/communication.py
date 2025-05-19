@@ -30,7 +30,7 @@ MAX_METRIC_REQUEST_SIZE = 1_000_000  # actually 1_048_576
 HTTP_BAD_REQUEST = 400
 
 
-class Deprecated(Exception):
+class DynatraceDeprecatedError(Exception):
     pass
 
 class StatusValue(Enum):
@@ -124,28 +124,26 @@ class MultiStatus:
 
 
 class EndpointStatus:
-    def __init__(self, endpoint_hint: str, short_status: StatusValue, message: str = None):
+    def __init__(self, endpoint_hint: str, short_status: StatusValue, message: str | None = None):
         self.endpoint = endpoint_hint
         self.status: StatusValue = short_status
         self.message = message
 
     def __repr__(self):
         return str(self.__dict__)
-    
+
     def __eq__(self, other):
         return isinstance(other, EndpointStatus) and self.__dict__ == other.__dict__
 
 
 
 class EndpointStatuses:
-    class MergeConflictError(Exception):
-        def __init__(self, first: EndpointStatus, second: EndpointStatus):
-            super().__init__(f"Endpoint Statuses conflict while merging - first: {first}; second: {second}")
-
     def __init__(self, total_endpoints_number=None):
         if total_endpoints_number is not None:
-            raise DeprecationWarning("EndpointStatuses::__init__: usage of `total_endpoints_number` parameter is abandoned. Use other class methods to explicitly report all status changes for any endpoint.")
-        
+            msg = ("EndpointStatuses::__init__: usage of `total_endpoints_number` parameter is abandoned. "
+            "Use other class methods to explicitly report all status changes for any endpoint.")
+            raise DynatraceDeprecatedError(msg)
+
         self._lock = Lock()
         self._endpoints_statuses: dict[str, EndpointStatus] = {}
 
@@ -155,54 +153,6 @@ class EndpointStatuses:
 
     def clear_endpoint_error(self, endpoint_hint: str):
         self.add_endpoint_status(EndpointStatus(endpoint_hint=endpoint_hint, short_status=StatusValue.OK))
-
-    def merge(self, other: EndpointStatuses):
-        with self._lock:
-            with other._lock:
-                for endpoint, status in other._endpoints_statuses.items():
-                    if endpoint not in self._endpoints_statuses.keys():
-                        self._endpoints_statuses[endpoint] = status
-                    else:
-                        raise EndpointStatuses.MergeConflictError(
-                            self._endpoints_statuses[endpoint], other._endpoints_statuses[endpoint]
-                        )
-
-    def build_common_status(self) -> Status:
-        with self._lock:
-            # Summarize all statuses
-            ok_count = 0
-            nok_count = 0
-            error_messages = []
-            has_warning_status = False
-
-            for ep_status in self._endpoints_statuses.values():
-                if ep_status.status.is_warning():
-                    has_warning_status = True
-
-                if ep_status.status.is_error():
-                    nok_count += 1
-                    error_messages.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
-                else:
-                    ok_count += 1
-
-            # Early return if all OK
-            if nok_count == 0:
-                return Status(StatusValue.OK, f"Endpoints OK: {ok_count} NOK: 0")
-
-            # Build final status if some errors present
-            common_msg = ", ".join(error_messages)
-            all_endpoints_faulty = ok_count == 0
-
-            if all_endpoints_faulty and not has_warning_status:
-                status_value = StatusValue.GENERIC_ERROR
-            else:
-                status_value = StatusValue.WARNING
-
-            message = f"Endpoints OK: {ok_count} NOK: {nok_count} NOK_reported_errors: {common_msg}"
-            return Status(status=status_value, message=message)
-        
-    def contains_any_status(self,) -> bool:
-        return len(self._endpoints_statuses) > 0
 
 
 class CommunicationClient(ABC):
@@ -435,7 +385,7 @@ class HttpClient(CommunicationClient):
     def send_sfm_logs(self, sfm_logs: dict | list[dict]):
         self.logger.debug(f"Sending SFM logs: {sfm_logs}")
         return self._send_events(self._sfm_logs_url, sfm_logs)
-    
+
     def _send_events(self, url, events: dict | list[dict], eec_enrichment: bool = True) -> list[dict | None]:
         responses = []
         if isinstance(events, dict):
@@ -454,7 +404,7 @@ class HttpClient(CommunicationClient):
             except json.JSONDecodeError:
                 responses.append(None)
 
-        return responses 
+        return responses
 
     def send_sfm_metrics(self, mint_lines: list[str]) -> MintResponse:
         mint_data = "\n".join(mint_lines).encode("utf-8")
@@ -601,7 +551,7 @@ class DebugClient(CommunicationClient):
             activation_config_string = activation_config_string.replace(f"{{{{{secret_name}}}}}", str(secret_value))
 
         return activation_config_string
-    
+
     def send_sfm_logs(self, sfm_logs: dict | list[dict]) -> list[dict | None]:
         if isinstance(sfm_logs, dict):
             sfm_logs = [sfm_logs]

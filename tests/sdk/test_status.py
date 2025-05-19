@@ -1,9 +1,8 @@
+import threading
 import time
 import unittest
-from datetime import timedelta, datetime
+from datetime import timedelta
 from unittest.mock import MagicMock
-import threading
-from freezegun import freeze_time
 
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Status, StatusValue
 from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
@@ -704,3 +703,66 @@ class TestStatus(unittest.TestCase):
             "\ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ",
             status.message,
         )
+
+    def test_endpoint_status_skipped_interval(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        skipped_callback_call_counter = 0
+        regular_callback_call_counter = 0
+
+        def skipped_callback():
+            nonlocal skipped_callback_call_counter
+            skipped_callback_call_counter += 1
+
+            statuses = EndpointStatuses()
+            statuses.add_endpoint_status(
+                EndpointStatus("skipped_callback", StatusValue.GENERIC_ERROR, "skipped_callback_msg")
+            )
+            return statuses
+
+        def regular_callback():
+            nonlocal regular_callback_call_counter
+            regular_callback_call_counter += 1
+            statuses = EndpointStatuses()
+            statuses.add_endpoint_status(
+                EndpointStatus("regular_callback", StatusValue.UNKNOWN_ERROR, "regular_callback_msg")
+            )
+            return statuses
+
+        ext.schedule(skipped_callback, timedelta(seconds=10)) # called only once during test
+        ext.schedule(regular_callback, timedelta(seconds=1))
+
+        # Runngin scheduler in another thread as we need it to run in parallel in this test
+        class KillSchedulerError(Exception):
+            pass
+
+        def scheduler_thread_impl(ext: Extension):
+            try:
+                ext._scheduler.run(blocking=True)
+            except KillSchedulerError:
+                pass
+
+        scheduler_thread = threading.Thread(target=scheduler_thread_impl, args=(ext,))
+        scheduler_thread.start()
+        time.sleep(0.01)
+
+        # 5 second of test
+        for _ in range(5):
+            status = ext._build_current_status()
+            self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+            self.assertIn(("Endpoints OK: 0 NOK: 2 NOK_reported_errors: "
+                "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"),
+                status.message,
+            )
+            time.sleep(1)
+
+        ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
+        scheduler_thread.join()
+
+        # Confirm schedulered called callbacks as requested
+        self.assertEqual(skipped_callback_call_counter, 1)
+        self.assertEqual(regular_callback_call_counter, 6)
