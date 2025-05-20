@@ -378,47 +378,6 @@ class TestStatus(unittest.TestCase):
             status.message,
         )
 
-    def test_endpoint_status_clearing_the_status(self):
-        ext = Extension()
-        ext.logger = MagicMock()
-        ext._running_in_sim = True
-        ext._client = DebugClient("", "", MagicMock())
-        ext._is_fastcheck = False
-
-        def callback():
-            statuses = EndpointStatuses()
-            statuses.add_endpoint_status(
-                EndpointStatus("1.2.3.4:80", StatusValue.AUTHENTICATION_ERROR, "Invalid authorization scheme 7")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme 8")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("6.7.8.9:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme 9")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.OK, "Invalid authorization scheme 10")
-            )
-
-            statuses.clear_endpoint_error("6.7.8.9:80")
-
-            return statuses
-
-        ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
-
-        status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn(
-            "OK: 2 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme 7",
-            status.message,
-        )
-
-
     def test_endpoint_empty(self):
         ext = Extension()
         ext.logger = MagicMock()

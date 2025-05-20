@@ -151,9 +151,6 @@ class EndpointStatuses:
         with self._lock:
             self._endpoints_statuses[status.endpoint] = status
 
-    def clear_endpoint_error(self, endpoint_hint: str):
-        self.add_endpoint_status(EndpointStatus(endpoint_hint=endpoint_hint, short_status=StatusValue.OK))
-
 
 class CommunicationClient(ABC):
     """
