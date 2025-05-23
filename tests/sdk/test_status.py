@@ -1,10 +1,11 @@
+import threading
 import time
 import unittest
 from datetime import timedelta
 from unittest.mock import MagicMock
 
-from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Status, StatusValue
-from dynatrace_extension.sdk.communication import DebugClient, MultiStatus
+from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, MultiStatus, Status, StatusValue
+from dynatrace_extension.sdk.communication import DebugClient
 
 
 class TestStatus(unittest.TestCase):
@@ -290,7 +291,17 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            return EndpointStatuses(10)
+            statuses = EndpointStatuses()
+            statuses.add_endpoint_status(EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"))
+            statuses.add_endpoint_status(
+                EndpointStatus("4.5.6.7:80", StatusValue.OK, "All good 2")
+            )
+
+            statuses.add_endpoint_status(
+                EndpointStatus("6.7.8.9:80", StatusValue.OK, "All good 3")
+            )
+
+            return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
@@ -298,7 +309,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("OK: 10 NOK: 0", status.message)
+        self.assertIn("OK: 3 NOK: 0", status.message)
 
     def test_endpoint_status_some_faulty_endpoints(self):
         ext = Extension()
@@ -308,7 +319,7 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            statuses = EndpointStatuses(10)
+            statuses = EndpointStatuses()
             statuses.add_endpoint_status(EndpointStatus("1.2.3.4:80", StatusValue.OK, "Invalid authorization scheme 1"))
             statuses.add_endpoint_status(
                 EndpointStatus("4.5.6.7:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme 2")
@@ -327,7 +338,7 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
         self.assertIn(
-            "OK: 8 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
+            "OK: 1 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
             "Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3",
             status.message,
         )
@@ -340,7 +351,7 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            statuses = EndpointStatuses(3)
+            statuses = EndpointStatuses()
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80", StatusValue.AUTHENTICATION_ERROR, "Invalid authorization scheme 4")
             )
@@ -367,81 +378,6 @@ class TestStatus(unittest.TestCase):
             status.message,
         )
 
-    def test_endpoint_status_clearing_the_status(self):
-        ext = Extension()
-        ext.logger = MagicMock()
-        ext._running_in_sim = True
-        ext._client = DebugClient("", "", MagicMock())
-        ext._is_fastcheck = False
-
-        def callback():
-            statuses = EndpointStatuses(10)
-            statuses.add_endpoint_status(
-                EndpointStatus("1.2.3.4:80", StatusValue.AUTHENTICATION_ERROR, "Invalid authorization scheme 7")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme 8")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("6.7.8.9:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme 9")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.OK, "Invalid authorization scheme 10")
-            )
-
-            statuses.clear_endpoint_error("6.7.8.9:80")
-
-            return statuses
-
-        ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
-
-        status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn(
-            "OK: 9 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme 7",
-            status.message,
-        )
-
-    def test_endpoint_status_max(self):
-        ext = Extension()
-        ext.logger = MagicMock()
-        ext._running_in_sim = True
-        ext._client = DebugClient("", "", MagicMock())
-        ext._is_fastcheck = False
-
-        def callback():
-            statuses = EndpointStatuses(2)
-            statuses.add_endpoint_status(
-                EndpointStatus("1.2.3.4:80", StatusValue.AUTHENTICATION_ERROR, "Invalid authorization scheme A")
-            )
-
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme B")
-            )
-
-            with self.assertRaises(EndpointStatuses.TooManyEndpointStatusesError):
-                statuses.add_endpoint_status(
-                    EndpointStatus("6.7.8.9:80", StatusValue.DEVICE_CONNECTION_ERROR, "Invalid authorization scheme C")
-                )
-            return statuses
-
-        ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
-
-        status = ext._build_current_status()
-        self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-        self.assertIn(
-            "OK: 0 NOK: 2 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR "
-            "Invalid authorization scheme A, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme B",
-            status.message,
-        )
-
     def test_endpoint_empty(self):
         ext = Extension()
         ext.logger = MagicMock()
@@ -450,7 +386,7 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            statuses = EndpointStatuses(3)
+            statuses = EndpointStatuses()
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
@@ -459,7 +395,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("OK: 3 NOK: 0", status.message)
+        self.assertNotIn("OK: 0 NOK: 0", status.message)
 
     def test_endpoint_status_single_warning(self):
         ext = Extension()
@@ -469,7 +405,7 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            statuses = EndpointStatuses(1)
+            statuses = EndpointStatuses()
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Invalid authorization scheme A")
             )
@@ -493,7 +429,7 @@ class TestStatus(unittest.TestCase):
         ext._is_fastcheck = False
 
         def callback():
-            statuses = EndpointStatuses(1)
+            statuses = EndpointStatuses()
             statuses.add_endpoint_status(
                 EndpointStatus("1.2.3.4:80", StatusValue.AUTHENTICATION_ERROR, "Invalid authorization scheme")
             )
@@ -512,11 +448,14 @@ class TestStatus(unittest.TestCase):
 
     def test_endpoint_merge_ok(self):
         def callback_ep_status_1():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
+            status.add_endpoint_status(EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"))
             return status
 
         def callback_ep_status_2():
-            status = EndpointStatuses(2)
+            status = EndpointStatuses()
+            status.add_endpoint_status(EndpointStatus("5.6.7.8:90", StatusValue.OK, "All good 2"))
+            status.add_endpoint_status(EndpointStatus("10.11.12.13:100", StatusValue.OK, "All good 3"))
             return status
 
         ext = Extension()
@@ -536,12 +475,12 @@ class TestStatus(unittest.TestCase):
 
     def test_endpoint_merge_error(self):
         def callback_ep_status_1():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT_1", StatusValue.AUTHENTICATION_ERROR, "EP1 MSG"))
             return status
 
         def callback_ep_status_2():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT_2", StatusValue.INVALID_CONFIG_ERROR, "EP2 MSG"))
             return status
 
@@ -565,12 +504,12 @@ class TestStatus(unittest.TestCase):
 
     def test_endpoint_merge_warning(self):
         def callback_ep_status_1():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT_1", StatusValue.OK, "EP1 MSG"))
             return status
 
         def callback_ep_status_2():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT_2", StatusValue.WARNING, "EP2 MSG"))
             return status
 
@@ -591,7 +530,7 @@ class TestStatus(unittest.TestCase):
 
     def test_overall_status_error(self):
         def callback_ep_status():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT", StatusValue.UNKNOWN_ERROR, "EP MSG"))
             return status
 
@@ -626,7 +565,7 @@ class TestStatus(unittest.TestCase):
 
     def test_overall_status_ok(self):
         def callback_ep_status():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT", StatusValue.OK, "EP MSG"))
             return status
 
@@ -657,7 +596,7 @@ class TestStatus(unittest.TestCase):
 
     def test_overall_status_warning_1(self):
         def callback_ep_status():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT", StatusValue.WARNING, "EP MSG"))
             return status
 
@@ -691,7 +630,7 @@ class TestStatus(unittest.TestCase):
 
     def test_overall_status_warning_2(self):
         def callback_ep_status():
-            status = EndpointStatuses(1)
+            status = EndpointStatuses()
             status.add_endpoint_status(EndpointStatus("EP_HINT", StatusValue.INVALID_CONFIG_ERROR, ""))
             return status
 
@@ -723,3 +662,66 @@ class TestStatus(unittest.TestCase):
             "\ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ",
             status.message,
         )
+
+    def test_endpoint_status_skipped_interval(self):
+        ext = Extension()
+        ext.logger = MagicMock()
+        ext._running_in_sim = True
+        ext._client = DebugClient("", "", MagicMock())
+        ext._is_fastcheck = False
+
+        skipped_callback_call_counter = 0
+        regular_callback_call_counter = 0
+
+        def skipped_callback():
+            nonlocal skipped_callback_call_counter
+            skipped_callback_call_counter += 1
+
+            statuses = EndpointStatuses()
+            statuses.add_endpoint_status(
+                EndpointStatus("skipped_callback", StatusValue.GENERIC_ERROR, "skipped_callback_msg")
+            )
+            return statuses
+
+        def regular_callback():
+            nonlocal regular_callback_call_counter
+            regular_callback_call_counter += 1
+            statuses = EndpointStatuses()
+            statuses.add_endpoint_status(
+                EndpointStatus("regular_callback", StatusValue.UNKNOWN_ERROR, "regular_callback_msg")
+            )
+            return statuses
+
+        ext.schedule(skipped_callback, timedelta(seconds=10)) # called only once during test
+        ext.schedule(regular_callback, timedelta(seconds=1))
+
+        # Runngin scheduler in another thread as we need it to run in parallel in this test
+        class KillSchedulerError(Exception):
+            pass
+
+        def scheduler_thread_impl(ext: Extension):
+            try:
+                ext._scheduler.run(blocking=True)
+            except KillSchedulerError:
+                pass
+
+        scheduler_thread = threading.Thread(target=scheduler_thread_impl, args=(ext,))
+        scheduler_thread.start()
+        time.sleep(0.01)
+
+        # 5 second of test
+        for _ in range(5):
+            status = ext._build_current_status()
+            self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+            self.assertIn(("Endpoints OK: 0 NOK: 2 NOK_reported_errors: "
+                "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"),
+                status.message,
+            )
+            time.sleep(1)
+
+        ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
+        scheduler_thread.join()
+
+        # Confirm schedulered called callbacks as requested
+        self.assertEqual(skipped_callback_call_counter, 1)
+        self.assertEqual(regular_callback_call_counter, 6)
