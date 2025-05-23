@@ -280,6 +280,9 @@ class Extension:
 
         # Map of all Endpoint Statuses
         self._sfm_logs_allowed = not self.extension_name.startswith("custom:")
+        if not self._sfm_logs_allowed:
+            self.logger.warning("SFM logs not allowed for custom extensions.")
+
         self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
 
         self._parse_args()
