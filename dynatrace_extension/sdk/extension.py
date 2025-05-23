@@ -11,7 +11,6 @@ import time
 from argparse import ArgumentParser
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from itertools import chain
@@ -21,11 +20,12 @@ from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import CommunicationClient, DebugClient, EndpointStatus, EndpointStatuses, HttpClient, IgnoreStatus, Status, StatusValue
+from .communication import CommunicationClient, DebugClient, HttpClient
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 from .snapshot import Snapshot
+from .status import EndpointStatuses, EndpointStatusesMap, IgnoreStatus, Status, StatusValue
 from .throttled_logger import StrictThrottledHandler, ThrottledHandler
 
 HEARTBEAT_INTERVAL = timedelta(seconds=50)
@@ -1244,117 +1244,3 @@ class Extension:
             log.pop("monitoring.configuration", None)
 
         self._internal_executor.submit(self._send_sfm_logs_internal, logs)
-
-
-class StatusState(Enum):
-    INITIAL = "INITIAL"
-    NEW = "NEW"
-    ONGOING = "ONGOING"
-
-
-@dataclass
-class EndpointStatusRecord:
-    ep_status: EndpointStatus
-    last_sent: datetime
-    state: StatusState
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-
-class EndpointStatusesMap:
-    DEFAULT_LAST_SENT = datetime(year=1, month=1, day=1)
-    RESENDING_INTERVAL = timedelta(hours=2)
-
-    def __init__(self, send_sfm_logs_function):
-        self._lock = Lock()
-        self._ep_records: dict[str, EndpointStatusRecord] = {}
-        self._send_sfm_logs_function = send_sfm_logs_function
-        self._logs_to_send = []
-
-    def contains_any_status(self,) -> bool:
-        return len(self._ep_records) > 0
-
-    def update_ep_statuses(self, new_ep_statuses: EndpointStatuses):
-        with self._lock:
-            with new_ep_statuses._lock:
-                for endpoint, ep_status in new_ep_statuses._endpoints_statuses.items():
-                    if endpoint not in self._ep_records.keys():
-                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.INITIAL)
-                    elif ep_status != self._ep_records[endpoint].ep_status:
-                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=self.DEFAULT_LAST_SENT, state=StatusState.NEW)
-
-    def send_ep_logs(self):
-        logs_to_send = []
-
-        with self._lock:
-            for ep_record in self._ep_records.values():
-                if self._should_be_reported(ep_record):
-                    logs_to_send.append(self._prepare_ep_status_log(
-                        ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
-                    ep_record.last_sent = datetime.now()
-                    ep_record.state = StatusState.ONGOING
-
-        if logs_to_send:
-            self._send_sfm_logs_function(logs_to_send)
-
-    def _should_be_reported(self, ep_record: EndpointStatusRecord):
-        if ep_record.ep_status.status == StatusValue.OK:
-            return ep_record.state == StatusState.NEW
-        elif ep_record.state in (StatusState.INITIAL, StatusState.NEW):
-            return True
-        elif ep_record.state == StatusState.ONGOING and datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL:
-            return  True
-        else:
-            return False
-
-    def _prepare_ep_status_log(self, endpoint_name: str, prefix: StatusState, status_value: StatusValue, status_message: str) -> dict:
-        level = Severity.ERROR.value
-
-        if status_value.is_error() is False:
-            level = Severity.INFO.value
-        elif status_value.is_warning():
-            level = Severity.WARN.value
-
-        ep_status_log = {
-            "device.address": endpoint_name,
-            "level": level,
-            "message": f"{endpoint_name}: [{prefix.value}] - {status_value.value} {status_message}"
-        }
-
-        return ep_status_log
-
-    def build_common_status(self) -> Status:
-        with self._lock:
-            # Summarize all statuses
-            ok_count = 0
-            nok_count = 0
-            error_messages = []
-            has_warning_status = False
-
-            for ep_record in self._ep_records.values():
-                ep_status = ep_record.ep_status
-                if ep_status.status.is_warning():
-                    has_warning_status = True
-
-                if ep_status.status.is_error():
-                    nok_count += 1
-                    error_messages.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
-                else:
-                    ok_count += 1
-
-            # Early return if all OK
-            if nok_count == 0:
-                return Status(StatusValue.OK, f"Endpoints OK: {ok_count} NOK: 0")
-
-            # Build final status if some errors present
-            common_msg = ", ".join(error_messages)
-            all_endpoints_faulty = ok_count == 0
-
-            if all_endpoints_faulty and not has_warning_status:
-                status_value = StatusValue.GENERIC_ERROR
-            else:
-                status_value = StatusValue.WARNING
-
-            message = f"Endpoints OK: {ok_count} NOK: {nok_count} NOK_reported_errors: {common_msg}"
-            return Status(status=status_value, message=message)

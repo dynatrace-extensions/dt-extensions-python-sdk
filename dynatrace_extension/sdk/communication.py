@@ -10,11 +10,10 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import Generator, Sequence
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
-from threading import Lock
 from typing import Any, TypeVar
 
+from .status import Status
 from .vendor.mureq.mureq import HTTPException, Response, request
 
 CONTENT_TYPE_JSON = "application/json;charset=utf-8"
@@ -28,128 +27,6 @@ MAX_LOG_REQUEST_SIZE = 5_000_000  # actually 5_242_880
 MAX_METRIC_REQUEST_SIZE = 1_000_000  # actually 1_048_576
 
 HTTP_BAD_REQUEST = 400
-
-
-class DynatraceDeprecatedError(Exception):
-    pass
-
-class StatusValue(Enum):
-    EMPTY = ""
-    OK = "OK"
-    GENERIC_ERROR = "GENERIC_ERROR"
-    INVALID_ARGS_ERROR = "INVALID_ARGS_ERROR"
-    EEC_CONNECTION_ERROR = "EEC_CONNECTION_ERROR"
-    INVALID_CONFIG_ERROR = "INVALID_CONFIG_ERROR"
-    AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR"
-    DEVICE_CONNECTION_ERROR = "DEVICE_CONNECTION_ERROR"
-    WARNING = "WARNING"
-    UNKNOWN_ERROR = "UNKNOWN_ERROR"
-
-    def is_error(self) -> bool:
-        # WARNING is treated as an error
-        return self not in (StatusValue.OK, StatusValue.EMPTY)
-
-    def is_warning(self) -> bool:
-        return self == StatusValue.WARNING
-
-
-class IgnoreStatus:
-    pass
-
-
-class Status:
-    def __init__(self, status: StatusValue = StatusValue.EMPTY, message: str = "", timestamp: int | None = None):
-        self.status = status
-        self.message = message
-        self.timestamp = timestamp
-
-    def to_json(self) -> dict:
-        status = {"status": self.status.value, "message": self.message}
-        if self.timestamp:
-            status["timestamp"] = self.timestamp  # type: ignore
-        return status
-
-    def __repr__(self):
-        return json.dumps(self.to_json())
-
-    def is_error(self) -> bool:
-        # WARNING is treated as an error
-        return self.status.is_error()
-
-    def is_warning(self) -> bool:
-        return self.status.is_warning()
-
-
-class MultiStatus:
-    def __init__(self):
-        self.statuses: list[Status] = []
-
-    def add_status(self, status: StatusValue, message):
-        self.statuses.append(Status(status, message))
-
-    def build(self) -> Status:
-        ret = Status(StatusValue.OK)
-        if len(self.statuses) == 0:
-            return ret
-
-        messages = []
-        all_ok = True
-        all_err = True
-        any_warning = False
-
-        for stored_status in self.statuses:
-            if stored_status.message != "":
-                messages.append(stored_status.message)
-
-            if stored_status.is_warning():
-                any_warning = True
-
-            if stored_status.is_error():
-                all_ok = False
-            else:
-                all_err = False
-
-        ret.message = ", ".join(messages)
-
-        if any_warning:
-            ret.status = StatusValue.WARNING
-        elif all_ok:
-            ret.status = StatusValue.OK
-        elif all_err:
-            ret.status = StatusValue.GENERIC_ERROR
-        else:
-            ret.status = StatusValue.WARNING
-
-        return ret
-
-
-class EndpointStatus:
-    def __init__(self, endpoint_hint: str, short_status: StatusValue, message: str | None = None):
-        self.endpoint = endpoint_hint
-        self.status: StatusValue = short_status
-        self.message = message
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-    def __eq__(self, other):
-        return isinstance(other, EndpointStatus) and self.__dict__ == other.__dict__
-
-
-
-class EndpointStatuses:
-    def __init__(self, total_endpoints_number=None):
-        if total_endpoints_number is not None:
-            msg = ("EndpointStatuses::__init__: usage of `total_endpoints_number` parameter is abandoned. "
-            "Use other class methods to explicitly report all status changes for any endpoint.")
-            raise DynatraceDeprecatedError(msg)
-
-        self._lock = Lock()
-        self._endpoints_statuses: dict[str, EndpointStatus] = {}
-
-    def add_endpoint_status(self, status: EndpointStatus):
-        with self._lock:
-            self._endpoints_statuses[status.endpoint] = status
 
 
 class CommunicationClient(ABC):
