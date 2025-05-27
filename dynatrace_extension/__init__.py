@@ -6,7 +6,6 @@
 # ruff: noqa: F401
 
 from .sdk.activation import ActivationConfig, ActivationType
-from .sdk.communication import EndpointStatus, EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue
 from .sdk.event import Severity
 from .sdk.extension import DtEventType, Extension
 from .sdk.helper import (
@@ -25,3 +24,4 @@ from .sdk.helper import (
     schedule_function,
 )
 from .sdk.metric import Metric, MetricType, SummaryStat
+from .sdk.status import EndpointStatus, EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue

@@ -20,19 +20,12 @@ from typing import Any, ClassVar, NamedTuple
 
 from .activation import ActivationConfig, ActivationType
 from .callback import WrappedCallback
-from .communication import (
-    CommunicationClient,
-    DebugClient,
-    EndpointStatuses,
-    HttpClient,
-    IgnoreStatus,
-    Status,
-    StatusValue,
-)
+from .communication import CommunicationClient, DebugClient, HttpClient
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
 from .snapshot import Snapshot
+from .status import EndpointStatuses, EndpointStatusesMap, IgnoreStatus, Status, StatusValue
 from .throttled_logger import StrictThrottledHandler, ThrottledHandler
 
 HEARTBEAT_INTERVAL = timedelta(seconds=50)
@@ -284,6 +277,13 @@ class Extension:
 
         # Error message from caught exception in self.initialize()
         self._initialization_error: str = ""
+
+        # Map of all Endpoint Statuses
+        self._sfm_logs_allowed = not self.extension_name.startswith("custom:")
+        if not self._sfm_logs_allowed:
+            self.logger.warning("SFM logs not allowed for custom extensions.")
+
+        self._ep_statuses = EndpointStatusesMap(send_sfm_logs_function=self._send_sfm_logs)
 
         self._parse_args()
 
@@ -1037,8 +1037,7 @@ class Extension:
             if internal_callback_error:
                 return Status(overall_status_value, "\n".join(messages))
 
-        # Handle regular statuses, merge all EndpointStatuses
-        ep_status_merged = EndpointStatuses(0)
+        # Handle regular statuses, report all EndpointStatuses
         all_ok = True
         all_err = True
         any_warning = False
@@ -1048,10 +1047,7 @@ class Extension:
                 continue
 
             if isinstance(callback.status, EndpointStatuses):
-                try:
-                    ep_status_merged.merge(callback.status)
-                except EndpointStatuses.MergeConflictError as e:
-                    self.logger.exception(e)
+                self._ep_statuses.update_ep_statuses(callback.status)
                 continue
 
             if callback.status.is_warning():
@@ -1066,8 +1062,9 @@ class Extension:
                 messages.append(f"{callback.name()}: {callback.status.status.value} - {callback.status.message}")
 
         # Handle merged EndpointStatuses
-        if ep_status_merged._num_endpoints > 0:
-            ep_status_merged = ep_status_merged.build_common_status()
+        if self._ep_statuses.contains_any_status():
+            self._ep_statuses.send_ep_logs()
+            ep_status_merged = self._ep_statuses.build_common_status()
             messages.insert(0, ep_status_merged.message)
 
             if ep_status_merged.is_warning():
@@ -1221,3 +1218,32 @@ class Extension:
                 raise FileNotFoundError(msg)
 
         return Snapshot.parse_from_file(snapshot_file)
+
+    def _send_sfm_logs_internal(self, logs: dict | list[dict]):
+        try:
+            responses = self._client.send_sfm_logs(logs)
+
+            for response in responses:
+                with self._internal_callbacks_results_lock:
+                    self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(StatusValue.OK)
+                    if not response or "error" not in response or "message" not in response["error"]:
+                        return
+                    self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(
+                        StatusValue.GENERIC_ERROR, response["error"]["message"]
+                    )
+        except Exception as e:
+            api_logger.error(f"Error sending SFM logs: {e!r}", exc_info=True)
+            with self._internal_callbacks_results_lock:
+                self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
+
+
+    def _send_sfm_logs(self, logs: dict | list[dict]):
+        if not self._sfm_logs_allowed or not logs:
+            return
+
+        for log in logs:
+            log.update(self._metadata)
+            log["dt.extension.config.label"] = self.monitoring_config_name
+            log.pop("monitoring.configuration", None)
+
+        self._internal_executor.submit(self._send_sfm_logs_internal, logs)

@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from timeit import default_timer as timer
 
 from .activation import ActivationType
-from .communication import EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue
+from .status import EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue
 
 
 class WrappedCallback:
