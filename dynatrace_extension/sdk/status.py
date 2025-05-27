@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
@@ -59,7 +60,7 @@ class Status:
 
 
 class MultiStatus:
-    def __init__(self):
+    def __init__(self) -> None:
         self.statuses: list[Status] = []
 
     def add_status(self, status: StatusValue, message):
@@ -115,10 +116,12 @@ class EndpointStatus:
 
 
 class EndpointStatuses:
-    def __init__(self, total_endpoints_number=None):
+    def __init__(self, total_endpoints_number=None) -> None:
         if total_endpoints_number is not None:
-            msg = ("EndpointStatuses.__init__: usage of `total_endpoints_number` parameter is abandoned. "
-            "Use other class methods to explicitly report all status changes for any endpoint.")
+            msg = (
+                "EndpointStatuses.__init__: usage of `total_endpoints_number` parameter is abandoned. "
+                "Use other class methods to explicitly report all status changes for any endpoint."
+            )
             raise DynatraceDeprecatedError(msg)
 
         self._lock = Lock()
@@ -148,13 +151,13 @@ class EndpointStatusRecord:
 class EndpointStatusesMap:
     RESENDING_INTERVAL = timedelta(hours=2)
 
-    def __init__(self, send_sfm_logs_function):
+    def __init__(self, send_sfm_logs_function: Callable) -> None:
         self._lock = Lock()
         self._ep_records: dict[str, EndpointStatusRecord] = {}
         self._send_sfm_logs_function = send_sfm_logs_function
-        self._logs_to_send = []
+        self._logs_to_send: list[str] = []
 
-    def contains_any_status(self,) -> bool:
+    def contains_any_status(self) -> bool:
         return len(self._ep_records) > 0
 
     def update_ep_statuses(self, new_ep_statuses: EndpointStatuses):
@@ -162,9 +165,13 @@ class EndpointStatusesMap:
             with new_ep_statuses._lock:
                 for endpoint, ep_status in new_ep_statuses._endpoints_statuses.items():
                     if endpoint not in self._ep_records.keys():
-                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=None, state=StatusState.INITIAL)
+                        self._ep_records[endpoint] = EndpointStatusRecord(
+                            ep_status=ep_status, last_sent=None, state=StatusState.INITIAL
+                        )
                     elif ep_status != self._ep_records[endpoint].ep_status:
-                        self._ep_records[endpoint] = EndpointStatusRecord(ep_status=ep_status, last_sent=None, state=StatusState.NEW)
+                        self._ep_records[endpoint] = EndpointStatusRecord(
+                            ep_status=ep_status, last_sent=None, state=StatusState.NEW
+                        )
 
     def send_ep_logs(self):
         logs_to_send = []
@@ -172,8 +179,14 @@ class EndpointStatusesMap:
         with self._lock:
             for ep_record in self._ep_records.values():
                 if self._should_be_reported(ep_record):
-                    logs_to_send.append(self._prepare_ep_status_log(
-                        ep_record.ep_status.endpoint, ep_record.state, ep_record.ep_status.status, ep_record.ep_status.message))
+                    logs_to_send.append(
+                        self._prepare_ep_status_log(
+                            ep_record.ep_status.endpoint,
+                            ep_record.state,
+                            ep_record.ep_status.status,
+                            ep_record.ep_status.message,
+                        )
+                    )
                     ep_record.last_sent = datetime.now()
                     ep_record.state = StatusState.ONGOING
 
@@ -185,12 +198,16 @@ class EndpointStatusesMap:
             return ep_record.state == StatusState.NEW
         elif ep_record.state in (StatusState.INITIAL, StatusState.NEW):
             return True
-        elif ep_record.state == StatusState.ONGOING and (ep_record.last_sent is None or datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL):
-            return  True
+        elif ep_record.state == StatusState.ONGOING and (
+            ep_record.last_sent is None or datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL
+        ):
+            return True
         else:
             return False
 
-    def _prepare_ep_status_log(self, endpoint_name: str, prefix: StatusState, status_value: StatusValue, status_message: str) -> dict:
+    def _prepare_ep_status_log(
+        self, endpoint_name: str, prefix: StatusState, status_value: StatusValue, status_message: str
+    ) -> dict:
         level = Severity.ERROR.value
 
         if status_value.is_error() is False:
@@ -201,7 +218,7 @@ class EndpointStatusesMap:
         ep_status_log = {
             "device.address": endpoint_name,
             "level": level,
-            "message": f"{endpoint_name}: [{prefix.value}] - {status_value.value} {status_message}"
+            "message": f"{endpoint_name}: [{prefix.value}] - {status_value.value} {status_message}",
         }
 
         return ep_status_log

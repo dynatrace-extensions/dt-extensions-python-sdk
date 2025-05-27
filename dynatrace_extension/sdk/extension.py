@@ -1234,8 +1234,9 @@ class Extension:
         except Exception as e:
             api_logger.error(f"Error sending SFM logs: {e!r}", exc_info=True)
             with self._internal_callbacks_results_lock:
-                self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(StatusValue.GENERIC_ERROR, str(e))
-
+                self._internal_callbacks_results[self._send_sfm_logs_internal.__name__] = Status(
+                    StatusValue.GENERIC_ERROR, str(e)
+                )
 
     def _send_sfm_logs(self, logs: dict | list[dict]):
         if not self._sfm_logs_allowed or not logs:

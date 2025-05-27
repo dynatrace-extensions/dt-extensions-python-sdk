@@ -293,13 +293,9 @@ class TestStatus(unittest.TestCase):
         def callback():
             statuses = EndpointStatuses()
             statuses.add_endpoint_status(EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"))
-            statuses.add_endpoint_status(
-                EndpointStatus("4.5.6.7:80", StatusValue.OK, "All good 2")
-            )
+            statuses.add_endpoint_status(EndpointStatus("4.5.6.7:80", StatusValue.OK, "All good 2"))
 
-            statuses.add_endpoint_status(
-                EndpointStatus("6.7.8.9:80", StatusValue.OK, "All good 3")
-            )
+            statuses.add_endpoint_status(EndpointStatus("6.7.8.9:80", StatusValue.OK, "All good 3"))
 
             return statuses
 
@@ -692,7 +688,7 @@ class TestStatus(unittest.TestCase):
             )
             return statuses
 
-        ext.schedule(skipped_callback, timedelta(seconds=10)) # called only once during test
+        ext.schedule(skipped_callback, timedelta(seconds=10))  # called only once during test
         ext.schedule(regular_callback, timedelta(seconds=1))
 
         # Runngin scheduler in another thread as we need it to run in parallel in this test
@@ -713,8 +709,11 @@ class TestStatus(unittest.TestCase):
         for _ in range(5):
             status = ext._build_current_status()
             self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-            self.assertIn(("Endpoints OK: 0 NOK: 2 NOK_reported_errors: "
-                "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"),
+            self.assertIn(
+                (
+                    "Endpoints OK: 0 NOK: 2 NOK_reported_errors: "
+                    "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"
+                ),
                 status.message,
             )
             time.sleep(1)
