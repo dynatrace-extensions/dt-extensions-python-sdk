@@ -74,7 +74,8 @@ dependencies = [
     "ruff>=0.9.10",
     "typer[all]",
     "pyyaml",
-    "pytest"
+    "pytest",    
+    "freezegun"
 ]
 
 [tool.hatch.envs.lint.scripts]

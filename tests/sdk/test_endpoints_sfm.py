@@ -12,6 +12,7 @@ from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Sev
 class KillSchedulerError(Exception):
     pass
 
+
 class TestSfmPerEndpont(unittest.TestCase):
     def setUp(self, extension_name=""):
         self.ext = Extension(name=extension_name)
@@ -39,18 +40,18 @@ class TestSfmPerEndpont(unittest.TestCase):
         self.scheduler_thread.start()
         time.sleep(0.1)
 
-        for case in self.test_cases[:self.time_machine_idx]:
+        for case in self.test_cases[: self.time_machine_idx]:
             self.single_test_iteration(case)
 
         if self.time_machine_idx:
             with freeze_time(datetime.now() + timedelta(hours=2), tick=True):
-                for case in self.test_cases[self.time_machine_idx:]:
+                for case in self.test_cases[self.time_machine_idx :]:
                     self.single_test_iteration(case)
 
     def single_test_iteration(self, case):
         self.ext._client.send_sfm_logs.reset_mock()
         self.ext._build_current_status()
-        time.sleep(0.05) # sleep required becuase mocked method is called in a different thread
+        time.sleep(0.05)  # sleep required becuase mocked method is called in a different thread
 
         if case["expected"]:
             if not isinstance(case["expected"], list):
@@ -72,9 +73,19 @@ class TestSfmPerEndpont(unittest.TestCase):
 
         return ep_status
 
-    def expected_sfm_dict(self, device_address, level, status, status_msg, status_state,
-        dt_extension_config_id="", dt_extension_ds="python", dt_extension_version ="",
-        dt_extension_name="", dt_extension_config_label=""):
+    def expected_sfm_dict(
+        self,
+        device_address,
+        level,
+        status,
+        status_msg,
+        status_state,
+        dt_extension_config_id="",
+        dt_extension_ds="python",
+        dt_extension_version="",
+        dt_extension_name="",
+        dt_extension_config_label="",
+    ):
 
         return {
             "device.address": device_address,
@@ -84,28 +95,30 @@ class TestSfmPerEndpont(unittest.TestCase):
             "dt.extension.ds": dt_extension_ds,
             "dt.extension.version": dt_extension_version,
             "dt.extension.name": dt_extension_name,
-            "dt.extension.config.label": dt_extension_config_label
+            "dt.extension.config.label": dt_extension_config_label,
         }
 
     def test_endpoint_sfm_ok(self):
         self.time_machine_idx = 5
         self.test_cases = [
             {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"), "expected": None},
-
             {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"), "expected": None},
-
             {"status": None, "expected": None},
-
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 2"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 2", status_state="NEW")},
-
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 2"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 2", status_state="NEW"
+                ),
+            },
             {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 2"), "expected": None},
-
             # Time machine applied
             {"status": None, "expected": None},
-
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 3"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 3", status_state="NEW")}
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 3"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 3", status_state="NEW"
+                ),
+            },
         ]
 
         self.run_test()
@@ -113,24 +126,54 @@ class TestSfmPerEndpont(unittest.TestCase):
     def test_endpoint_sfm_nok(self):
         self.time_machine_idx = 2
         self.test_cases = [
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Warning 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="WARN", status="WARNING", status_msg="Warning 1", status_state="INITIAL")},
-
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Warning 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 1",
+                    status_state="INITIAL",
+                ),
+            },
             {"status": EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Warning 1"), "expected": None},
-
             # Time machine applied
-            {"status": None,
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="WARN", status="WARNING", status_msg="Warning 1", status_state="ONGOING")},
-
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.GENERIC_ERROR, "Generic error 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="ERROR", status="GENERIC_ERROR", status_msg="Generic error 1",
-                                              status_state="NEW")},
-
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Warning 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="WARN", status="WARNING", status_msg="Warning 1", status_state="NEW")},
-
-            {"status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 1", status_state="NEW")}
+            {
+                "status": None,
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 1",
+                    status_state="ONGOING",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.GENERIC_ERROR, "Generic error 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80",
+                    level="ERROR",
+                    status="GENERIC_ERROR",
+                    status_msg="Generic error 1",
+                    status_state="NEW",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.WARNING, "Warning 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 1",
+                    status_state="NEW",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:80", StatusValue.OK, "All good 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:80", level="INFO", status="OK", status_msg="All good 1", status_state="NEW"
+                ),
+            },
         ]
 
         self.run_test()
@@ -147,7 +190,7 @@ class TestSfmPerEndpont(unittest.TestCase):
                 StatusValue.AUTHENTICATION_ERROR: Severity.ERROR,
                 StatusValue.DEVICE_CONNECTION_ERROR: Severity.ERROR,
                 StatusValue.WARNING: Severity.WARN,
-                StatusValue.UNKNOWN_ERROR: Severity.ERROR
+                StatusValue.UNKNOWN_ERROR: Severity.ERROR,
             }
 
             for s in StatusValue:
@@ -156,10 +199,17 @@ class TestSfmPerEndpont(unittest.TestCase):
             return requirements[status].value
 
         self.test_cases = [
-            {"status": EndpointStatus("1.2.3.4:123", status, f"Status {i}"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:123", level=expected_severtity(status), status=status.value, status_msg=f"Status {i}",
-                                              status_state="INITIAL" if i == 0 else "NEW")
-        } for i, status in enumerate(StatusValue)
+            {
+                "status": EndpointStatus("1.2.3.4:123", status, f"Status {i}"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:123",
+                    level=expected_severtity(status),
+                    status=status.value,
+                    status_msg=f"Status {i}",
+                    status_state="INITIAL" if i == 0 else "NEW",
+                ),
+            }
+            for i, status in enumerate(StatusValue)
         ]
 
         self.run_test()
@@ -176,22 +226,65 @@ class TestSfmPerEndpont(unittest.TestCase):
 
     def test_endpoint_independent_ongoing(self):
         self.test_cases = [
-            {"status": EndpointStatus("1.2.3.4:1", StatusValue.WARNING, "Warning 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:1", level="WARN", status="WARNING", status_msg="Warning 1", status_state="INITIAL")},
-
-            {"status": EndpointStatus("1.2.3.4:2", StatusValue.WARNING, "Warning 2"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:2", level="WARN", status="WARNING", status_msg="Warning 2", status_state="INITIAL")},
-
-            {"status": EndpointStatus("1.2.3.4:1", StatusValue.WARNING, "Warning 1"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:1", level="WARN", status="WARNING", status_msg="Warning 1", status_state="ONGOING")},
-
-            {"status": EndpointStatus("1.2.3.4:2", StatusValue.WARNING, "Warning 2"),
-             "expected": self.expected_sfm_dict(device_address="1.2.3.4:2", level="WARN", status="WARNING", status_msg="Warning 2", status_state="ONGOING")},
-
-            {"status": None, "expected": [
-                self.expected_sfm_dict(device_address="1.2.3.4:1", level="WARN", status="WARNING", status_msg="Warning 1", status_state="ONGOING"),
-                self.expected_sfm_dict(device_address="1.2.3.4:2", level="WARN", status="WARNING", status_msg="Warning 2", status_state="ONGOING")]
-            }
+            {
+                "status": EndpointStatus("1.2.3.4:1", StatusValue.WARNING, "Warning 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:1",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 1",
+                    status_state="INITIAL",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:2", StatusValue.WARNING, "Warning 2"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:2",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 2",
+                    status_state="INITIAL",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:1", StatusValue.WARNING, "Warning 1"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:1",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 1",
+                    status_state="ONGOING",
+                ),
+            },
+            {
+                "status": EndpointStatus("1.2.3.4:2", StatusValue.WARNING, "Warning 2"),
+                "expected": self.expected_sfm_dict(
+                    device_address="1.2.3.4:2",
+                    level="WARN",
+                    status="WARNING",
+                    status_msg="Warning 2",
+                    status_state="ONGOING",
+                ),
+            },
+            {
+                "status": None,
+                "expected": [
+                    self.expected_sfm_dict(
+                        device_address="1.2.3.4:1",
+                        level="WARN",
+                        status="WARNING",
+                        status_msg="Warning 1",
+                        status_state="ONGOING",
+                    ),
+                    self.expected_sfm_dict(
+                        device_address="1.2.3.4:2",
+                        level="WARN",
+                        status="WARNING",
+                        status_msg="Warning 2",
+                        status_state="ONGOING",
+                    ),
+                ],
+            },
         ]
 
         self.scheduler_thread.start()
