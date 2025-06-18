@@ -412,7 +412,7 @@ class Extension:
         else:
             self._schedule_callback(callback)
 
-    def query(self):
+    def query(self) -> Any:
         """Callback to be executed every minute by default.
 
         Optional method that can be implemented by subclasses.
