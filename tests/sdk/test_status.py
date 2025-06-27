@@ -305,7 +305,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("OK: 3 NOK: 0", status.message)
+        self.assertIn("OK: 3 WARNING: 0 ERROR: 0", status.message)
 
     def test_endpoint_status_some_faulty_endpoints(self):
         ext = Extension()
@@ -334,8 +334,8 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
         self.assertIn(
-            "OK: 1 NOK: 2 NOK_reported_errors: 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
-            "Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3",
+            "Endpoints OK: 1 WARNING: 0 ERROR: 2 Unhealthy endpoints: "
+            "4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 2, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 3",
             status.message,
         )
 
@@ -368,9 +368,8 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "OK: 0 NOK: 3 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR "
-            "Invalid authorization scheme 4, 4.5.6.7:80 - DEVICE_CONNECTION_ERROR "
-            "Invalid authorization scheme 5, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 6",
+            "Endpoints OK: 0 WARNING: 0 ERROR: 3 Unhealthy endpoints: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme 4, "
+            "4.5.6.7:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 5, 6.7.8.9:80 - DEVICE_CONNECTION_ERROR Invalid authorization scheme 6",
             status.message,
         )
 
@@ -391,7 +390,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertNotIn("OK: 0 NOK: 0", status.message)
+        self.assertNotIn("Endpoints", status.message)
 
     def test_endpoint_status_single_warning(self):
         ext = Extension()
@@ -414,7 +413,8 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
         self.assertIn(
-            "OK: 0 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - WARNING Invalid authorization scheme A", status.message
+            "Endpoints OK: 0 WARNING: 1 ERROR: 0 Unhealthy endpoints: 1.2.3.4:80 - WARNING Invalid authorization scheme A",
+            status.message,
         )
 
     def test_endpoint_status_single_error(self):
@@ -438,7 +438,7 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "OK: 0 NOK: 1 NOK_reported_errors: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme",
+            "OK: 0 WARNING: 0 ERROR: 1 Unhealthy endpoints: 1.2.3.4:80 - AUTHENTICATION_ERROR Invalid authorization scheme",
             status.message,
         )
 
@@ -467,7 +467,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("OK: 3 NOK: 0", status.message)
+        self.assertIn("OK: 3 WARNING: 0 ERROR: 0", status.message)
 
     def test_endpoint_merge_error(self):
         def callback_ep_status_1():
@@ -494,7 +494,7 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "OK: 0 NOK: 2 NOK_reported_errors: EP_HINT_1 - AUTHENTICATION_ERROR EP1 MSG, EP_HINT_2 - INVALID_CONFIG_ERROR EP2 MSG",
+            "OK: 0 WARNING: 0 ERROR: 2 Unhealthy endpoints: EP_HINT_1 - AUTHENTICATION_ERROR EP1 MSG, EP_HINT_2 - INVALID_CONFIG_ERROR EP2 MSG",
             status.message,
         )
 
@@ -522,7 +522,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
-        self.assertIn("OK: 1 NOK: 1 NOK_reported_errors: EP_HINT_2 - WARNING EP2 MSG", status.message)
+        self.assertIn("OK: 1 WARNING: 1 ERROR: 0 Unhealthy endpoints: EP_HINT_2 - WARNING EP2 MSG", status.message)
 
     def test_overall_status_error(self):
         def callback_ep_status():
@@ -554,7 +554,7 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - UNKNOWN_ERROR EP MSG"
+            "Endpoints OK: 0 WARNING: 0 ERROR: 1 Unhealthy endpoints: EP_HINT - UNKNOWN_ERROR EP MSG"
             "\ncallback_multistatus: GENERIC_ERROR - MULTI MSG\ncallback_status: EEC_CONNECTION_ERROR - STATUS MSG",
             status.message,
         )
@@ -588,7 +588,7 @@ class TestStatus(unittest.TestCase):
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
-        self.assertIn("Endpoints OK: 1 NOK: 0\ncallback_status: OK - STATUS MSG", status.message)
+        self.assertIn("Endpoints OK: 1 WARNING: 0 ERROR: 0\ncallback_status: OK - STATUS MSG", status.message)
 
     def test_overall_status_warning_1(self):
         def callback_ep_status():
@@ -620,7 +620,7 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
         self.assertIn(
-            "Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - WARNING EP MSG\ncallback_multistatus: OK - MULTI MSG",
+            "Endpoints OK: 0 WARNING: 1 ERROR: 0 Unhealthy endpoints: EP_HINT - WARNING EP MSG\ncallback_multistatus: OK - MULTI MSG",
             status.message,
         )
 
@@ -654,8 +654,9 @@ class TestStatus(unittest.TestCase):
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
         self.assertIn(
-            "Endpoints OK: 0 NOK: 1 NOK_reported_errors: EP_HINT - INVALID_CONFIG_ERROR "
-            "\ncallback_multistatus: GENERIC_ERROR - \ncallback_status: WARNING - ",
+            "Endpoints OK: 0 WARNING: 0 ERROR: 1 Unhealthy endpoints: EP_HINT - INVALID_CONFIG_ERROR "
+            "\ncallback_multistatus: GENERIC_ERROR - "
+            "\ncallback_status: WARNING - ",
             status.message,
         )
 
@@ -711,7 +712,7 @@ class TestStatus(unittest.TestCase):
             self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
             self.assertIn(
                 (
-                    "Endpoints OK: 0 NOK: 2 NOK_reported_errors: "
+                    "Endpoints OK: 0 WARNING: 0 ERROR: 2 Unhealthy endpoints: "
                     "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"
                 ),
                 status.message,
