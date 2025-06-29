@@ -23,7 +23,7 @@ setup(
     description="%Extension_Name% python EF2 extension",
     author="Dynatrace",
     packages=find_packages(),
-    python_requires=">=3.10",
+    python_requires="%python_version%",
     include_package_data=True,
     install_requires=["dt-extensions-sdk"],
     extras_require={"dev": ["dt-extensions-sdk[cli]"]},
