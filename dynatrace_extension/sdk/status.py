@@ -227,33 +227,34 @@ class EndpointStatusesMap:
         with self._lock:
             # Summarize all statuses
             ok_count = 0
-            nok_count = 0
-            error_messages = []
-            has_warning_status = False
+            warning_count = 0
+            error_count = 0
+            messages_to_report = []
 
             for ep_record in self._ep_records.values():
                 ep_status = ep_record.ep_status
-                if ep_status.status.is_warning():
-                    has_warning_status = True
 
-                if ep_status.status.is_error():
-                    nok_count += 1
-                    error_messages.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
+                if ep_status.status.is_warning():
+                    warning_count += 1
+                    messages_to_report.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
+                elif ep_status.status.is_error():
+                    error_count += 1
+                    messages_to_report.append(f"{ep_status.endpoint} - {ep_status.status.value} {ep_status.message}")
                 else:
                     ok_count += 1
 
+            status_msg = f"Endpoints OK: {ok_count} WARNING: {warning_count} ERROR: {error_count}"
+
             # Early return if all OK
-            if nok_count == 0:
-                return Status(StatusValue.OK, f"Endpoints OK: {ok_count} NOK: 0")
+            if error_count == 0 and warning_count == 0:
+                return Status(StatusValue.OK, status_msg)
 
             # Build final status if some errors present
-            common_msg = ", ".join(error_messages)
-            all_endpoints_faulty = ok_count == 0
+            status_msg += f" Unhealthy endpoints: {', '.join(messages_to_report)}"
 
-            if all_endpoints_faulty and not has_warning_status:
+            if ok_count == 0 and warning_count == 0:
                 status_value = StatusValue.GENERIC_ERROR
             else:
                 status_value = StatusValue.WARNING
 
-            message = f"Endpoints OK: {ok_count} NOK: {nok_count} NOK_reported_errors: {common_msg}"
-            return Status(status=status_value, message=message)
+            return Status(status=status_value, message=status_msg)
