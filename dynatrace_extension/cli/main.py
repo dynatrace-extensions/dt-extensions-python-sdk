@@ -17,13 +17,18 @@ from .schema import ExtensionYaml
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 console = Console()
 
-# if we are not python 3.10.X, exit with an error
-if sys.version_info < (3, 10) or sys.version_info >= (3, 11):
-    console.print(f"Python 3.10.X is required to build extensions, you are using {sys.version_info}", style="bold red")
-    sys.exit(1)
-
 CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
 CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
+
+DEFAULT_TARGET_PYTHON_VERSION = "310"
+USABLE_TARGET_PYTHON_VERSIONS = ["310"]
+
+
+def python_version_in_usable_versions(versions: str):
+    for local_version in versions.split(","):
+        if local_version not in USABLE_TARGET_PYTHON_VERSIONS:
+            return False
+    return True
 
 
 # show version
@@ -56,6 +61,12 @@ def run(
     :param local_ingest_port: The port to send metrics to, by default this is 14499
     :param print_metrics: If true, print metrics to the console
     """
+
+    if sys.version_info < (3, 10) or sys.version_info >= (3, 11):
+        console.print(
+            f"Extensions are run on {DEFAULT_TARGET_PYTHON_VERSION}, you are using {sys.version_info}", style="bold red"
+        )
+        sys.exit(1)
 
     # This parses the yaml, which validates it before running
     extension_yaml = ExtensionYaml(extension_dir / "extension/extension.yaml")
@@ -106,6 +117,12 @@ def build(
         "-o",
         help="Only build for the extra platforms, useful when building from arm64 (mac)",
     ),
+    python_version: str = typer.Option(
+        DEFAULT_TARGET_PYTHON_VERSION,
+        "--python-version",
+        "-p",
+        help="Python version to use to downloads wheels, e.g. 310",
+    ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -119,7 +136,12 @@ def build(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
+    :param python_version: List of comma separated python tags to use to downloads wheels, e.g. 310,313. Used only when extra_platforms is specified
     """
+    if not python_version_in_usable_versions(python_version):
+        console.print(f"Currently you can only build extensions for Python  versions {USABLE_TARGET_PYTHON_VERSIONS}")
+        sys.exit(1)
+
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
         target_directory = extension_dir / "dist"
@@ -127,17 +149,17 @@ def build(
         target_directory.mkdir()
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms)
+    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_version)
 
-    console.print("Stage 2 - Create the extension zip file", style="bold blue")
+    console.print("Stage 4 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
 
-    console.print("Stage 3 - Sign the extension", style="bold blue")
+    console.print("Stage 5 - Sign the extension", style="bold blue")
     extension_yaml = ExtensionYaml(Path(extension_dir) / "extension" / "extension.yaml")
     output = target_directory / extension_yaml.zip_file_name()
     sign(built_zip, private_key, output)
 
-    console.print(f"Stage 4 - Delete {built_zip}", style="bold blue")
+    console.print(f"Stage 6 - Delete {built_zip}", style="bold blue")
     built_zip.unlink()
 
 
@@ -202,6 +224,12 @@ def wheel(
         "-o",
         help="Only build for the extra platforms, useful when building from arm64 (mac)",
     ),
+    python_version: str = typer.Option(
+        DEFAULT_TARGET_PYTHON_VERSION,
+        "--python-versions",
+        "-p",
+        help="Python version to use to downloads wheels, e.g. 310",
+    ),
 ):
     """
     Builds the extension and it's dependencies into wheel files
@@ -212,7 +240,12 @@ def wheel(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
+    :param python_version: List of comma separated python tags to use to downloads wheels, e.g. 310,313. Used only when extra_platforms is specified
     """
+    if not python_version_in_usable_versions(python_version):
+        console.print(f"Currently you can only build extensions for Python {USABLE_TARGET_PYTHON_VERSIONS}")
+        sys.exit(1)
+
     relative_lib_folder_dir = "extension/lib"
     lib_folder: Path = extension_dir / relative_lib_folder_dir
     _clean_directory(lib_folder)
@@ -227,6 +260,7 @@ def wheel(
         command.extend(["--find-links", find_links])
     if only_extra_platforms:
         command.append("--no-deps")
+        command.append("--ignore-requires-python")
     command.append(".")
     run_process(command, cwd=extension_dir)
 
@@ -243,6 +277,8 @@ def wheel(
                 "--only-binary=:all:",
                 "--platform",
                 extra_platform,
+                "--python-version",
+                f"{python_version}",
             ]
             if extra_index_url:
                 command.extend(["--extra-index-url", extra_index_url])
@@ -405,12 +441,17 @@ def gencerts(
 
 
 @app.command(help="Creates a new python extension")
-def create(extension_name: str, output: Path = typer.Option(None, "--output", "-o")):
+def create(
+    extension_name: str,
+    output: Path = typer.Option(None, "--output", "-o"),
+    python_version: str = typer.Option(f"{DEFAULT_TARGET_PYTHON_VERSION}", "--python-version", "-p"),
+):
     """
     Creates a new python extension
 
     :param extension_name: The name of the extension
     :param output: The path to the output directory, if not specified, we will use the extension name
+    :param python_version: version of python to build extension for, in format of 3XX (i.e. 310)
     """
 
     if not is_pep8_compliant(extension_name):
@@ -421,7 +462,8 @@ def create(extension_name: str, output: Path = typer.Option(None, "--output", "-
         output = Path.cwd() / extension_name
     else:
         output = output / extension_name
-    extension_path = generate_extension(extension_name, output)
+    effective_python_version = f"=={python_version[0]}.{python_version[1:]}"
+    extension_path = generate_extension(extension_name, output, effective_python_version)
     console.print(f"Extension created at {extension_path}", style="bold green")
 
 
@@ -481,7 +523,7 @@ def run_process(command: list[str], cwd: Path | None = None, env: dict | None = 
         console.print(print_message, style="cyan")
     else:
         console.print(f"Running: {friendly_command}", style="cyan")
-    return subprocess.run(command, cwd=cwd, env=env, check=True)  # noqa: S603
+    return subprocess.run(command, cwd=cwd, env=env, check=True, capture_output=True)  # noqa: S603
 
 
 def _clean_directory(directory: Path):
