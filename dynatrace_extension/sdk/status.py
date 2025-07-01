@@ -115,7 +115,7 @@ class EndpointStatus:
         return isinstance(other, EndpointStatus) and self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash((self.endpoint, self.status, self.message))
+        return hash(tuple(sorted(self.__dict__.items())))
 
 
 class EndpointStatuses:
