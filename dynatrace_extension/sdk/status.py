@@ -114,6 +114,9 @@ class EndpointStatus:
     def __eq__(self, other):
         return isinstance(other, EndpointStatus) and self.__dict__ == other.__dict__
 
+    def __hash__(self):
+        return hash((self.endpoint, self.status, self.message))
+
 
 class EndpointStatuses:
     def __init__(self, total_endpoints_number=None) -> None:
