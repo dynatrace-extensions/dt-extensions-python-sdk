@@ -184,7 +184,7 @@ class Extension:
 
     def __new__(cls, *args, **kwargs):  # noqa: ARG004
         if Extension._instance is None:
-            Extension._instance = super(__class__, cls).__new__(cls)
+            Extension._instance = super().__new__(cls)
         return Extension._instance
 
     def __init__(self, name: str = "") -> None:
@@ -683,7 +683,7 @@ class Extension:
                 msg = f"Event type must be a DtEventType enum value, got: {value}"
                 raise ValueError(msg)
             if key == "properties":
-                for prop_key, prop_val in event[key].items():
+                for prop_key, prop_val in value.items():
                     if not isinstance(prop_key, str) or not isinstance(prop_val, str):
                         msg = f'invalid "properties" member: {prop_key}: {prop_val}, required: "str": str'
                         raise ValueError(msg)

@@ -343,7 +343,7 @@ class DebugClient(CommunicationClient):
     def get_feature_sets(self) -> dict[str, list[str]]:
         # This is only called from dt-sdk run, where PyYaml is installed because of dt-cli
         # Do NOT move this to the top of the file
-        import yaml  # type: ignore
+        import yaml  # noqa: PLC0415
 
         # Grab the feature sets from the extension.yaml file
         extension_yaml = yaml.safe_load(self.extension_config)
