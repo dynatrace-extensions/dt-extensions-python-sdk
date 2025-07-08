@@ -31,3 +31,10 @@ jobs:
       - name: Build a wheel and a source tarball
         run: |
           python3 -m hatch build
+      
+      - name: Upload built distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: dist/*
+
