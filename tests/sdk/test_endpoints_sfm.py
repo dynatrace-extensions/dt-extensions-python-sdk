@@ -1,16 +1,9 @@
-import threading
 import time
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from freezegun import freeze_time
-
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Severity, StatusValue
-
-
-class KillSchedulerError(Exception):
-    pass
 
 
 class TestSfmPerEndpont(unittest.TestCase):
@@ -19,34 +12,31 @@ class TestSfmPerEndpont(unittest.TestCase):
         self.ext.logger = MagicMock()
         self.ext._running_in_sim = True
         self.ext._client = MagicMock()
+        self.ext._client.send_sfm_logs = MagicMock(side_effect=lambda *args, **kwargs: [])
         self.ext._is_fastcheck = False
         self.i = 0
         self.test_cases = None
         self.time_machine_idx = None
 
         self.ext.schedule(self.callback, timedelta(seconds=1))
-        self.scheduler_thread = threading.Thread(target=self.scheduler_thread_fun)
-
-    def scheduler_thread_fun(self):
-        with self.assertRaises(KillSchedulerError):
-            self.ext._scheduler.run()
 
     def tearDown(self) -> None:
-        self.ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
-        self.scheduler_thread.join()
+        if Extension._instance and Extension._instance._scheduler.running:
+            Extension._instance._scheduler.shutdown(wait=True)
+
         Extension._instance = None
 
     def run_test(self):
-        self.scheduler_thread.start()
+        self.ext._scheduler.start()
         time.sleep(0.1)
 
         for case in self.test_cases[: self.time_machine_idx]:
             self.single_test_iteration(case)
 
         if self.time_machine_idx:
-            with freeze_time(datetime.now() + timedelta(hours=2), tick=True):
-                for case in self.test_cases[self.time_machine_idx :]:
-                    self.single_test_iteration(case)
+            self.ext._ep_statuses._datetime_now = lambda: datetime.now() + timedelta(hours=2)
+            for case in self.test_cases[self.time_machine_idx :]:
+                self.single_test_iteration(case)
 
     def single_test_iteration(self, case):
         self.ext._client.send_sfm_logs.reset_mock()
@@ -247,7 +237,7 @@ class TestSfmPerEndpont(unittest.TestCase):
                 ),
             },
             {
-                "status": EndpointStatus("1.2.3.4:1", StatusValue.WARNING, "Warning 1"),
+                "status": None,
                 "expected": self.expected_sfm_dict(
                     device_address="1.2.3.4:1",
                     level="WARN",
@@ -257,7 +247,7 @@ class TestSfmPerEndpont(unittest.TestCase):
                 ),
             },
             {
-                "status": EndpointStatus("1.2.3.4:2", StatusValue.WARNING, "Warning 2"),
+                "status": None,
                 "expected": self.expected_sfm_dict(
                     device_address="1.2.3.4:2",
                     level="WARN",
@@ -287,19 +277,21 @@ class TestSfmPerEndpont(unittest.TestCase):
             },
         ]
 
-        self.scheduler_thread.start()
+        self.ext._scheduler.start()
         time.sleep(0.1)
 
         self.single_test_iteration(self.test_cases[0])
 
-        with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
-            self.single_test_iteration(self.test_cases[1])
+        self.ext._ep_statuses._datetime_now = lambda: datetime.now() + timedelta(hours=1)
+        self.single_test_iteration(self.test_cases[1])
 
-            with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
-                self.single_test_iteration(self.test_cases[2])
+        self.ext._ep_statuses._datetime_now = lambda: datetime.now() + timedelta(hours=2)
+        self.single_test_iteration(self.test_cases[2])
 
-                with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
-                    self.single_test_iteration(self.test_cases[3])
+        self.ext._ep_statuses._datetime_now = lambda: datetime.now() + timedelta(hours=3)
+        self.single_test_iteration(self.test_cases[3])
 
-                    with freeze_time(datetime.now() + timedelta(hours=2), tick=True):
-                        self.single_test_iteration(self.test_cases[4])
+        self.ext._ep_statuses._datetime_now = lambda: datetime.now() + timedelta(hours=5)
+        self.single_test_iteration(self.test_cases[4])
+
+        self.ext._scheduler.shutdown(wait=True)

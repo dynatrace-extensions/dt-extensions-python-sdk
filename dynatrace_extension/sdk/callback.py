@@ -33,7 +33,7 @@ class WrappedCallback:
         self.interval: timedelta = interval
         self.logger = logger
         self.running: bool = False
-        self.status = Status(StatusValue.OK)
+        self.status = IgnoreStatus()
         self.executions_total = 0  # global counter
         self.executions_per_interval = 0  # counter per interval = 1 min by default
         self.duration = 0  # global counter
@@ -45,7 +45,6 @@ class WrappedCallback:
         self.ok_count = 0  # counter per interval = 1 min by default
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
-        self.iterations = 0  # how many times we ran the callback iterator for this callback
 
     def get_current_time_with_cluster_diff(self):
         return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
@@ -142,13 +141,3 @@ class WrappedCallback:
         self.duration_interval_total = 0
         self.exception_count = 0
         self.executions_per_interval = 0
-
-    def get_next_execution_timestamp(self) -> float:
-        """
-        Get the timestamp for the next execution of the callback
-        This is done using execution total, the interval and the start timestamp
-        :return: datetime
-        """
-        return (
-            self.start_timestamp + timedelta(seconds=self.interval.total_seconds() * (self.iterations or 1))
-        ).timestamp()

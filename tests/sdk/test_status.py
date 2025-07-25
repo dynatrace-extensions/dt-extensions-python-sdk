@@ -1,4 +1,3 @@
-import threading
 import time
 import unittest
 from datetime import timedelta
@@ -10,6 +9,8 @@ from dynatrace_extension.sdk.communication import DebugClient
 
 class TestStatus(unittest.TestCase):
     def tearDown(self) -> None:
+        if Extension._instance and Extension._instance._scheduler.running:
+            Extension._instance._scheduler.shutdown(wait=True)
         Extension._instance = None
 
     def test_status(self):
@@ -27,7 +28,9 @@ class TestStatus(unittest.TestCase):
         ext._running_in_sim = True
         ext._client = DebugClient("", "", MagicMock())
         ext._is_fastcheck = False
-        ext.schedule(callback, timedelta(seconds=1))
+        ext.schedule(callback, timedelta(seconds=1))        
+        ext._scheduler.start()
+        time.sleep(0.1)
         status = ext._build_current_status()
 
         self.assertEqual(status.status, StatusValue.OK)
@@ -45,8 +48,8 @@ class TestStatus(unittest.TestCase):
             raise Exception(msg)
 
         ext.schedule(bad_method, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -69,7 +72,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(bad_method_1, timedelta(seconds=1))
         ext.schedule(bad_method_2, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -88,7 +91,7 @@ class TestStatus(unittest.TestCase):
             time.sleep(1)
 
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
+        extension._scheduler.start()
         time.sleep(2)
 
         self.assertTrue(extension._scheduled_callbacks[1].status.is_error())
@@ -105,8 +108,8 @@ class TestStatus(unittest.TestCase):
             return Status(StatusValue.OK, "foo1")
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -127,8 +130,8 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext.schedule(custom_query, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -147,7 +150,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -167,7 +170,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -189,7 +192,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -211,7 +214,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -233,7 +236,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -254,7 +257,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -275,7 +278,7 @@ class TestStatus(unittest.TestCase):
             return ret
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
+        ext._scheduler.start()
         time.sleep(1)
 
         status = ext._build_current_status()
@@ -300,8 +303,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -328,8 +331,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -362,8 +365,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -385,8 +388,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -407,8 +410,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -432,8 +435,8 @@ class TestStatus(unittest.TestCase):
             return statuses
 
         ext.schedule(callback, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -462,8 +465,8 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback_ep_status_1, timedelta(seconds=1))
         ext.schedule(callback_ep_status_2, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -488,8 +491,8 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback_ep_status_1, timedelta(seconds=1))
         ext.schedule(callback_ep_status_2, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -517,8 +520,8 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback_ep_status_1, timedelta(seconds=1))
         ext.schedule(callback_ep_status_2, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -548,8 +551,8 @@ class TestStatus(unittest.TestCase):
         ext.schedule(callback_ep_status, timedelta(seconds=1))
         ext.schedule(callback_multistatus, timedelta(seconds=1))
         ext.schedule(callback_status, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -583,8 +586,8 @@ class TestStatus(unittest.TestCase):
         ext.schedule(callback_ep_status, timedelta(seconds=1))
         ext.schedule(callback_multistatus, timedelta(seconds=1))
         ext.schedule(callback_status, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -614,8 +617,8 @@ class TestStatus(unittest.TestCase):
         ext.schedule(callback_ep_status, timedelta(seconds=1))
         ext.schedule(callback_multistatus, timedelta(seconds=1))
         ext.schedule(callback_status, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -648,8 +651,8 @@ class TestStatus(unittest.TestCase):
         ext.schedule(callback_ep_status, timedelta(seconds=1))
         ext.schedule(callback_multistatus, timedelta(seconds=1))
         ext.schedule(callback_status, timedelta(seconds=1))
-        ext._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -692,19 +695,8 @@ class TestStatus(unittest.TestCase):
         ext.schedule(skipped_callback, timedelta(seconds=10))  # called only once during test
         ext.schedule(regular_callback, timedelta(seconds=1))
 
-        # Runngin scheduler in another thread as we need it to run in parallel in this test
-        class KillSchedulerError(Exception):
-            pass
-
-        def scheduler_thread_impl(ext: Extension):
-            try:
-                ext._scheduler.run(blocking=True)
-            except KillSchedulerError:
-                pass
-
-        scheduler_thread = threading.Thread(target=scheduler_thread_impl, args=(ext,))
-        scheduler_thread.start()
-        time.sleep(0.01)
+        ext._scheduler.start()
+        time.sleep(0.1)
 
         # 5 second of test
         for _ in range(5):
@@ -718,9 +710,6 @@ class TestStatus(unittest.TestCase):
                 status.message,
             )
             time.sleep(1)
-
-        ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
-        scheduler_thread.join()
 
         # Confirm schedulered called callbacks as requested
         self.assertEqual(skipped_callback_call_counter, 1)

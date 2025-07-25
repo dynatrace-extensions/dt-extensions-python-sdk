@@ -159,6 +159,7 @@ class EndpointStatusesMap:
         self._ep_records: dict[str, EndpointStatusRecord] = {}
         self._send_sfm_logs_function = send_sfm_logs_function
         self._logs_to_send: list[str] = []
+        self._datetime_now = datetime.now # Mockable datetime function
 
     def contains_any_status(self) -> bool:
         return len(self._ep_records) > 0
@@ -190,7 +191,7 @@ class EndpointStatusesMap:
                             ep_record.ep_status.message,
                         )
                     )
-                    ep_record.last_sent = datetime.now()
+                    ep_record.last_sent = self._datetime_now()
                     ep_record.state = StatusState.ONGOING
 
         if logs_to_send:
@@ -202,7 +203,7 @@ class EndpointStatusesMap:
         elif ep_record.state in (StatusState.INITIAL, StatusState.NEW):
             return True
         elif ep_record.state == StatusState.ONGOING and (
-            ep_record.last_sent is None or datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL
+            ep_record.last_sent is None or self._datetime_now() - ep_record.last_sent >= self.RESENDING_INTERVAL
         ):
             return True
         else:
