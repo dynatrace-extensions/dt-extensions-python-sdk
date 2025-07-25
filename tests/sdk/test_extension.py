@@ -19,6 +19,9 @@ from dynatrace_extension.sdk.helper import _HelperExtension, dt_fastcheck, sched
 
 class TestExtension(unittest.TestCase):
     def tearDown(self) -> None:
+        if Extension._instance and Extension._instance._scheduler.running:
+            Extension._instance._scheduler.shutdown(wait=True)
+
         Extension._instance = None
         Extension.schedule_decorators = []
 
@@ -27,8 +30,8 @@ class TestExtension(unittest.TestCase):
         extension = Extension()
         extension.logger = MagicMock()
         extension._running_in_sim = True
-        extension._next_heartbeat = datetime.now()
-        extension._heartbeat_iteration()
+        extension._scheduler.start()
+        time.sleep(50.1)
         extension._heartbeat.assert_called()
 
     def test_loglevel(self):
@@ -63,8 +66,8 @@ class TestExtension(unittest.TestCase):
         extension.report_metric("my_metric", 1)
 
         self.assertEqual(len(extension._metrics), 1)
-        extension._metrics_iteration()
-        time.sleep(0.01)
+        extension._send_metrics()
+        time.sleep(0.1)
         with extension._metrics_lock:
             self.assertEqual(len(extension._metrics), 0)
 
@@ -107,8 +110,8 @@ class TestExtension(unittest.TestCase):
         extension.report_event("my_event1", "my_description")
         extension.report_event("my_event1", "my_description")
         self.assertEqual(len(extension._logs), 2)
-        extension._events_iteration()
-        time.sleep(0.01)
+        extension._send_buffered_events()
+        time.sleep(0.1)
         with extension._logs_lock:
             self.assertEqual(len(extension._logs), 0)
 
@@ -129,9 +132,11 @@ class TestExtension(unittest.TestCase):
 
         extension.schedule(callback, timedelta(seconds=1))
         self.assertEqual(len(extension._scheduled_callbacks), 3)
-        extension._scheduler.run(blocking=False)
-        time.sleep(0.01)
-        self.assertEqual(extension._run_callback.call_count, 3)
+        extension._scheduler.start()
+        time.sleep(0.1)
+
+        # call_count expected to be 2 because scheduled `query` method used the original, nonmocked _run_callback
+        self.assertEqual(extension._run_callback.call_count, 2)
 
     def test_callback_scheduled_multiple_times(self):
         extension = Extension()
@@ -148,8 +153,8 @@ class TestExtension(unittest.TestCase):
 
         extension.schedule(callback, timedelta(seconds=1))
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
+        extension._scheduler.start()
+        time.sleep(0.1)
 
         self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
@@ -169,9 +174,9 @@ class TestExtension(unittest.TestCase):
                 args=(i,),
             )
         # run scheduler once and flush metrics
-        extension._scheduler.run(blocking=False)
+        extension._scheduler.start()
         time.sleep(0.1)
-        extension._metrics_iteration()
+        extension._send_metrics()
 
     def test_callback_from_init(self):
         class MyExt(Extension):
@@ -188,8 +193,8 @@ class TestExtension(unittest.TestCase):
         extension._is_fastcheck = False
         extension._client = MagicMock()
 
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
+        extension._scheduler.start()
+        time.sleep(0.1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 2)
         self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
@@ -222,22 +227,22 @@ class TestExtension(unittest.TestCase):
         extension.schedule(extension.callback_that_schedules_another_callback, timedelta(seconds=1))
         self.assertEqual(len(extension._scheduled_callbacks), 2)
 
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
+        extension._scheduler.start()
+        time.sleep(0.1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 3)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
         self.assertEqual(extension.callback_that_schedules_another_callback_call_count, 1)
-        extension._scheduler.run(blocking=False)
+        self.assertEqual(extension._scheduled_callbacks[2].executions_total, 1)
+        self.assertEqual(extension.another_callback_call_count, 1)
         time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 3)
         self.assertEqual(extension._scheduled_callbacks[1].executions_total, 2)
         self.assertEqual(extension.callback_that_schedules_another_callback_call_count, 2)
-        self.assertGreaterEqual(extension._scheduled_callbacks[1].executions_total, 1)
-        self.assertGreaterEqual(extension.callback_that_schedules_another_callback_call_count, 1)
+        self.assertEqual(extension._scheduled_callbacks[2].executions_total, 2)
+        self.assertEqual(extension.another_callback_call_count, 2)
 
-        extension._scheduler.run(blocking=False)
         time.sleep(1)
         assert len(extension._scheduled_callbacks) == 3
 
@@ -264,10 +269,8 @@ class TestExtension(unittest.TestCase):
         def run_scheduler():
             nonlocal extension, callback, callback_wait, callback_call_count
             extension.schedule(callback, timedelta(seconds=1))
-            extension._scheduler.run(blocking=False)
-            time.sleep(1)
-            extension._scheduler.run(blocking=False)
-            time.sleep(1)
+            extension._scheduler.start()
+            time.sleep(2)
             if callback_call_count < 2:
                 callback_wait.notify()
 
@@ -289,8 +292,8 @@ class TestExtension(unittest.TestCase):
 
         extension = MyExt()
 
-        extension._scheduler.run(blocking=False)
-        time.sleep(0.01)
+        extension._scheduler.start()
+        time.sleep(0.1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 2)
         self.assertTrue(extension.called_callback)
@@ -304,7 +307,7 @@ class TestExtension(unittest.TestCase):
             callback_done = True
 
         extension = _HelperExtension()
-        extension._scheduler.run(blocking=False)
+        extension._scheduler.start()
         time.sleep(1)
 
         self.assertEqual(len(extension._scheduled_callbacks), 1)
@@ -326,10 +329,9 @@ class TestExtension(unittest.TestCase):
                 raise RuntimeError(msg)
 
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
+        extension._scheduler.start()
+        time.sleep(0.1)
         self.assertEqual(extension._build_current_status().status, StatusValue.GENERIC_ERROR)
-        extension._scheduler.run(blocking=False)
         time.sleep(1)
         self.assertEqual(extension._build_current_status().status, StatusValue.OK)
 
@@ -509,11 +511,11 @@ class TestExtension(unittest.TestCase):
         # extension._run_callback = MagicMock()
 
         def callback():
-            time.sleep(0.01)
+            time.sleep(0.1)
             return 1
 
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
+        extension._scheduler.start()
         time.sleep(0.1)
         sfm = extension._prepare_sfm_metrics()
         expected_values = {
@@ -539,8 +541,8 @@ class TestExtension(unittest.TestCase):
             return 1
 
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(2)
+        extension._scheduler.start()
+        time.sleep(1.5)
         sfm = extension._prepare_sfm_metrics()
         expected_values = {
             "dsfm:datasource.python.threads": 0,
@@ -565,8 +567,8 @@ class TestExtension(unittest.TestCase):
             raise Exception(msg)
 
         extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
+        extension._scheduler.start()
+        time.sleep(0.1)
         sfm = extension._prepare_sfm_metrics()
         expected_values = {
             "dsfm:datasource.python.threads": 0,

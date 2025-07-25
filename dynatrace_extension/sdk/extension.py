@@ -8,9 +8,11 @@ import signal
 import sys
 import threading
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors.pool import ThreadPoolExecutor
+from apscheduler.triggers.interval import IntervalTrigger
 from argparse import ArgumentParser
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from itertools import chain
@@ -172,6 +174,12 @@ def _add_sfm_metric(metric: Metric, sfm_metrics: list[Metric] | None = None):
     sfm_metrics.append(metric)
 
 
+class ExecutorType(str, Enum):
+    CALLBACKS = 'callbacks'
+    INTERNAL = 'internal'
+    HEARTBEAT = 'heartbeat'
+
+
 class Extension:
     """Base class for Python extensions.
 
@@ -240,21 +248,12 @@ class Extension:
         self._running_callbacks: dict[int, WrappedCallback] = {}
         self._running_callbacks_lock: Lock = Lock()
 
-        self._scheduler = sched.scheduler(time.time, time.sleep)
-
-        # Timestamps for scheduling of internal callbacks
-        self._next_internal_callbacks_timestamps: dict[str, datetime] = {
-            "timediff": datetime.now() + TIME_DIFF_INTERVAL,
-            "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
-            "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
-            "events": datetime.now() + METRIC_SENDING_INTERVAL,
-            "sfm_metrics": datetime.now() + SFM_METRIC_SENDING_INTERVAL,
-        }
-
-        # Executors for the callbacks and internal methods
-        self._callbacks_executor = ThreadPoolExecutor(max_workers=CALLBACKS_THREAD_POOL_SIZE)
-        self._internal_executor = ThreadPoolExecutor(max_workers=INTERNAL_THREAD_POOL_SIZE)
-        self._heartbeat_executor = ThreadPoolExecutor(max_workers=HEARTBEAT_THREAD_POOL_SIZE)
+        # Scheduler and executors for the callbacks and internal methods
+        self._scheduler = BackgroundScheduler(executors={
+            ExecutorType.CALLBACKS: ThreadPoolExecutor(max_workers=CALLBACKS_THREAD_POOL_SIZE),
+            ExecutorType.INTERNAL: ThreadPoolExecutor(max_workers=INTERNAL_THREAD_POOL_SIZE),
+            ExecutorType.HEARTBEAT: ThreadPoolExecutor(max_workers=HEARTBEAT_THREAD_POOL_SIZE)
+        })
 
         # Extension metrics
         self._metrics_lock = RLock()
@@ -376,7 +375,12 @@ class Extension:
         callback.cluster_time_diff = self._cluster_time_diff
         callback.running_in_sim = self._running_in_sim
         self._scheduled_callbacks.append(callback)
-        self._scheduler.enter(callback.initial_wait_time(), 1, self._callback_iteration, (callback,))
+
+        self._scheduler.add_job(self._run_callback, args=[callback],
+            executor=ExecutorType.CALLBACKS,
+            trigger=IntervalTrigger(seconds=callback.interval.total_seconds()),
+            next_run_time=datetime.now() + timedelta(seconds=callback.initial_wait_time())
+        )
 
     def schedule(
         self,
@@ -809,7 +813,10 @@ class Extension:
 
         if not self._is_fastcheck:
             try:
-                self._heartbeat_iteration()
+                # TODO: is it surely okay to schedule hearbeat this way? Originally it was scheduled in the very same scheduler, which would starve heartbeat if any callback took too long
+                # On the other hand, those callbacks inserted specific potentially risky jobs to different executors, so it should be okay?
+                # Why did heartbeat have a different priority (higher or lower?)
+                self._scheduler.add_job(self._heartbeat, executor=ExecutorType.HEARTBEAT, trigger=IntervalTrigger(seconds=HEARTBEAT_INTERVAL.total_seconds()))
                 self.initialize()
                 if not self.is_helper:
                     self.schedule(self.query, timedelta(minutes=1))
@@ -863,11 +870,6 @@ class Extension:
             with self._running_callbacks_lock:
                 self._running_callbacks.pop(current_thread_id, None)
 
-    def _callback_iteration(self, callback: WrappedCallback):
-        self._callbacks_executor.submit(self._run_callback, callback)
-        callback.iterations += 1
-        next_timestamp = callback.get_next_execution_timestamp()
-        self._scheduler.enterabs(next_timestamp, 1, self._callback_iteration, (callback,))
 
     def _start_extension_loop(self):
         api_logger.debug(f"Starting main loop for monitoring configuration: '{self.monitoring_config_name}'")
@@ -875,36 +877,32 @@ class Extension:
         # These were scheduled before the extension started, schedule them now
         for callback in self._scheduled_callbacks_before_run:
             self._schedule_callback(callback)
-        self._metrics_iteration()
-        self._events_iteration()
-        self._sfm_metrics_iteration()
-        self._timediff_iteration()
-        self._scheduler.run()
 
-    def _timediff_iteration(self):
-        self._internal_executor.submit(self._update_cluster_time_diff)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp("timediff", TIME_DIFF_INTERVAL)
-        self._scheduler.enterabs(next_timestamp, 1, self._timediff_iteration)
+                
+        self._scheduler.add_job(self._send_metrics, executor=ExecutorType.INTERNAL,
+            trigger=IntervalTrigger(seconds=METRIC_SENDING_INTERVAL.total_seconds()),
+            next_run_time=datetime.now())
 
-    def _heartbeat_iteration(self):
-        self._heartbeat_executor.submit(self._heartbeat)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp("heartbeat", HEARTBEAT_INTERVAL)
-        self._scheduler.enterabs(next_timestamp, 2, self._heartbeat_iteration)
+        self._scheduler.add_job(self._send_buffered_events, executor=ExecutorType.INTERNAL,
+            trigger=IntervalTrigger(seconds=METRIC_SENDING_INTERVAL.total_seconds()),
+            next_run_time=datetime.now())
 
-    def _metrics_iteration(self):
-        self._internal_executor.submit(self._send_metrics)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp("metrics", METRIC_SENDING_INTERVAL)
-        self._scheduler.enterabs(next_timestamp, 1, self._metrics_iteration)
+        self._scheduler.add_job(self._send_sfm_metrics, executor=ExecutorType.INTERNAL,
+            trigger=IntervalTrigger(seconds=SFM_METRIC_SENDING_INTERVAL.total_seconds()),
+            next_run_time=datetime.now())
 
-    def _events_iteration(self):
-        self._internal_executor.submit(self._send_buffered_events)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp("events", METRIC_SENDING_INTERVAL)
-        self._scheduler.enterabs(next_timestamp, 1, self._events_iteration)
+        self._scheduler.add_job(self._update_cluster_time_diff, executor=ExecutorType.INTERNAL,
+            trigger=IntervalTrigger(seconds=TIME_DIFF_INTERVAL.total_seconds()),
+            next_run_time=datetime.now())
 
-    def _sfm_metrics_iteration(self):
-        self._internal_executor.submit(self._send_sfm_metrics)
-        next_timestamp = self._get_and_set_next_internal_callback_timestamp("sfm_metrics", SFM_METRIC_SENDING_INTERVAL)
-        self._scheduler.enterabs(next_timestamp, 1, self._sfm_metrics_iteration)
+        self._scheduler.start()
+        
+        try:
+            while self._scheduler.running:
+                time.sleep(1)
+        except Exception:
+            self._scheduler.shutdown()
+
 
     def _send_metrics(self):
         with self._metrics_lock:
@@ -1105,8 +1103,8 @@ class Extension:
             api_logger.error(f"Heartbeat failed because {e}, response {response}", exc_info=True)
 
     def __del__(self):
-        self._callbacks_executor.shutdown()
-        self._internal_executor.shutdown()
+        if self._scheduler.running:
+            self._scheduler.shutdown()
 
     def _add_metric(self, metric: Metric):
         metric.validate()
@@ -1150,7 +1148,7 @@ class Extension:
 
     def _send_events(self, events: dict | list[dict], send_immediately: bool = False):
         if send_immediately:
-            self._internal_executor.submit(self._send_events_internal, events)
+            self._scheduler.add_job(self._send_events_internal, args=[events], executor=ExecutorType.INTERNAL)
             return
         with self._logs_lock:
             if isinstance(events, dict):
@@ -1247,4 +1245,4 @@ class Extension:
             log["dt.extension.config.label"] = self.monitoring_config_name
             log.pop("monitoring.configuration", None)
 
-        self._internal_executor.submit(self._send_sfm_logs_internal, logs)
+        self._scheduler.add_job(self._send_sfm_logs_internal, args=[logs], executor=ExecutorType.INTERNAL)

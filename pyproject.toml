@@ -47,8 +47,7 @@ dependencies = [
     "pytest",
     "typer[all]",
     "pyyaml",
-    "dt-cli>=1.6.13",
-    "freezegun"
+    "dt-cli>=1.6.13"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -74,8 +73,7 @@ dependencies = [
     "ruff>=0.9.10",
     "typer[all]",
     "pyyaml",
-    "pytest",    
-    "freezegun"
+    "pytest"
 ]
 
 [tool.hatch.envs.lint.scripts]
