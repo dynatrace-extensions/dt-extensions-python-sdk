@@ -1,7 +1,7 @@
 import threading
 import time
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest

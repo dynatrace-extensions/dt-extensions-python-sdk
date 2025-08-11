@@ -28,7 +28,7 @@ class TestStatus(unittest.TestCase):
         ext._running_in_sim = True
         ext._client = DebugClient("", "", MagicMock())
         ext._is_fastcheck = False
-        ext.schedule(callback, timedelta(seconds=1))        
+        ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.start()
         time.sleep(0.1)
         status = ext._build_current_status()

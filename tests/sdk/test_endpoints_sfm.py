@@ -12,7 +12,7 @@ class TestSfmPerEndpont(unittest.TestCase):
         self.ext.logger = MagicMock()
         self.ext._running_in_sim = True
         self.ext._client = MagicMock()
-        self.ext._client.send_sfm_logs = MagicMock(side_effect=lambda *args, **kwargs: [])
+        self.ext._client.send_sfm_logs = MagicMock()
         self.ext._is_fastcheck = False
         self.i = 0
         self.test_cases = None

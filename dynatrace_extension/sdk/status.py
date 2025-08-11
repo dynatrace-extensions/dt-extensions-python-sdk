@@ -159,7 +159,7 @@ class EndpointStatusesMap:
         self._ep_records: dict[str, EndpointStatusRecord] = {}
         self._send_sfm_logs_function = send_sfm_logs_function
         self._logs_to_send: list[str] = []
-        self._datetime_now = datetime.now # Mockable datetime function
+        self._datetime_now = datetime.now  # Mockable datetime function
 
     def contains_any_status(self) -> bool:
         return len(self._ep_records) > 0
