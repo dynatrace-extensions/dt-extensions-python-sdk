@@ -1,3 +1,29 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "%extension_name%"
+version = "0.0.1"
+description = "%Extension_Name% python EF2 extension"
+authors = [
+    {name = "Dynatrace"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    "dt-extensions-sdk"
+]
+
+[project.optional-dependencies]
+dev = ["dt-extensions-sdk[cli]"]
+
+[tool.setuptools.packages.find]
+include = ["%extension_name%*"]
+
+[tool.setuptools.package-data]
+"*" = ["*"]
+
+[tool.ruff]
 exclude = [
     ".bzr",
     ".direnv",
@@ -42,7 +68,7 @@ indent-width = 4
 # Assume Python 3.10
 target-version = "py310"
 
-[lint]
+[tool.ruff.lint]
 select = ["E", "F", "W", "C90", "I", "N", "UP", "B", "A", "FA", "T20", "Q", "RET", "SIM", "ARG", "PTH", "C"]
 ignore = [
     "T201", # we allow print because these are logged into the extension logs
@@ -56,11 +82,11 @@ unfixable = []
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-[lint.mccabe]
+[tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 20.
 max-complexity = 20
 
-[format]
+[tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"
 

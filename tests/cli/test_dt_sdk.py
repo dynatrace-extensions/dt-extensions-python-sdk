@@ -86,7 +86,7 @@ class TestDtSdk(TestCase):
 
         # Check that the extension files exist
         self.assertTrue((self.temp_dir / "test_extension" / "test_extension" / "__main__.py").exists())
-        self.assertTrue((self.temp_dir / "test_extension" / "setup.py").exists())
+        self.assertTrue((self.temp_dir / "test_extension" / "pyproject.toml").exists())
         self.assertTrue((self.temp_dir / "test_extension" / "activation.json").exists())
         self.assertTrue((self.temp_dir / "test_extension" / "extension" / "extension.yaml").exists())
 
