@@ -79,7 +79,7 @@ structure:
    │   ├── __init__.py
    │   └── __main__.py
    ├── secrets.json
-   └── setup.py
+   └── pyproject.toml
 
 .. admonition:: What do these files mean?
    :class: seealso
