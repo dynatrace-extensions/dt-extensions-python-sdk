@@ -181,7 +181,7 @@ class Extension:
     """
 
     _instance: ClassVar = None
-    schedule_decorators: ClassVar = []
+    schedule_decorators: ClassVar[list[tuple[Callable, timedelta | int, tuple | None, ActivationType | None]]] = []
 
     def __new__(cls, *args, **kwargs):  # noqa: ARG004
         if Extension._instance is None:
