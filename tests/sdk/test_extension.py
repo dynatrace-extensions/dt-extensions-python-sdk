@@ -27,7 +27,7 @@ class TestExtension(unittest.TestCase):
         extension = Extension()
         extension.logger = MagicMock()
         extension._running_in_sim = True
-        extension._next_heartbeat = datetime.now()
+        extension._next_heartbeat = time.monotonic()
         extension._heartbeat_iteration()
         extension._heartbeat.assert_called()
 

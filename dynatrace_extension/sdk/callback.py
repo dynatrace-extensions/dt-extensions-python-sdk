@@ -4,6 +4,7 @@
 
 import logging
 import random
+import time
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from timeit import default_timer as timer
@@ -39,6 +40,7 @@ class WrappedCallback:
         self.duration = 0  # global counter
         self.duration_interval_total = 0  # counter per interval = 1 min by default
         self.cluster_time_diff = 0
+        self.start_timestamp_monotonic = time.monotonic()
         self.start_timestamp = self.get_current_time_with_cluster_diff()
         self.running_in_sim = running_in_sim
         self.activation_type = activation_type
@@ -149,6 +151,5 @@ class WrappedCallback:
         This is done using execution total, the interval and the start timestamp
         :return: datetime
         """
-        return (
-            self.start_timestamp + timedelta(seconds=self.interval.total_seconds() * (self.iterations or 1))
-        ).timestamp()
+        return self.start_timestamp_monotonic + self.interval.total_seconds() * (self.iterations or 1)
+

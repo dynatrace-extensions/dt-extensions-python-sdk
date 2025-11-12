@@ -28,10 +28,11 @@ from .snapshot import Snapshot
 from .status import EndpointStatuses, EndpointStatusesMap, IgnoreStatus, Status, StatusValue
 from .throttled_logger import StrictThrottledHandler, ThrottledHandler
 
-HEARTBEAT_INTERVAL = timedelta(seconds=50)
-METRIC_SENDING_INTERVAL = timedelta(seconds=30)
-SFM_METRIC_SENDING_INTERVAL = timedelta(seconds=60)
-TIME_DIFF_INTERVAL = timedelta(seconds=60)
+# Intervals defined in seconds for internal callbacks
+HEARTBEAT_INTERVAL = 50
+METRIC_SENDING_INTERVAL = 30
+SFM_METRIC_SENDING_INTERVAL = 60
+TIME_DIFF_INTERVAL = 60
 
 CALLBACKS_THREAD_POOL_SIZE = 100
 INTERNAL_THREAD_POOL_SIZE = 20
@@ -240,15 +241,15 @@ class Extension:
         self._running_callbacks: dict[int, WrappedCallback] = {}
         self._running_callbacks_lock: Lock = Lock()
 
-        self._scheduler = sched.scheduler(time.time, time.sleep)
+        self._scheduler = sched.scheduler(time.monotonic, time.sleep)
 
         # Timestamps for scheduling of internal callbacks
-        self._next_internal_callbacks_timestamps: dict[str, datetime] = {
-            "timediff": datetime.now() + TIME_DIFF_INTERVAL,
-            "heartbeat": datetime.now() + HEARTBEAT_INTERVAL,
-            "metrics": datetime.now() + METRIC_SENDING_INTERVAL,
-            "events": datetime.now() + METRIC_SENDING_INTERVAL,
-            "sfm_metrics": datetime.now() + SFM_METRIC_SENDING_INTERVAL,
+        self._next_internal_callbacks_timestamps: dict[str, float] = {
+            "timediff": time.monotonic() + TIME_DIFF_INTERVAL,
+            "heartbeat": time.monotonic() + HEARTBEAT_INTERVAL,
+            "metrics": time.monotonic() + METRIC_SENDING_INTERVAL,
+            "events": time.monotonic() + METRIC_SENDING_INTERVAL,
+            "sfm_metrics": time.monotonic() + SFM_METRIC_SENDING_INTERVAL,
         }
 
         # Executors for the callbacks and internal methods
@@ -1169,10 +1170,10 @@ class Extension:
     def _send_dt_event(self, event: dict[str, str | int | dict[str, str]]):
         self._client.send_dt_event(event)
 
-    def _get_and_set_next_internal_callback_timestamp(self, callback_name: str, interval: timedelta):
+    def _get_and_set_next_internal_callback_timestamp(self, callback_name: str, interval: float) -> float:
         next_timestamp = self._next_internal_callbacks_timestamps[callback_name]
         self._next_internal_callbacks_timestamps[callback_name] += interval
-        return next_timestamp.timestamp()
+        return next_timestamp
 
     def get_version(self) -> str:
         """Return the extension version."""
