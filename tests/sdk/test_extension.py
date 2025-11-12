@@ -1,7 +1,7 @@
 import threading
 import time
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -387,15 +387,15 @@ class TestExtension(unittest.TestCase):
         extension._client = MagicMock()
 
         fastcheck = MagicMock()
-        fastcheck.side_effect = Exception("SomeException")
+        fastcheck.side_effect = ImportError("SomeException")
         extension.register_fastcheck(fastcheck)
-        self.assertRaises(Exception, extension._run_fastcheck)
+        self.assertRaises(ImportError, extension._run_fastcheck)
 
         fastcheck.assert_called_once()
         extension._client.send_status.assert_called_once()
         self.assertEqual(extension._client.send_status.call_args[0][0].status, StatusValue.GENERIC_ERROR)
         self.assertIn(
-            "Python datasource fastcheck error: Exception('SomeException')",
+            "Python datasource fastcheck error: ImportError('SomeException')",
             extension._client.send_status.call_args[0][0].message,
         )
 

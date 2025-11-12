@@ -149,7 +149,6 @@ class WrappedCallback:
         """
         Get the timestamp for the next execution of the callback
         This is done using execution total, the interval and the start timestamp
-        :return: datetime
+        :return: float
         """
         return self.start_timestamp_monotonic + self.interval.total_seconds() * (self.iterations or 1)
-

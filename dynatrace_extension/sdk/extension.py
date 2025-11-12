@@ -778,7 +778,7 @@ class Extension:
         parser.add_argument("--secrets", required=False, default="secrets.json")
         parser.add_argument("--no-print-metrics", required=False, action="store_true")
 
-        args, unknown = parser.parse_known_args()
+        args, _ = parser.parse_known_args()
         self._is_fastcheck = args.fastcheck
         if args.dsid is None:
             # DEV mode
