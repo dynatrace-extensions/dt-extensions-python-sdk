@@ -19,7 +19,8 @@ The documentation can be found on [github pages](https://dynatrace-extensions.gi
 
 ### Requirements:
 
-* Python 3.10
+* Python 3.10 is recommended
+* Running on later Python versions is possible, but you have to adjust command lines, and simulate does not work
 
 ### Install the SDK
 
@@ -42,15 +43,25 @@ dt-sdk create my_first_extension
 
 ### Simulate
 
+To simulate extension you need to run it on the same Python version as the framework, so Python 3.10
+
 ```bash
 cd my_first_extension
 dt-sdk run
 ```
 
 ### Build
-    
+   
+On Python 3.10
+ 
 ```bash
 dt-sdk build
+```
+
+On other versions of Python (e.g. 3.2) you need to specifically provide platforms that extension has to support, for example:
+
+```bash
+dt-sdk build -o -e win_amd64,manylinux1_x86_64
 ```
 
 
