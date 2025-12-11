@@ -23,6 +23,7 @@ class WrappedCallback:
         kwargs: dict | None = None,
         running_in_sim=False,
         activation_type: ActivationType | None = None,
+        offset_seconds: float | None = None,
     ):
         self.callback: Callable = callback
         if args is None:
@@ -47,7 +48,11 @@ class WrappedCallback:
         self.ok_count = 0  # counter per interval = 1 min by default
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
-        self.iterations = 0  # how many times we ran the callback iterator for this callback
+        self.iterations = 0  # how many times we ran the callback iterator for this callback'
+        self.offset_seconds = offset_seconds
+
+        if self.offset_seconds is None:
+            self.offset_seconds = self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
         return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
@@ -97,24 +102,29 @@ class WrappedCallback:
     def name(self):
         return self.callback.__name__
 
-    def initial_wait_time(self) -> float:
-        if not self.running_in_sim:
-            """
-            Here we chose a random second between 5 and 55 to start the callback
-            This is to distribute load for extension running on this host
-            When running from the simulator, this is not done
-            """
+    def calculate_initial_wait_time(self) -> float:
+        """
+        Here we chose a random second between 5 and 55 to start the callback
+        This is to distribute load for extension running on this host
+        """
 
-            now = self.get_current_time_with_cluster_diff()
-            random_second = random.randint(5, 55)  # noqa: S311
-            next_execution = datetime.now().replace(second=random_second, microsecond=0)
-            if next_execution <= now:
-                # The random chosen second already passed this minute
-                next_execution += timedelta(minutes=1)
-            wait_time = (next_execution - now).total_seconds()
-            self.logger.debug(f"Randomly choosing next execution time for callback {self} to be {next_execution}")
-            return wait_time
-        return 0
+        now = self.get_current_time_with_cluster_diff()
+        random_second = random.randint(5, 55)  # noqa: S311
+        next_execution = datetime.now().replace(second=random_second, microsecond=0)
+        if next_execution <= now:
+            # The random chosen second already passed this minute
+            next_execution += timedelta(minutes=1)
+        wait_time = (next_execution - now).total_seconds()
+        self.logger.debug(f"Randomly choosing next execution time for callback {self} to be {next_execution}")
+        return wait_time
+
+    def initial_wait_time(self) -> float:
+        # When running from the simulator, we don't want any offset
+        if self.running_in_sim:
+            return 0
+        
+        return self.offset_seconds
+        
 
     def get_adjusted_metric_timestamp(self) -> datetime:
         """
@@ -151,4 +161,4 @@ class WrappedCallback:
         This is done using execution total, the interval and the start timestamp
         :return: float
         """
-        return self.start_timestamp_monotonic + self.interval.total_seconds() * (self.iterations or 1)
+        return self.initial_wait_time() + self.start_timestamp_monotonic + self.interval.total_seconds() * (self.iterations or 1)

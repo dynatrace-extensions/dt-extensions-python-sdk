@@ -385,6 +385,7 @@ class Extension:
         interval: timedelta | int,
         args: tuple | None = None,
         activation_type: ActivationType | None = None,
+        offset_seconds: float | None = None,
     ) -> None:
         """Schedule a method to be executed periodically.
 
@@ -398,6 +399,7 @@ class Extension:
             args: Arguments to the callback, if any
             activation_type: Optional activation type when this callback should run,
                 can be 'ActivationType.LOCAL' or 'ActivationType.REMOTE'
+            offset_seconds: Optional offest of first execution represented in seconds. Offset is random if `offset_seconds` is `None`.
         """
 
         if isinstance(interval, int):
@@ -407,7 +409,7 @@ class Extension:
             msg = f"Interval must be at least 1 second, got {interval.total_seconds()} seconds"
             raise ValueError(msg)
 
-        callback = WrappedCallback(interval, callback, api_logger, args, activation_type=activation_type)
+        callback = WrappedCallback(interval, callback, api_logger, args, activation_type=activation_type, offset_seconds=offset_seconds)
         if self._is_fastcheck:
             self._scheduled_callbacks_before_run.append(callback)
         else:
