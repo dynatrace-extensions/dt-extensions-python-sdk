@@ -399,7 +399,7 @@ class Extension:
             args: Arguments to the callback, if any
             activation_type: Optional activation type when this callback should run,
                 can be 'ActivationType.LOCAL' or 'ActivationType.REMOTE'
-            offset_seconds: Optional offest of first execution represented in seconds. Offset is random if `offset_seconds` is `None`.
+            offset_seconds: Optional offset of first execution represented in seconds. Offset is random if `offset_seconds` is `None`.
         """
 
         if isinstance(interval, int):

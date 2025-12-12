@@ -48,7 +48,7 @@ class WrappedCallback:
         self.ok_count = 0  # counter per interval = 1 min by default
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
-        self.iterations = 0  # how many times we ran the callback iterator for this callback'
+        self.iterations = 0  # how many times we ran the callback iterator for this callback
         self.offset_seconds = offset_seconds or self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
