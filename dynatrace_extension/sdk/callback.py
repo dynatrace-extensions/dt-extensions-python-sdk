@@ -49,10 +49,7 @@ class WrappedCallback:
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
         self.iterations = 0  # how many times we ran the callback iterator for this callback'
-        self.offset_seconds = offset_seconds
-
-        if self.offset_seconds is None:
-            self.offset_seconds = self.calculate_initial_wait_time()
+        self.offset_seconds = offset_seconds or self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
         return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
@@ -122,9 +119,8 @@ class WrappedCallback:
         # When running from the simulator, we don't want any offset
         if self.running_in_sim:
             return 0
-        
+
         return self.offset_seconds
-        
 
     def get_adjusted_metric_timestamp(self) -> datetime:
         """
@@ -161,4 +157,8 @@ class WrappedCallback:
         This is done using execution total, the interval and the start timestamp
         :return: float
         """
-        return self.initial_wait_time() + self.start_timestamp_monotonic + self.interval.total_seconds() * (self.iterations or 1)
+        return (
+            self.initial_wait_time()
+            + self.start_timestamp_monotonic
+            + self.interval.total_seconds() * (self.iterations or 1)
+        )
