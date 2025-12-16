@@ -1,7 +1,7 @@
 import threading
 import time
 import unittest
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -276,6 +276,51 @@ class TestExtension(unittest.TestCase):
             t.start()
             callback_wait.wait(timeout=5)
         self.assertEqual(callback_call_count, 2)
+
+    def test_schedule_callback_with_offset(self):
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = False
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        callback_call_dt = {"callback_random": [], "callback_offset_15": [], "callback_offset_45": []}
+
+        def callback_random():
+            nonlocal callback_call_dt
+            callback_call_dt["callback_random"].append(datetime.now())
+
+        def callback_offset_15():
+            nonlocal callback_call_dt
+            callback_call_dt["callback_offset_15"].append(datetime.now())
+
+        def callback_offset_45():
+            nonlocal callback_call_dt
+            callback_call_dt["callback_offset_45"].append(datetime.now())
+
+        extension.schedule(callback_random, timedelta(seconds=60))  # Random offset in range 5 - 55 second of the minute
+        extension.schedule(callback_offset_15, timedelta(seconds=60), offset_seconds=15)  # Offset from now
+        extension.schedule(callback_offset_45, timedelta(seconds=60), offset_seconds=45)  # Offset from now
+
+        dt_start = datetime.now()
+        while datetime.now() - dt_start < timedelta(seconds=125):
+            extension._scheduler.run(blocking=False)
+            time.sleep(0.1)
+
+        assert len(callback_call_dt["callback_random"]) >= 2
+        assert len(callback_call_dt["callback_offset_15"]) >= 2
+        assert len(callback_call_dt["callback_offset_45"]) >= 2
+
+        assert 4 <= callback_call_dt["callback_random"][0].second <= 56
+        assert 14 <= (callback_call_dt["callback_offset_15"][0] - dt_start).total_seconds() <= 16
+        assert 44 <= (callback_call_dt["callback_offset_45"][0] - dt_start).total_seconds() <= 46
+
+        def interval(x):
+            return (x[1] - x[0]).total_seconds()
+
+        assert 59 <= interval(callback_call_dt["callback_random"]) <= 61
+        assert 59 <= interval(callback_call_dt["callback_offset_15"]) <= 61
+        assert 59 <= interval(callback_call_dt["callback_offset_45"]) <= 61
 
     def test_schedule_method_decorator(self):
         class MyExt(Extension):
