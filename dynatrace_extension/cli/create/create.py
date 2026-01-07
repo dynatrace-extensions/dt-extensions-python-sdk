@@ -24,7 +24,7 @@ def replace_placeholders(file: Path, replaces: list[tuple[str, str]]):
         f.write(contents)
 
 
-def copy_templates(source: Path, destination: Path, extension_name: str):
+def copy_templates(source: Path, destination: Path, extension_name: str, python_version: str):
     extension_name_lower = extension_name.lower()
     extension_name_capitalize = extension_name.capitalize()
     extension_name_dash = extension_name_lower.replace("_", "-")
@@ -34,6 +34,7 @@ def copy_templates(source: Path, destination: Path, extension_name: str):
         ("%extension_name%", extension_name_lower),
         ("%extension-name%", extension_name_dash),
         ("%extension-prefix%", extension_prefix),
+        ("%python_version%", python_version),
     ]
     for file in source.iterdir():
         if file.is_dir() and file.name != "__pycache__":
@@ -43,7 +44,7 @@ def copy_templates(source: Path, destination: Path, extension_name: str):
                 dir_name = extension_name
             dest_dir = Path(destination, dir_name)
             dest_dir.mkdir(mode=output_mode_folder, exist_ok=True)
-            copy_templates(file, dest_dir, extension_name)
+            copy_templates(file, dest_dir, extension_name, python_version)
 
         elif file.is_file() and file.name.endswith(".template"):
             # If it is a file, copy and process it
@@ -66,10 +67,10 @@ def is_pep8_compliant(extension_name: str) -> bool:
     return True
 
 
-def generate_extension(extension_name: str, output: Path) -> Path:
+def generate_extension(extension_name: str, output: Path, python_version: str) -> Path:
     output.mkdir(mode=output_mode_folder, exist_ok=True, parents=True)
     try:
-        copy_templates(template_base_folder / "extension_template", output, extension_name)
+        copy_templates(template_base_folder / "extension_template", output, extension_name, python_version)
         return output.resolve()
     except Exception:
         shutil.rmtree(output)
