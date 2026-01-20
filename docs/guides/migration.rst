@@ -6,7 +6,7 @@ Migrating EF1 Extensions
 Requirements
 ============
 
-* `Python 3.10 <https://www.python.org/downloads/>`_
+* `Python 3.10 or 3.14 <https://www.python.org/downloads/>`_
 * ``dt-extensions-sdk`` installed and in your ``PATH`` (you can run with ``dt-sdk --help``).
 * `VSCode <https://code.visualstudio.com>`_ with the `Dynatrace Extensions <https://marketplace.visualstudio.com/items?itemName=DynatracePlatformExtensions.dynatrace-extensions>`_ extension installed.
 
