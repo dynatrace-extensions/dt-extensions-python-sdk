@@ -230,9 +230,11 @@ def wheel(
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
     :param python_versions: Python versions to download wheels for, defaults to ['3.10']
     """
-    # Default to 3.10 if no versions specified
-    if python_versions is None:
+    # Handle OptionInfo objects when called directly (not via CLI)
+    if python_versions is None or isinstance(python_versions, typer.models.OptionInfo):
         python_versions = ["3.10"]
+    if only_extra_platforms is None or isinstance(only_extra_platforms, typer.models.OptionInfo):
+        only_extra_platforms = False
 
     # Validate python versions
     for version in python_versions:
