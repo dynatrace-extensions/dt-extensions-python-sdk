@@ -239,7 +239,9 @@ def wheel(
     # Validate python versions
     for version in python_versions:
         if version not in SUPPORTED_PYTHON_VERSIONS:
-            msg = f"Python version {version} is not supported. Supported versions: {', '.join(SUPPORTED_PYTHON_VERSIONS)}"
+            msg = (
+                f"Python version {version} is not supported. Supported versions: {', '.join(SUPPORTED_PYTHON_VERSIONS)}"
+            )
             console.print(msg, style="bold red")
             raise typer.Exit(1)
 
