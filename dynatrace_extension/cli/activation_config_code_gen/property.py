@@ -38,11 +38,12 @@ class Property(documented.Documented):
 
         match prop_type:
             case "list" | "set":
-                if not self.items:
-                    imports.add("typing", "Any")
-                    inner_type = "Any"
-                else:
+                if self.items:
                     inner_type = self.items.generate(imports)
+                else:
+                    imports.add("typing", "Any")
+
+                    inner_type = "Any"
 
                 prop_type = f"{prop_type}[{inner_type}]"
             case _:
