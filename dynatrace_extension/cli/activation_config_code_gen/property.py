@@ -41,9 +41,9 @@ class Property(documented.Documented):
                 if not self.items:
                     imports.add("typing", "Any")
 
-                    return f"{prop_type}[Any]"
-
-                prop_type = f"{prop_type}[{self.items.generate(imports)}]"
+                    prop_type = f"{prop_type}[Any]"
+                else:
+                    prop_type = f"{prop_type}[{self.items.generate(imports)}]"
             case _:
                 pass
 
