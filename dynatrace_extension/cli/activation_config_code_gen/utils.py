@@ -21,11 +21,7 @@ def get_property_name(name: str) -> str:
 
 
 def get_class_name(name: str) -> str:
-    return "".join(
-        f"{part[0].upper()}{part[1:]}"
-        for part in get_property_name(name).split("_")
-        if part
-    )
+    return "".join(f"{part[0].upper()}{part[1:]}" for part in get_property_name(name).split("_") if part)
 
 
 def quote_wrap(text: str) -> str:

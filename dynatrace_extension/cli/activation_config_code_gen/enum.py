@@ -40,6 +40,4 @@ class EnumType(documented.Documented):
 
 class Enums(pydantic.RootModel[dict[str, EnumType]]):
     def generate(self, imports: imports.Imports) -> str:
-        return "\n\n".join(
-            enum.generate(name, imports) for name, enum in self.root.items()
-        )
+        return "\n\n".join(enum.generate(name, imports) for name, enum in self.root.items())

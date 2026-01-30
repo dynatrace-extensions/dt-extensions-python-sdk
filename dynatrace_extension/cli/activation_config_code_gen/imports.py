@@ -10,10 +10,6 @@ class Imports:
 
     def generate(self) -> str:
         return "\n".join(
-            (
-                f"import {module}"
-                if not items
-                else f"from {module} import {', '.join(items)}"
-            )
+            (f"import {module}" if not items else f"from {module} import {', '.join(items)}")
             for module, items in self.imports.items()
         )

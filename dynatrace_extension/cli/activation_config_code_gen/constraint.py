@@ -90,6 +90,6 @@ class Constraints(pydantic.RootModel[list[Constraint]]):
         constraints: ConstraintDict = ConstraintDict()
 
         for constraint in self.root:
-            constraints.update(utils.remove_none_values(constraint.generate()))
+            constraints.update(utils.remove_none_values(constraint.generate()))  # type: ignore
 
         return constraints
