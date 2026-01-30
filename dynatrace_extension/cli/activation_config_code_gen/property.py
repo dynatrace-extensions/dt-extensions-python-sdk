@@ -40,10 +40,11 @@ class Property(documented.Documented):
             case "list" | "set":
                 if not self.items:
                     imports.add("typing", "Any")
-
-                    prop_type = f"{prop_type}[Any]"
+                    inner_type = "Any"
                 else:
-                    prop_type = f"{prop_type}[{self.items.generate(imports)}]"
+                    inner_type = self.items.generate(imports)
+
+                prop_type = f"{prop_type}[{inner_type}]"
             case _:
                 pass
 
