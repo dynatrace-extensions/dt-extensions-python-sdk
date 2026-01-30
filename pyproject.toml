@@ -48,7 +48,8 @@ dependencies = [
     "typer[all]",
     "pyyaml",
     "dt-cli>=1.6.13",
-    "freezegun"
+    "freezegun",
+    "pydantic>=2.12.5"
 ]
 
 [tool.hatch.envs.default.scripts]
