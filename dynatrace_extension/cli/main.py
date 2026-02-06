@@ -17,10 +17,8 @@ from .schema import ExtensionYaml
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 console = Console()
 
-# if we are not python 3.10.X, exit with an error
-if sys.version_info < (3, 10) or sys.version_info >= (3, 11):
-    console.print(f"Python 3.10.X is required to build extensions, you are using {sys.version_info}", style="bold red")
-    sys.exit(1)
+SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]
+
 
 CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
 CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
@@ -106,6 +104,12 @@ def build(
         "-o",
         help="Only build for the extra platforms, useful when building from arm64 (mac)",
     ),
+    python_versions: list[str] | None = typer.Option(
+        None,
+        "--python-version",
+        "-p",
+        help=f"Python versions to download wheels for. Supported: {', '.join(SUPPORTED_PYTHON_VERSIONS)}",
+    ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -119,6 +123,7 @@ def build(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
+    :param python_versions: Python versions to download wheels for, defaults to ['3.10']
     """
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
@@ -127,7 +132,7 @@ def build(
         target_directory.mkdir()
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms)
+    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_versions)
 
     console.print("Stage 2 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
@@ -184,6 +189,11 @@ def assemble(
     return output
 
 
+def _version_to_pip_version(version: str) -> str:
+    """Convert a version string like '3.10' to pip format '310'."""
+    return version.replace(".", "")
+
+
 @app.command(help="Downloads the dependencies of the extension to the lib folder")
 def wheel(
     extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
@@ -202,6 +212,12 @@ def wheel(
         "-o",
         help="Only build for the extra platforms, useful when building from arm64 (mac)",
     ),
+    python_versions: list[str] | None = typer.Option(
+        None,
+        "--python-version",
+        "-p",
+        help=f"Python versions to download wheels for. Supported: {', '.join(SUPPORTED_PYTHON_VERSIONS)}",
+    ),
 ):
     """
     Builds the extension and it's dependencies into wheel files
@@ -212,27 +228,43 @@ def wheel(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
+    :param python_versions: Python versions to download wheels for, defaults to ['3.10']
     """
+    # Handle OptionInfo objects when called directly (not via CLI)
+    if python_versions is None or isinstance(python_versions, typer.models.OptionInfo):
+        python_versions = ["3.10"]
+    if only_extra_platforms is None or isinstance(only_extra_platforms, typer.models.OptionInfo):
+        only_extra_platforms = False
+
+    # Validate python versions
+    for version in python_versions:
+        if version not in SUPPORTED_PYTHON_VERSIONS:
+            msg = (
+                f"Python version {version} is not supported. Supported versions: {', '.join(SUPPORTED_PYTHON_VERSIONS)}"
+            )
+            console.print(msg, style="bold red")
+            raise typer.Exit(1)
+
     relative_lib_folder_dir = "extension/lib"
     lib_folder: Path = extension_dir / relative_lib_folder_dir
     _clean_directory(lib_folder)
 
     console.print(f"Downloading dependencies to {lib_folder}", style="cyan")
 
-    # Downloads the dependencies and places them in the lib folder
-    command = [sys.executable, "-m", "pip", "wheel", "-w", relative_lib_folder_dir]
+    # Build the wheel for the extension itself (no deps)
+    command = [sys.executable, "-m", "pip", "wheel", "-w", relative_lib_folder_dir, "--no-deps"]
     if extra_index_url is not None:
         command.extend(["--extra-index-url", extra_index_url])
     if find_links is not None:
         command.extend(["--find-links", find_links])
-    if only_extra_platforms:
-        command.append("--no-deps")
     command.append(".")
     run_process(command, cwd=extension_dir)
 
-    if extra_platforms:
-        for extra_platform in extra_platforms:
-            console.print(f"Downloading wheels for platform {extra_platform}", style="cyan")
+    # Download dependencies for the current platform for each requested python version
+    if not only_extra_platforms:
+        for version in python_versions:
+            pip_version = _version_to_pip_version(version)
+            console.print(f"Downloading wheels for Python {version} (current platform)", style="cyan")
             command = [
                 sys.executable,
                 "-m",
@@ -241,16 +273,42 @@ def wheel(
                 "-d",
                 relative_lib_folder_dir,
                 "--only-binary=:all:",
-                "--platform",
-                extra_platform,
+                "--python-version",
+                pip_version,
             ]
             if extra_index_url:
                 command.extend(["--extra-index-url", extra_index_url])
             if find_links:
                 command.extend(["--find-links", find_links])
             command.append(".")
-
             run_process(command, cwd=extension_dir)
+
+    # Download dependencies for extra platforms for each requested python version
+    if extra_platforms:
+        for extra_platform in extra_platforms:
+            for version in python_versions:
+                pip_version = _version_to_pip_version(version)
+                console.print(f"Downloading wheels for Python {version}, platform {extra_platform}", style="cyan")
+                command = [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "download",
+                    "-d",
+                    relative_lib_folder_dir,
+                    "--only-binary=:all:",
+                    "--python-version",
+                    pip_version,
+                    "--platform",
+                    extra_platform,
+                ]
+                if extra_index_url:
+                    command.extend(["--extra-index-url", extra_index_url])
+                if find_links:
+                    command.extend(["--find-links", find_links])
+                command.append(".")
+
+                run_process(command, cwd=extension_dir)
 
     console.print(f"Installed dependencies to {lib_folder}", style="bold green")
 

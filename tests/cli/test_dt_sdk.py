@@ -98,6 +98,8 @@ class TestDtSdk(TestCase):
             extra_platforms=None,
             extra_index_url=None,
             find_links=None,
+            only_extra_platforms=False,
+            python_versions=None,
         )
 
         # Check that the built extension file exists

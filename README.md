@@ -1,7 +1,7 @@
 # Dynatrace Extensions Python SDK
 
 [![PyPI - Version](https://img.shields.io/pypi/v/dt-extensions-sdk.svg)](https://pypi.org/project/dt-extensions-sdk)
-[![PyPI - Python Version](https://img.shields.io/badge/python-3.10-blue)](https://img.shields.io/badge/python-3.10-blue)
+[![PyPI - Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.14-blue)](https://img.shields.io/badge/python-3.10%20%7C%203.14-blue)
 
 -----
 
@@ -19,7 +19,7 @@ The documentation can be found on [github pages](https://dynatrace-extensions.gi
 
 ### Requirements:
 
-* Python 3.10
+* Python 3.10 or 3.14
 
 ### Install the SDK
 
