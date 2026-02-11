@@ -25,9 +25,9 @@ Contains the python code for the extension
 
 Contains the yaml and activation definitions for the framework v2 extension
 
-### setup.py
+### pyproject.toml
 
-Contains dependency and other python metadata
+Contains dependency and other python metadata in modern TOML format
 
 ### activation.json
 
