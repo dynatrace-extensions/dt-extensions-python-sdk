@@ -12,11 +12,13 @@ from rich.console import Console
 
 from ..__about__ import __version__
 from .create import generate_extension, is_pep8_compliant
+from .hub.hub_cli import hub_app
 from .schema import ExtensionYaml
 
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 version_app = typer.Typer(help="Version commands", invoke_without_command=True)
 app.add_typer(version_app, name="version")
+app.add_typer(hub_app, name="hub", hidden=True)
 console = Console()
 
 SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]

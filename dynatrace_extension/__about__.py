@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: MIT
 
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
