@@ -15,6 +15,8 @@ from .create import generate_extension, is_pep8_compliant
 from .schema import ExtensionYaml
 
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
+version_app = typer.Typer(help="Version commands", invoke_without_command=True)
+app.add_typer(version_app, name="version")
 console = Console()
 
 SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]
@@ -24,13 +26,28 @@ CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
 CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
 
 
-# show version
-@app.command()
-def version():
+@version_app.callback()
+def version(ctx: typer.Context):
     """
     Show the version of the CLI
     """
-    console.print(f"dt-extensions-sdk version {__version__}", style="bold green")
+    if ctx.invoked_subcommand is None:
+        console.print(f"dt-extensions-sdk version {__version__}", style="bold green")
+
+
+@version_app.command("get")
+def version_get(
+    extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
+):
+    """
+    Get the version of the extension from extension.yaml
+    """
+    yaml_path = Path(extension_dir) / "extension" / "extension.yaml"
+    if not yaml_path.exists():
+        console.print(f"Extension yaml not found at {yaml_path}", style="bold red")
+        raise typer.Exit(1)
+    extension_yaml = ExtensionYaml(yaml_path)
+    console.print(extension_yaml.version)
 
 
 @app.command()
