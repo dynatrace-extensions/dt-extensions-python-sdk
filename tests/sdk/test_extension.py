@@ -1,8 +1,7 @@
-import threading
 import time
 import time as _real_time
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -17,7 +16,7 @@ from dynatrace_extension.sdk.extension import (
 )
 from dynatrace_extension.sdk.helper import _HelperExtension, dt_fastcheck, schedule_function, schedule_method
 
-THREAD_SYNC = 0.05  # seconds – small real sleep for thread pool sync
+THREAD_SYNC = 0.05  # seconds - small real sleep for thread pool sync
 
 
 class TestExtension(unittest.TestCase):
@@ -615,6 +614,7 @@ def test_callback_scheduled_multiple_times(mock_time):
 
 def test_callback_from_init(mock_time):
     try:
+
         class MyExt(Extension):
             def callback(self):
                 self.callback_call_count += 1
@@ -642,6 +642,7 @@ def test_callback_from_init(mock_time):
 
 def test_schedule_callback_from_callback(mock_time):
     try:
+
         class MyExt(Extension):
             def __init__(self) -> None:
                 super().__init__()
@@ -771,6 +772,7 @@ def test_schedule_callback_with_offset(mock_time):
 
 def test_schedule_method_decorator(mock_time):
     try:
+
         class MyExt(Extension):
             def __init__(self) -> None:
                 super().__init__()

@@ -43,7 +43,8 @@ def publish(
         changelog_path = None
 
     if extension_id is None:
-        raise typer.BadParameter("Could not determine extension ID. Provide a directory with extension.yaml.")
+        msg = "Could not determine extension ID. Provide a directory with extension.yaml."
+        raise typer.BadParameter(msg)
 
     client = HubConsole()
     result = client.post_extension_release(extension_id, zip_file_path, changelog_path)

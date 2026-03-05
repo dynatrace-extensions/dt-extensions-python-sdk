@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import time as _real_time
 from unittest.mock import patch
 
 import pytest
@@ -21,7 +20,7 @@ class MockTime:
     ``delayfunc(0)`` yielding to the callback thread.
     """
 
-    THREAD_SYNC_DELAY = 0.05  # seconds – enough for thread pool to finish
+    THREAD_SYNC_DELAY = 0.05  # seconds - enough for thread pool to finish
 
     def __init__(self, start: float = 1000.0):
         self._monotonic = start

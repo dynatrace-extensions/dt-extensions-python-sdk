@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, MultiStatus, Status, StatusValue
 from dynatrace_extension.sdk.communication import DebugClient
+from tests.sdk.conftest import MockTime
 
 THREAD_SYNC = 0.05
 
@@ -80,7 +81,6 @@ class TestStatus(unittest.TestCase):
         self.assertIn("something broke", status.message)
 
     def test_callback_taking_too_long_sets_status(self):
-        from tests.sdk.conftest import MockTime
 
         mt = MockTime()
         with (
@@ -671,7 +671,6 @@ class TestStatus(unittest.TestCase):
         )
 
     def test_endpoint_status_skipped_interval(self):
-        from tests.sdk.conftest import MockTime
 
         mt = MockTime()
         with (
