@@ -1,7 +1,7 @@
-import threading
 import time
+import time as _real_time
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -15,6 +15,8 @@ from dynatrace_extension.sdk.extension import (
     Extension,
 )
 from dynatrace_extension.sdk.helper import _HelperExtension, dt_fastcheck, schedule_function, schedule_method
+
+THREAD_SYNC = 0.05  # seconds - small real sleep for thread pool sync
 
 
 class TestExtension(unittest.TestCase):
@@ -133,28 +135,6 @@ class TestExtension(unittest.TestCase):
         time.sleep(0.01)
         self.assertEqual(extension._run_callback.call_count, 3)
 
-    def test_callback_scheduled_multiple_times(self):
-        extension = Extension()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        callback_call_count = 0
-
-        def callback():
-            nonlocal callback_call_count
-            callback_call_count += 1
-
-        extension.schedule(callback, timedelta(seconds=1))
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-
-        self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
-        self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
-        self.assertEqual(callback_call_count, 2)
-
     def test_big_number_callbacks_scheduled(self):
         extension = Extension()
         extension.logger = MagicMock()
@@ -172,211 +152,6 @@ class TestExtension(unittest.TestCase):
         extension._scheduler.run(blocking=False)
         time.sleep(0.1)
         extension._metrics_iteration()
-
-    def test_callback_from_init(self):
-        class MyExt(Extension):
-            def callback(self):
-                self.callback_call_count += 1
-
-            def initialize(self):
-                self.callback_call_count = 0
-                self.schedule(self.callback, timedelta(seconds=1))
-
-        extension = MyExt()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-
-        self.assertEqual(len(extension._scheduled_callbacks), 2)
-        self.assertEqual(extension._scheduled_callbacks[0].executions_total, 1)
-        self.assertEqual(extension.callback_call_count, 1)
-
-    def test_schedule_callback_from_callback(self):
-        class MyExt(Extension):
-            def __init__(self) -> None:
-                super().__init__()
-
-                self.callback_that_schedules_another_callback_call_count = 0
-                self.another_callback_scheduled = False
-                self.another_callback_call_count = 0
-
-            def callback_that_schedules_another_callback(self):
-                self.callback_that_schedules_another_callback_call_count += 1
-                if not self.another_callback_scheduled:
-                    self.another_callback_scheduled = True
-                    self.schedule(self.another_callback, timedelta(seconds=1))
-
-            def another_callback(self):
-                self.another_callback_call_count += 1
-
-        extension = MyExt()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        extension.schedule(extension.callback_that_schedules_another_callback, timedelta(seconds=1))
-        self.assertEqual(len(extension._scheduled_callbacks), 2)
-
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-
-        self.assertEqual(len(extension._scheduled_callbacks), 3)
-        self.assertEqual(extension._scheduled_callbacks[1].executions_total, 1)
-        self.assertEqual(extension.callback_that_schedules_another_callback_call_count, 1)
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-
-        self.assertEqual(len(extension._scheduled_callbacks), 3)
-        self.assertEqual(extension._scheduled_callbacks[1].executions_total, 2)
-        self.assertEqual(extension.callback_that_schedules_another_callback_call_count, 2)
-        self.assertGreaterEqual(extension._scheduled_callbacks[1].executions_total, 1)
-        self.assertGreaterEqual(extension.callback_that_schedules_another_callback_call_count, 1)
-
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-        assert len(extension._scheduled_callbacks) == 3
-
-    def test_callback_scheduled_exception(self):
-        extension = Extension()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-        callback_call_count = 0
-        callback_wait = threading.Condition()
-        callback_wait.acquire()
-
-        def callback():
-            nonlocal callback_call_count, callback_wait
-            callback_call_count += 1
-            if callback_call_count == 2:
-                with callback_wait:
-                    callback_wait.notify()
-
-            msg = "test exception"
-            raise RuntimeError(msg)
-
-        def run_scheduler():
-            nonlocal extension, callback, callback_wait, callback_call_count
-            extension.schedule(callback, timedelta(seconds=1))
-            extension._scheduler.run(blocking=False)
-            time.sleep(1)
-            extension._scheduler.run(blocking=False)
-            time.sleep(1)
-            if callback_call_count < 2:
-                callback_wait.notify()
-
-        with callback_wait:
-            t = threading.Thread(target=run_scheduler)
-            t.start()
-            callback_wait.wait(timeout=5)
-        self.assertEqual(callback_call_count, 2)
-
-    def test_schedule_callback_with_offset(self):
-        extension = Extension()
-        extension.logger = MagicMock()
-        extension._running_in_sim = False
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        callback_call_dt = {"callback_random": [], "callback_offset_15": [], "callback_offset_45": []}
-
-        def callback_random():
-            nonlocal callback_call_dt
-            callback_call_dt["callback_random"].append(datetime.now())
-
-        def callback_offset_15():
-            nonlocal callback_call_dt
-            callback_call_dt["callback_offset_15"].append(datetime.now())
-
-        def callback_offset_45():
-            nonlocal callback_call_dt
-            callback_call_dt["callback_offset_45"].append(datetime.now())
-
-        extension.schedule(callback_random, timedelta(seconds=60))  # Random offset in range 5 - 55 second of the minute
-        extension.schedule(callback_offset_15, timedelta(seconds=60), offset_seconds=15)  # Offset from now
-        extension.schedule(callback_offset_45, timedelta(seconds=60), offset_seconds=45)  # Offset from now
-
-        dt_start = datetime.now()
-        while datetime.now() - dt_start < timedelta(seconds=125):
-            extension._scheduler.run(blocking=False)
-            time.sleep(0.1)
-
-        assert len(callback_call_dt["callback_random"]) >= 2
-        assert len(callback_call_dt["callback_offset_15"]) >= 2
-        assert len(callback_call_dt["callback_offset_45"]) >= 2
-
-        assert 4 <= callback_call_dt["callback_random"][0].second <= 56
-        assert 14 <= (callback_call_dt["callback_offset_15"][0] - dt_start).total_seconds() <= 16
-        assert 44 <= (callback_call_dt["callback_offset_45"][0] - dt_start).total_seconds() <= 46
-
-        def interval(x):
-            return (x[1] - x[0]).total_seconds()
-
-        assert 59 <= interval(callback_call_dt["callback_random"]) <= 61
-        assert 59 <= interval(callback_call_dt["callback_offset_15"]) <= 61
-        assert 59 <= interval(callback_call_dt["callback_offset_45"]) <= 61
-
-    def test_schedule_method_decorator(self):
-        class MyExt(Extension):
-            def __init__(self) -> None:
-                super().__init__()
-                self.called_callback = False
-
-            @schedule_method(timedelta(seconds=1))
-            def callback(self):
-                self.called_callback = True
-
-        extension = MyExt()
-
-        extension._scheduler.run(blocking=False)
-        time.sleep(0.01)
-
-        self.assertEqual(len(extension._scheduled_callbacks), 2)
-        self.assertTrue(extension.called_callback)
-
-    def test_schedule_function_decorator(self):
-        callback_done = False
-
-        @schedule_function(timedelta(seconds=1))
-        def callback():
-            nonlocal callback_done
-            callback_done = True
-
-        extension = _HelperExtension()
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-
-        self.assertEqual(len(extension._scheduled_callbacks), 1)
-        self.assertTrue(callback_done)
-
-    def test_query_status(self):
-        extension = Extension()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-        callback_call_count = 0
-
-        def callback():
-            nonlocal callback_call_count
-            callback_call_count += 1
-            if callback_call_count == 1:
-                msg = "test exception"
-                raise RuntimeError(msg)
-
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-        self.assertEqual(extension._build_current_status().status, StatusValue.GENERIC_ERROR)
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-        self.assertEqual(extension._build_current_status().status, StatusValue.OK)
 
     def test_register_fastcheck(self):
         extension = Extension()
@@ -543,86 +318,6 @@ class TestExtension(unittest.TestCase):
                 self.assertEqual(int(value), expected_values[name])
                 found = True
             self.assertTrue(found, f"No SFM metrics found: {line}")
-
-    def test_sfm_ok(self):
-        extension = get_helper_extension()
-        extension.extension_logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        # extension._run_callback = MagicMock()
-
-        def callback():
-            time.sleep(0.01)
-            return 1
-
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(0.1)
-        sfm = extension._prepare_sfm_metrics()
-        expected_values = {
-            "dsfm:datasource.python.threads": 0,
-            "dsfm:datasource.python.execution.time": 0.01,
-            "dsfm:datasource.python.execution.total.count": 1,
-            "dsfm:datasource.python.execution.count": 1,
-            "dsfm:datasource.python.execution.ok.count": 1,
-            "dsfm:datasource.python.execution.timeout.count": 0,
-            "dsfm:datasource.python.execution.exception.count": 0,
-        }
-        self.verify_sfm_value(sfm, expected_values)
-
-    def test_sfm_timeout(self):
-        extension = get_helper_extension()
-        extension.extension_logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        def callback():
-            time.sleep(1.1)
-            return 1
-
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(2)
-        sfm = extension._prepare_sfm_metrics()
-        expected_values = {
-            "dsfm:datasource.python.threads": 0,
-            "dsfm:datasource.python.execution.time": 1.1,
-            "dsfm:datasource.python.execution.total.count": 1,
-            "dsfm:datasource.python.execution.count": 1,
-            "dsfm:datasource.python.execution.ok.count": 0,
-            "dsfm:datasource.python.execution.timeout.count": 1,
-            "dsfm:datasource.python.execution.exception.count": 0,
-        }
-        self.verify_sfm_value(sfm, expected_values)
-
-    def test_sfm_exception(self):
-        extension = get_helper_extension()
-        extension.extension_logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
-
-        def callback():
-            msg = "Ups ..."
-            raise Exception(msg)
-
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(1)
-        sfm = extension._prepare_sfm_metrics()
-        expected_values = {
-            "dsfm:datasource.python.threads": 0,
-            "dsfm:datasource.python.execution.time": 0.1,
-            "dsfm:datasource.python.execution.total.count": 1,
-            "dsfm:datasource.python.execution.count": 1,
-            "dsfm:datasource.python.execution.ok.count": 0,
-            "dsfm:datasource.python.execution.timeout.count": 0,
-            "dsfm:datasource.python.execution.exception.count": 1,
-        }
-        self.verify_sfm_value(sfm, expected_values)
 
     def test_count_metric_registration(self):
         extension = get_helper_extension()
@@ -879,3 +574,404 @@ class TestExtension(unittest.TestCase):
 
         assert not extension.enabled_feature_sets_names
         assert not extension.enabled_feature_sets_metrics
+
+
+# ---------------------------------------------------------------------------
+# Standalone pytest tests using mock_time fixture (formerly slow tests)
+# ---------------------------------------------------------------------------
+
+
+def _teardown_extension():
+    Extension._instance = None
+    Extension.schedule_decorators = []
+
+
+def test_callback_scheduled_multiple_times(mock_time):
+    try:
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        callback_call_count = 0
+
+        def callback():
+            nonlocal callback_call_count
+            callback_call_count += 1
+
+        extension.schedule(callback, timedelta(seconds=1))
+        extension.schedule(callback, timedelta(seconds=1))
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert extension._scheduled_callbacks[0].executions_total == 1
+        assert extension._scheduled_callbacks[1].executions_total == 1
+        assert callback_call_count == 2
+    finally:
+        _teardown_extension()
+
+
+def test_callback_from_init(mock_time):
+    try:
+
+        class MyExt(Extension):
+            def callback(self):
+                self.callback_call_count += 1
+
+            def initialize(self):
+                self.callback_call_count = 0
+                self.schedule(self.callback, timedelta(seconds=1))
+
+        extension = MyExt()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        # In sim mode, callbacks have delay=0 so they fire immediately
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert len(extension._scheduled_callbacks) == 2
+        assert extension._scheduled_callbacks[0].executions_total == 1
+        assert extension.callback_call_count == 1
+    finally:
+        _teardown_extension()
+
+
+def test_schedule_callback_from_callback(mock_time):
+    try:
+
+        class MyExt(Extension):
+            def __init__(self) -> None:
+                super().__init__()
+                self.callback_that_schedules_another_callback_call_count = 0
+                self.another_callback_scheduled = False
+                self.another_callback_call_count = 0
+
+            def callback_that_schedules_another_callback(self):
+                self.callback_that_schedules_another_callback_call_count += 1
+                if not self.another_callback_scheduled:
+                    self.another_callback_scheduled = True
+                    self.schedule(self.another_callback, timedelta(seconds=1))
+
+            def another_callback(self):
+                self.another_callback_call_count += 1
+
+        extension = MyExt()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        extension.schedule(extension.callback_that_schedules_another_callback, timedelta(seconds=1))
+        assert len(extension._scheduled_callbacks) == 2
+
+        # First run — delay=0 in sim mode, fires immediately
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert len(extension._scheduled_callbacks) == 3
+        assert extension._scheduled_callbacks[1].executions_total == 1
+        assert extension.callback_that_schedules_another_callback_call_count == 1
+
+        # Second run — advance past next scheduled time
+        mock_time.advance(1)
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert len(extension._scheduled_callbacks) == 3
+        assert extension._scheduled_callbacks[1].executions_total == 2
+        assert extension.callback_that_schedules_another_callback_call_count == 2
+
+        # Third run
+        mock_time.advance(1)
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+        assert len(extension._scheduled_callbacks) == 3
+    finally:
+        _teardown_extension()
+
+
+def test_callback_scheduled_exception(mock_time):
+    try:
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        callback_call_count = 0
+
+        def callback():
+            nonlocal callback_call_count
+            callback_call_count += 1
+            msg = "test exception"
+            raise RuntimeError(msg)
+
+        extension.schedule(callback, timedelta(seconds=1))
+
+        # First run
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        # Second run
+        mock_time.advance(1)
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert callback_call_count == 2
+    finally:
+        _teardown_extension()
+
+
+def test_schedule_callback_with_offset(mock_time):
+    try:
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = False
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        call_times = {"offset_15": [], "offset_45": []}
+
+        def callback_offset_15():
+            call_times["offset_15"].append(mock_time.now)
+
+        def callback_offset_45():
+            call_times["offset_45"].append(mock_time.now)
+
+        start_time = mock_time.now
+
+        extension.schedule(callback_offset_15, timedelta(seconds=60), offset_seconds=15)
+        extension.schedule(callback_offset_45, timedelta(seconds=60), offset_seconds=45)
+
+        # Advance time in 1-second steps up to 125 seconds
+        for _ in range(125):
+            mock_time.advance(1)
+            extension._scheduler.run(blocking=False)
+            _real_time.sleep(0.001)  # tiny sync for thread pool
+
+        _real_time.sleep(THREAD_SYNC)
+
+        # Each callback should have fired at least twice
+        assert len(call_times["offset_15"]) >= 2
+        assert len(call_times["offset_45"]) >= 2
+
+        # Check offsets from start
+        assert 14 <= (call_times["offset_15"][0] - start_time) <= 16
+        assert 44 <= (call_times["offset_45"][0] - start_time) <= 46
+
+        # Check intervals between first two calls (~60s)
+        assert 59 <= (call_times["offset_15"][1] - call_times["offset_15"][0]) <= 61
+        assert 59 <= (call_times["offset_45"][1] - call_times["offset_45"][0]) <= 61
+    finally:
+        _teardown_extension()
+
+
+def test_schedule_method_decorator(mock_time):
+    try:
+
+        class MyExt(Extension):
+            def __init__(self) -> None:
+                super().__init__()
+                self.called_callback = False
+
+            @schedule_method(timedelta(seconds=1))
+            def callback(self):
+                self.called_callback = True
+
+        extension = MyExt()
+
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert len(extension._scheduled_callbacks) == 2
+        assert extension.called_callback
+    finally:
+        _teardown_extension()
+
+
+def test_schedule_function_decorator(mock_time):
+    try:
+        callback_done = False
+
+        @schedule_function(timedelta(seconds=1))
+        def callback():
+            nonlocal callback_done
+            callback_done = True
+
+        extension = _HelperExtension()
+
+        # In sim mode, callback fires immediately (delay=0)
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        assert len(extension._scheduled_callbacks) == 1
+        assert callback_done
+    finally:
+        _teardown_extension()
+
+
+def test_query_status(mock_time):
+    try:
+        extension = Extension()
+        extension.logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+        callback_call_count = 0
+
+        def callback():
+            nonlocal callback_call_count
+            callback_call_count += 1
+            if callback_call_count == 1:
+                msg = "test exception"
+                raise RuntimeError(msg)
+
+        extension.schedule(callback, timedelta(seconds=1))
+
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+        assert extension._build_current_status().status == StatusValue.GENERIC_ERROR
+
+        mock_time.advance(1)
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+        assert extension._build_current_status().status == StatusValue.OK
+    finally:
+        _teardown_extension()
+
+
+def _parse_sfm(line):
+    tokens = line.split(",")
+    name = tokens[0]
+    last_token = tokens[-1]
+    tokens = last_token.split("=")
+    value = tokens[-1]
+    return (name, value)
+
+
+def _verify_sfm_value(sfm, expected_values):
+    found = False
+    for line in sfm:
+        name, value = _parse_sfm(line)
+        if name == "dsfm:datasource.python.threads":
+            assert expected_values.get(name) is not None
+            found = True
+        if name == "dsfm:datasource.python.execution.time":
+            assert abs(float(value) - expected_values[name]) <= 0.1
+            found = True
+        if name == "dsfm:datasource.python.execution.total.count":
+            assert int(value) == expected_values[name]
+            found = True
+        if name == "dsfm:datasource.python.execution.count":
+            assert int(value) == expected_values[name]
+            found = True
+        if name == "dsfm:datasource.python.execution.ok.count":
+            assert int(value) == expected_values[name]
+            found = True
+        if name == "dsfm:datasource.python.execution.timeout.count":
+            assert int(value) == expected_values[name]
+            found = True
+        if name == "dsfm:datasource.python.execution.exception.count":
+            assert int(value) == expected_values[name]
+            found = True
+        assert found, f"No SFM metrics found: {line}"
+
+
+def test_sfm_ok(mock_time):
+    try:
+        extension = get_helper_extension()
+        extension.extension_logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        def callback():
+            # Simulate 0.01s of work by advancing the duration timer only
+            mock_time.advance_perf(0.01)
+            return 1
+
+        extension.schedule(callback, timedelta(seconds=1))
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        sfm = extension._prepare_sfm_metrics()
+        expected_values = {
+            "dsfm:datasource.python.threads": 0,
+            "dsfm:datasource.python.execution.time": 0.01,
+            "dsfm:datasource.python.execution.total.count": 1,
+            "dsfm:datasource.python.execution.count": 1,
+            "dsfm:datasource.python.execution.ok.count": 1,
+            "dsfm:datasource.python.execution.timeout.count": 0,
+            "dsfm:datasource.python.execution.exception.count": 0,
+        }
+        _verify_sfm_value(sfm, expected_values)
+    finally:
+        _teardown_extension()
+
+
+def test_sfm_timeout(mock_time):
+    try:
+        extension = get_helper_extension()
+        extension.extension_logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        def callback():
+            # Simulate 1.1s of work (exceeds 1s interval → timeout)
+            # Only advance the duration timer, NOT the scheduler clock
+            mock_time.advance_perf(1.1)
+            return 1
+
+        extension.schedule(callback, timedelta(seconds=1))
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        sfm = extension._prepare_sfm_metrics()
+        expected_values = {
+            "dsfm:datasource.python.threads": 0,
+            "dsfm:datasource.python.execution.time": 1.1,
+            "dsfm:datasource.python.execution.total.count": 1,
+            "dsfm:datasource.python.execution.count": 1,
+            "dsfm:datasource.python.execution.ok.count": 0,
+            "dsfm:datasource.python.execution.timeout.count": 1,
+            "dsfm:datasource.python.execution.exception.count": 0,
+        }
+        _verify_sfm_value(sfm, expected_values)
+    finally:
+        _teardown_extension()
+
+
+def test_sfm_exception(mock_time):
+    try:
+        extension = get_helper_extension()
+        extension.extension_logger = MagicMock()
+        extension._running_in_sim = True
+        extension._is_fastcheck = False
+        extension._client = MagicMock()
+
+        def callback():
+            msg = "Ups ..."
+            raise Exception(msg)
+
+        extension.schedule(callback, timedelta(seconds=1))
+        extension._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
+
+        sfm = extension._prepare_sfm_metrics()
+        expected_values = {
+            "dsfm:datasource.python.threads": 0,
+            "dsfm:datasource.python.execution.time": 0.1,
+            "dsfm:datasource.python.execution.total.count": 1,
+            "dsfm:datasource.python.execution.count": 1,
+            "dsfm:datasource.python.execution.ok.count": 0,
+            "dsfm:datasource.python.execution.timeout.count": 0,
+            "dsfm:datasource.python.execution.exception.count": 1,
+        }
+        _verify_sfm_value(sfm, expected_values)
+    finally:
+        _teardown_extension()

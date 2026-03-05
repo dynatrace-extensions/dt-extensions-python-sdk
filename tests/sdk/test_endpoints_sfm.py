@@ -1,20 +1,44 @@
-import threading
-import time
+import time as _real_time
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from freezegun import freeze_time
 
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, Severity, StatusValue
 
+THREAD_SYNC = 0.05
 
-class KillSchedulerError(Exception):
-    pass
+
+class MockTime:
+    """Lightweight mock for time.monotonic used by the scheduler."""
+
+    def __init__(self, start: float = 1000.0):
+        self._now = start
+
+    def monotonic(self) -> float:
+        return self._now
+
+    def advance(self, seconds: float) -> None:
+        self._now += seconds
 
 
 class TestSfmPerEndpont(unittest.TestCase):
     def setUp(self, extension_name=""):
+        # Stop any patches from a previous setUp call (e.g. test_endpoint_custom_blocked
+        # calls setUp twice — the first set of patches must be stopped first)
+        if hasattr(self, "_patches"):
+            for p in self._patches:
+                p.stop()
+
+        self.mock_time = MockTime()
+        self._patches = [
+            patch("time.monotonic", side_effect=self.mock_time.monotonic),
+            patch("dynatrace_extension.sdk.callback.timer", side_effect=self.mock_time.monotonic),
+        ]
+        for p in self._patches:
+            p.start()
+
         self.ext = Extension(name=extension_name)
         self.ext.logger = MagicMock()
         self.ext._running_in_sim = True
@@ -25,20 +49,16 @@ class TestSfmPerEndpont(unittest.TestCase):
         self.time_machine_idx = None
 
         self.ext.schedule(self.callback, timedelta(seconds=1))
-        self.scheduler_thread = threading.Thread(target=self.scheduler_thread_fun)
-
-    def scheduler_thread_fun(self):
-        with self.assertRaises(KillSchedulerError):
-            self.ext._scheduler.run()
 
     def tearDown(self) -> None:
-        self.ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
-        self.scheduler_thread.join()
         Extension._instance = None
+        for p in self._patches:
+            p.stop()
 
     def run_test(self):
-        self.scheduler_thread.start()
-        time.sleep(0.1)
+        # Fire all initially-due events (delay=0 in sim mode)
+        self.ext._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
 
         for case in self.test_cases[: self.time_machine_idx]:
             self.single_test_iteration(case)
@@ -51,7 +71,7 @@ class TestSfmPerEndpont(unittest.TestCase):
     def single_test_iteration(self, case):
         self.ext._client.send_sfm_logs.reset_mock()
         self.ext._build_current_status()
-        time.sleep(0.05)  # sleep required becuase mocked method is called in a different thread
+        _real_time.sleep(THREAD_SYNC)  # let background thread complete send_sfm_logs call
 
         if case["expected"]:
             if not isinstance(case["expected"], list):
@@ -60,7 +80,10 @@ class TestSfmPerEndpont(unittest.TestCase):
         else:
             self.ext._client.send_sfm_logs.assert_not_called()
 
-        time.sleep(1)
+        # Advance mock time by 1s to trigger next callback iteration
+        self.mock_time.advance(1)
+        self.ext._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
 
     def callback(self):
         assert self.test_cases
@@ -287,8 +310,9 @@ class TestSfmPerEndpont(unittest.TestCase):
             },
         ]
 
-        self.scheduler_thread.start()
-        time.sleep(0.1)
+        # Fire initial events
+        self.ext._scheduler.run(blocking=False)
+        _real_time.sleep(THREAD_SYNC)
 
         self.single_test_iteration(self.test_cases[0])
 
