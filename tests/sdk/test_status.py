@@ -1,11 +1,13 @@
-import threading
 import time
+import time as _real_time
 import unittest
 from datetime import timedelta
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from dynatrace_extension import EndpointStatus, EndpointStatuses, Extension, MultiStatus, Status, StatusValue
 from dynatrace_extension.sdk.communication import DebugClient
+
+THREAD_SYNC = 0.05
 
 
 class TestStatus(unittest.TestCase):
@@ -70,7 +72,7 @@ class TestStatus(unittest.TestCase):
         ext.schedule(bad_method_1, timedelta(seconds=1))
         ext.schedule(bad_method_2, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -78,21 +80,29 @@ class TestStatus(unittest.TestCase):
         self.assertIn("something broke", status.message)
 
     def test_callback_taking_too_long_sets_status(self):
-        extension = Extension()
-        extension.logger = MagicMock()
-        extension._running_in_sim = True
-        extension._is_fastcheck = False
-        extension._client = MagicMock()
+        from tests.sdk.conftest import MockTime
 
-        def callback():
-            time.sleep(1)
+        mt = MockTime()
+        with (
+            patch("time.monotonic", side_effect=mt.monotonic),
+            patch("dynatrace_extension.sdk.callback.timer", side_effect=mt.perf_counter),
+        ):
+            extension = Extension()
+            extension.logger = MagicMock()
+            extension._running_in_sim = True
+            extension._is_fastcheck = False
+            extension._client = MagicMock()
 
-        extension.schedule(callback, timedelta(seconds=1))
-        extension._scheduler.run(blocking=False)
-        time.sleep(2)
+            def callback():
+                # Simulate 1.5s of work (exceeds 1s interval)
+                mt.advance_perf(1.5)
 
-        self.assertTrue(extension._scheduled_callbacks[1].status.is_error())
-        self.assertIn("longer than the interval", extension._scheduled_callbacks[1].status.message)
+            extension.schedule(callback, timedelta(seconds=1))
+            extension._scheduler.run(blocking=False)
+            _real_time.sleep(THREAD_SYNC)
+
+            self.assertTrue(extension._scheduled_callbacks[1].status.is_error())
+            self.assertIn("longer than the interval", extension._scheduled_callbacks[1].status.message)
 
     def test_direct_status_return(self):
         ext = Extension()
@@ -148,7 +158,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -168,7 +178,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.OK)
@@ -190,7 +200,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -212,7 +222,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -234,7 +244,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -255,7 +265,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.WARNING)
@@ -276,7 +286,7 @@ class TestStatus(unittest.TestCase):
 
         ext.schedule(callback, timedelta(seconds=1))
         ext._scheduler.run(blocking=False)
-        time.sleep(1)
+        time.sleep(0.05)
 
         status = ext._build_current_status()
         self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
@@ -661,67 +671,63 @@ class TestStatus(unittest.TestCase):
         )
 
     def test_endpoint_status_skipped_interval(self):
-        ext = Extension()
-        ext.logger = MagicMock()
-        ext._running_in_sim = True
-        ext._client = DebugClient("", "", MagicMock())
-        ext._is_fastcheck = False
+        from tests.sdk.conftest import MockTime
 
-        skipped_callback_call_counter = 0
-        regular_callback_call_counter = 0
+        mt = MockTime()
+        with (
+            patch("time.monotonic", side_effect=mt.monotonic),
+            patch("dynatrace_extension.sdk.callback.timer", side_effect=mt.monotonic),
+        ):
+            ext = Extension()
+            ext.logger = MagicMock()
+            ext._running_in_sim = True
+            ext._client = DebugClient("", "", MagicMock())
+            ext._is_fastcheck = False
 
-        def skipped_callback():
-            nonlocal skipped_callback_call_counter
-            skipped_callback_call_counter += 1
+            skipped_callback_call_counter = 0
+            regular_callback_call_counter = 0
 
-            statuses = EndpointStatuses()
-            statuses.add_endpoint_status(
-                EndpointStatus("skipped_callback", StatusValue.GENERIC_ERROR, "skipped_callback_msg")
-            )
-            return statuses
+            def skipped_callback():
+                nonlocal skipped_callback_call_counter
+                skipped_callback_call_counter += 1
 
-        def regular_callback():
-            nonlocal regular_callback_call_counter
-            regular_callback_call_counter += 1
-            statuses = EndpointStatuses()
-            statuses.add_endpoint_status(
-                EndpointStatus("regular_callback", StatusValue.UNKNOWN_ERROR, "regular_callback_msg")
-            )
-            return statuses
+                statuses = EndpointStatuses()
+                statuses.add_endpoint_status(
+                    EndpointStatus("skipped_callback", StatusValue.GENERIC_ERROR, "skipped_callback_msg")
+                )
+                return statuses
 
-        ext.schedule(skipped_callback, timedelta(seconds=10))  # called only once during test
-        ext.schedule(regular_callback, timedelta(seconds=1))
+            def regular_callback():
+                nonlocal regular_callback_call_counter
+                regular_callback_call_counter += 1
+                statuses = EndpointStatuses()
+                statuses.add_endpoint_status(
+                    EndpointStatus("regular_callback", StatusValue.UNKNOWN_ERROR, "regular_callback_msg")
+                )
+                return statuses
 
-        # Runngin scheduler in another thread as we need it to run in parallel in this test
-        class KillSchedulerError(Exception):
-            pass
+            ext.schedule(skipped_callback, timedelta(seconds=10))  # called only once during test
+            ext.schedule(regular_callback, timedelta(seconds=1))
 
-        def scheduler_thread_impl(ext: Extension):
-            try:
-                ext._scheduler.run(blocking=True)
-            except KillSchedulerError:
-                pass
+            # Fire initial callbacks (delay=0 in sim mode)
+            ext._scheduler.run(blocking=False)
+            _real_time.sleep(THREAD_SYNC)
 
-        scheduler_thread = threading.Thread(target=scheduler_thread_impl, args=(ext,))
-        scheduler_thread.start()
-        time.sleep(0.01)
+            # Simulate 5 seconds: regular_callback fires each second, skipped_callback only at t=0
+            for _ in range(5):
+                status = ext._build_current_status()
+                self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
+                self.assertIn(
+                    (
+                        "Endpoints OK: 0 WARNING: 0 ERROR: 2 Unhealthy endpoints: "
+                        "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"
+                    ),
+                    status.message,
+                )
+                mt.advance(1)
+                ext._scheduler.run(blocking=False)
+                _real_time.sleep(THREAD_SYNC)
 
-        # 5 second of test
-        for _ in range(5):
-            status = ext._build_current_status()
-            self.assertEqual(status.status, StatusValue.GENERIC_ERROR)
-            self.assertIn(
-                (
-                    "Endpoints OK: 0 WARNING: 0 ERROR: 2 Unhealthy endpoints: "
-                    "skipped_callback - GENERIC_ERROR skipped_callback_msg, regular_callback - UNKNOWN_ERROR regular_callback_msg"
-                ),
-                status.message,
-            )
-            time.sleep(1)
-
-        ext._scheduler.enter(delay=0, priority=1, action=lambda: (_ for _ in ()).throw(KillSchedulerError()))
-        scheduler_thread.join()
-
-        # Confirm schedulered called callbacks as requested
-        self.assertEqual(skipped_callback_call_counter, 1)
-        self.assertEqual(regular_callback_call_counter, 6)
+            # Confirm scheduler called callbacks as requested
+            self.assertEqual(skipped_callback_call_counter, 1)
+            self.assertEqual(regular_callback_call_counter, 6)
