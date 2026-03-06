@@ -83,9 +83,8 @@ class HubConsole:
         files: list[tuple[str, tuple[str, Any, str]]] = [
             ("artifact", (zip_file.name, open(zip_file, "rb"), "application/x-zip-compressed")),
         ]
+        data = {}
         if release_notes is not None:
-            files.append(
-                ("releaseNotes", (release_notes.name, open(release_notes, "rb"), "text/markdown")),
-            )
-        resp = self.make_request("POST", f"projects/extensions/{extension_id}/releases", files=files)
+            data["releaseNotes"] = release_notes.read_text(encoding="utf-8")
+        resp = self.make_request("POST", f"projects/extensions/{extension_id}/releases", files=files, data=data)
         return resp.json()
