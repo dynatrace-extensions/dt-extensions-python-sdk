@@ -88,3 +88,9 @@ class HubConsole:
             data["releaseNotes"] = release_notes.read_text(encoding="utf-8")
         resp = self.make_request("POST", f"projects/extensions/{extension_id}/releases", files=files, data=data)
         return resp.json()
+
+    def approve_release(self, extension_id: str, version: str) -> None:
+        self.make_request("POST", f"projects/extensions/{extension_id}/releases/{version}:accept")
+
+    def assign_release_to_channel(self, extension_id: str, version: str, channel_id: str) -> None:
+        self.make_request("POST", f"projects/extensions/{extension_id}/releases/{version}/channels/{channel_id}")

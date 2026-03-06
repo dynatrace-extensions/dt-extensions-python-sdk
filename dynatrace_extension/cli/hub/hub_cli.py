@@ -15,8 +15,8 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def _get_extension_id_from_zip(zip_path: Path) -> str:
-    """Extract the extension name from a signed extension zip file.
+def _get_extension_yaml_from_zip(zip_path: Path) -> ExtensionYaml:
+    """Extract extension metadata from a signed extension zip file.
 
     The signed zip contains an inner zip, which in turn contains
     ``extension.yaml`` with the extension metadata.
@@ -31,32 +31,45 @@ def _get_extension_id_from_zip(zip_path: Path) -> str:
             with zipfile.ZipFile(io.BytesIO(inner_file.read())) as inner_zip:
                 with inner_zip.open("extension.yaml") as yaml_file:
                     data = yaml.safe_load(yaml_file.read())
-                    name = data.get("name")
-                    if not name:
+                    if not data.get("name"):
                         msg = f"Could not find 'name' in extension.yaml inside {zip_path}"
                         raise typer.BadParameter(msg)
-                    return name
+                    return ExtensionYaml.from_data(data)
 
 
 @hub_app.command(help="Publish the extension to the Dynatrace Hub")
 def publish(
     extension_path: Path = typer.Argument(Path("."), help="Path to the extension folder or built zip file"),
     changelog: Path = typer.Option(Path("CHANGELOG.md"), "--changelog", "-c", help="Path to the changelog file"),
+    auto_approve: bool = typer.Option(
+        False, "--auto-approve", help="Automatically approve the release after publishing"
+    ),
+    channel_id: str = typer.Option(
+        None, "--channel-id", help="Assign the release to a specific channel (requires --auto-approve)"
+    ),
 ):
     """
     Publishes the extension to the Dynatrace Hub
 
     :param extension_path: The path to the extension folder or built zip file
     :param changelog: The path to the changelog file (CHANGELOG.md by default)
+    :param auto_approve: Automatically approve the release after publishing
+    :param channel_id: Assign the release to a specific channel (requires --auto-approve)
     """
+    if channel_id and not auto_approve:
+        msg = "--channel-id requires --auto-approve to be set"
+        raise typer.BadParameter(msg)
+
     zip_file_path = extension_path
     if extension_path.is_dir():
         yaml_path = extension_path / "extension" / "extension.yaml"
         extension_yaml = ExtensionYaml(yaml_path)
-        extension_id = extension_yaml.name
         zip_file_path = extension_path / "dist" / extension_yaml.zip_file_name()
     else:
-        extension_id = _get_extension_id_from_zip(zip_file_path)
+        extension_yaml = _get_extension_yaml_from_zip(zip_file_path)
+
+    extension_id = extension_yaml.name
+    version = extension_yaml.version
 
     if not zip_file_path.exists():
         msg = f"Extension zip file not found: {zip_file_path}"
@@ -71,3 +84,11 @@ def publish(
     client = HubConsole()
     result = client.post_extension_release(extension_id, zip_file_path, changelog_path)
     console.print(f"Published extension {extension_id} to the Hub: {result}", style="bold green")
+
+    if auto_approve:
+        client.approve_release(extension_id, version)
+        console.print(f"Approved release {version}", style="bold green")
+
+        if channel_id:
+            client.assign_release_to_channel(extension_id, version, channel_id)
+            console.print(f"Assigned release {version} to channel {channel_id}", style="bold green")

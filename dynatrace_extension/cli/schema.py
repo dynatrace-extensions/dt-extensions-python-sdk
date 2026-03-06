@@ -11,6 +11,13 @@ class ExtensionYaml:
         self._file = yaml_file
         self._data = yaml.safe_load(yaml_file.read_text())
 
+    @classmethod
+    def from_data(cls, data: dict) -> ExtensionYaml:
+        instance = cls.__new__(cls)
+        instance._file = None  # type: ignore[assignment]
+        instance._data = data
+        return instance
+
     @property
     def name(self) -> str:
         return self._data.get("name", "")
