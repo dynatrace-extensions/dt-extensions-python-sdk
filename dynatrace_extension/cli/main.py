@@ -1,3 +1,4 @@
+import ast
 import os
 import shutil
 import stat
@@ -213,6 +214,38 @@ def _version_to_pip_version(version: str) -> str:
     return version.replace(".", "")
 
 
+def _get_windows_dependencies(extension_dir: Path) -> list[str]:
+    """Parse setup.py and return package names that are Windows-only (platform_system=='Windows')."""
+    setup_py = extension_dir / "setup.py"
+    if not setup_py.exists():
+        return []
+
+    tree = ast.parse(setup_py.read_text())
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        is_setup_call = (isinstance(func, ast.Name) and func.id == "setup") or (
+            isinstance(func, ast.Attribute) and func.attr == "setup"
+        )
+        if not is_setup_call:
+            continue
+        for keyword in node.keywords:
+            if keyword.arg != "install_requires":
+                continue
+            if not isinstance(keyword.value, ast.List):
+                continue
+            windows_deps = []
+            for elt in keyword.value.elts:
+                if not isinstance(elt, ast.Constant) or not isinstance(elt.value, str):
+                    continue
+                dep = elt.value
+                if "platform_system=='Windows'" in dep or 'platform_system=="Windows"' in dep:
+                    windows_deps.append(dep.split(";")[0].strip())
+            return windows_deps
+    return []
+
+
 @app.command(help="Downloads the dependencies of the extension to the lib folder")
 def wheel(
     extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
@@ -328,6 +361,33 @@ def wheel(
                 command.append(".")
 
                 run_process(command, cwd=extension_dir)
+
+    # Download Windows-specific dependencies (platform_system=='Windows' markers)
+    windows_deps = _get_windows_dependencies(extension_dir)
+    if windows_deps:
+        console.print(f"Found Windows-specific dependencies: {windows_deps}", style="cyan")
+        for version in python_versions:
+            pip_version = _version_to_pip_version(version)
+            console.print(f"Downloading Windows-specific wheels for Python {version} (win_amd64)", style="cyan")
+            command = [
+                sys.executable,
+                "-m",
+                "pip",
+                "download",
+                "-d",
+                relative_lib_folder_dir,
+                "--only-binary=:all:",
+                "--python-version",
+                pip_version,
+                "--platform",
+                "win_amd64",
+            ]
+            if extra_index_url:
+                command.extend(["--extra-index-url", extra_index_url])
+            if find_links:
+                command.extend(["--find-links", find_links])
+            command.extend(windows_deps)
+            run_process(command, cwd=extension_dir)
 
     console.print(f"Installed dependencies to {lib_folder}", style="bold green")
 
