@@ -55,8 +55,10 @@ class HubConsole:
             "client_id": self.client_id,
             "client_secret": self._client_secret,
             "grant_type": "client_credentials",
-            "scope": "hub-console:projects.releases:write",
         }
+        scope = os.getenv("HUB_CLIENT_SCOPE")
+        if scope:
+            params["scope"] = scope
         resp = requests.post(self.sso_url, data=params, headers=headers, timeout=30)
         resp.raise_for_status()
         data = resp.json()
