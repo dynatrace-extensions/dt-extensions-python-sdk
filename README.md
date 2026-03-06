@@ -3,7 +3,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/dt-extensions-sdk.svg)](https://pypi.org/project/dt-extensions-sdk)
 [![PyPI - Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.14-blue)](https://img.shields.io/badge/python-3.10%20%7C%203.14-blue)
 
------
+---
 
 **Table of Contents**
 
@@ -13,19 +13,18 @@
 
 ## Documentation
 
-The documentation can be found on [github pages](https://dynatrace-extensions.github.io/dt-extensions-python-sdk/) 
+The documentation can be found on [github pages](https://dynatrace-extensions.github.io/dt-extensions-python-sdk/)
 
 ## Quick Start
 
 ### Requirements:
 
-* Python 3.10 or 3.14
+- Python 3.10 or 3.14
 
 ### Install the SDK
 
 ```bash
-pip install dt-extensions-sdk[cli]
-# Note, on some shells like zsh you may need to escape the brackets - pip install dt-extensions-sdk\[cli\]
+pip install "dt-extensions-sdk[cli]"
 ```
 
 ### Create signing certificates
@@ -48,14 +47,13 @@ dt-sdk run
 ```
 
 ### Build
-    
+
 ```bash
 dt-sdk build
 ```
 
-
 ### Upload
-    
+
 ```bash
 # Note, you need to either set environment variables DT_API_URL and DT_API_TOKEN or pass them as arguments
 dt-sdk upload
@@ -91,8 +89,7 @@ hatch run docs:build
 
 `dt-extensions-sdk` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
 
-
 ## Publishing to PyPI
 
 It's automatically published to PyPi on each pushed tag, and uses [gh-action-pypi-publish](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/)
-Version will be determined using __about__.py
+Version will be determined using **about**.py

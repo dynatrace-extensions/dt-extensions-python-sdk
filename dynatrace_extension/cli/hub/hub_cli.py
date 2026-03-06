@@ -1,7 +1,10 @@
+import io
 import logging
+import zipfile
 from pathlib import Path
 
 import typer
+import yaml
 from rich.console import Console
 
 from ..schema import ExtensionYaml
@@ -10,6 +13,29 @@ from .hub_client import HubConsole
 hub_app = typer.Typer(help="Hub commands")
 console = Console()
 logger = logging.getLogger(__name__)
+
+
+def _get_extension_id_from_zip(zip_path: Path) -> str:
+    """Extract the extension name from a signed extension zip file.
+
+    The signed zip contains an inner zip, which in turn contains
+    ``extension.yaml`` with the extension metadata.
+    """
+    with zipfile.ZipFile(zip_path) as outer_zip:
+        inner_names = [n for n in outer_zip.namelist() if n.endswith(".zip")]
+        if not inner_names:
+            msg = f"No inner zip file found in {zip_path}"
+            raise typer.BadParameter(msg)
+
+        with outer_zip.open(inner_names[0]) as inner_file:
+            with zipfile.ZipFile(io.BytesIO(inner_file.read())) as inner_zip:
+                with inner_zip.open("extension.yaml") as yaml_file:
+                    data = yaml.safe_load(yaml_file.read())
+                    name = data.get("name")
+                    if not name:
+                        msg = f"Could not find 'name' in extension.yaml inside {zip_path}"
+                        raise typer.BadParameter(msg)
+                    return name
 
 
 @hub_app.command(help="Publish the extension to the Dynatrace Hub")
@@ -30,7 +56,7 @@ def publish(
         extension_id = extension_yaml.name
         zip_file_path = extension_path / "dist" / extension_yaml.zip_file_name()
     else:
-        extension_id = None
+        extension_id = _get_extension_id_from_zip(zip_file_path)
 
     if not zip_file_path.exists():
         msg = f"Extension zip file not found: {zip_file_path}"
@@ -41,10 +67,6 @@ def publish(
     if not changelog.exists():
         logger.warning("Changelog file not found at %s, publishing without release notes", changelog)
         changelog_path = None
-
-    if extension_id is None:
-        msg = "Could not determine extension ID. Provide a directory with extension.yaml."
-        raise typer.BadParameter(msg)
 
     client = HubConsole()
     result = client.post_extension_release(extension_id, zip_file_path, changelog_path)
