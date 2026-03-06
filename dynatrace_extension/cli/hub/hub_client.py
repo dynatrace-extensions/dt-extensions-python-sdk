@@ -55,7 +55,7 @@ class HubConsole:
             "client_id": self.client_id,
             "client_secret": self._client_secret,
             "grant_type": "client_credentials",
-            "scope": "hub-console:projects:read hub-console:projects.releases:read hub-console:projects.releases:write",
+            "scope": "hub-console:projects.releases:write",
         }
         resp = requests.post(self.sso_url, data=params, headers=headers, timeout=30)
         resp.raise_for_status()
@@ -78,14 +78,6 @@ class HubConsole:
             msg = f"{e}\nResponse body: {resp.text}"
             raise requests.exceptions.HTTPError(msg, response=resp) from e
         return resp
-
-    def get_extension(self, extension_id: str):
-        resp = self.make_request("GET", f"projects/extensions/{extension_id}")
-        return resp.json()
-
-    def get_extension_releases(self, extension_id: str):
-        resp = self.make_request("GET", f"projects/extensions/{extension_id}/releases")
-        return resp.json()
 
     def post_extension_release(self, extension_id: str, zip_file: Path, release_notes: Path | None = None) -> dict:
         files: list[tuple[str, tuple[str, Any, str]]] = [
