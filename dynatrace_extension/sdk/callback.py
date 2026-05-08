@@ -140,7 +140,9 @@ class WrappedCallback:
         This guarantees each execution gets a unique timestamp spaced exactly one
         interval apart, and is immune to OS scheduling jitter.
         """
-        return self.start_timestamp + timedelta(seconds=self.interval.total_seconds() * max(self.executions_total - 1, 0))
+        return self.start_timestamp + timedelta(
+            seconds=self.interval.total_seconds() * max(self.executions_total - 1, 0)
+        )
 
     def clear_sfm_metrics(self):
         self.ok_count = 0
