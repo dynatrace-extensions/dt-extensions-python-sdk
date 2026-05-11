@@ -28,7 +28,7 @@ Native dependencies
 | This means that your extension must be built on a machine that has the same version of python as the Activegate.
 |
 | Dynatrace extensions support **python 3.10** and **python 3.14**.
-| We plan to end support for **python 3.10** around October/2026.
+| We plan to `end support for python 3.10 soon`_, and suggest you migrate to **python 3.14**.
 |
 | When you build the extension with **dt-sdk build**, it downloads the dependencies **whl** files and places them in the lib folder of the extension.
 | To obtain whl files for different a operating system than what the build machine is, the SDK provides the **--extra-platform** flag.
@@ -137,3 +137,4 @@ Musl vs libc
 .. _charset-normalizer pypi page: https://pypi.org/project/charset-normalizer/#files
 .. _musl: https://musl.libc.org/
 .. _libc: https://en.wikipedia.org/wiki/C_standard_library
+.. _end support for python 3.10 soon: https://docs.dynatrace.com/docs/shortlink/python-extension-runtime-update
