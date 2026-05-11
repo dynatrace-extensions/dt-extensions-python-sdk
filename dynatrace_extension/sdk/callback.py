@@ -135,14 +135,14 @@ class WrappedCallback:
         In this scenario a metric is reported twice in the same minute
         This can also cause minutes where a metric is not reported at all, creating gaps
 
-        Here we calculate the metric timestamp based on the start timestamp of the callback
-        If the callback started in the last minute, we use the callback start timestamp
-        between 60 seconds and 120 seconds, we use the callback timestamp + 1 minute
-        between 120 seconds and 180 seconds, we use the callback timestamp + 2 minutes, and so forth
+        The metric timestamp is derived from the callback's start time and its exact
+        iteration count: start_timestamp + (executions_total - 1) * interval.
+        This guarantees each execution gets a unique timestamp spaced exactly one
+        interval apart, and is immune to OS scheduling jitter.
         """
-        now = self.get_current_time_with_cluster_diff()
-        minutes_since_start = int((now - self.start_timestamp).total_seconds() / 60)
-        return self.start_timestamp + timedelta(minutes=minutes_since_start)
+        return self.start_timestamp + timedelta(
+            seconds=self.interval.total_seconds() * max(self.executions_total - 1, 0)
+        )
 
     def clear_sfm_metrics(self):
         self.ok_count = 0
