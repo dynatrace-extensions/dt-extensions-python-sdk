@@ -165,6 +165,7 @@ class TestCallBack(unittest.TestCase):
         timestamps: list[datetime] = []
 
         with freeze_time(anchor) as frozen:
+
             def long_running_callback():
                 # T=10: first metric reported within the run
                 frozen.tick(timedelta(seconds=10))
