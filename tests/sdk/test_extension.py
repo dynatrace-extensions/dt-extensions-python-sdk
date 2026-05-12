@@ -975,3 +975,44 @@ def test_sfm_exception(mock_time):
         _verify_sfm_value(sfm, expected_values)
     finally:
         _teardown_extension()
+
+
+class TestGetTagsAndFieldsDimensions(unittest.TestCase):
+    def setUp(self):
+        self.extension = Extension()
+
+    def tearDown(self):
+        Extension._instance = None
+        Extension.schedule_decorators = []
+
+    def test_returns_merged_fields_and_tags(self):
+        endpoint = {
+            "name": "test",
+            "primaryFields": [{"key": "aws.account.id", "value": "aws_test"}],
+            "primaryTags": [{"key": "primary_tags.test_a", "value": "value_b"}],
+        }
+        result = self.extension.get_tags_and_fields_dimensions(endpoint)
+        assert result == {"aws.account.id": "aws_test", "primary_tags.test_a": "value_b"}
+
+    def test_returns_empty_dict_when_no_primary_fields_or_tags(self):
+        endpoint = {"name": "test", "login_url": "other"}
+        assert self.extension.get_tags_and_fields_dimensions(endpoint) == {}
+
+    def test_returns_empty_dict_for_empty_endpoint(self):
+        assert self.extension.get_tags_and_fields_dimensions({}) == {}
+
+    def test_get_fields_dimensions_only(self):
+        endpoint = {"primaryFields": [{"key": "aws.account.id", "value": "aws_test"}]}
+        assert self.extension.get_fields_dimensions(endpoint) == {"aws.account.id": "aws_test"}
+
+    def test_get_tags_dimensions_only(self):
+        endpoint = {"primaryTags": [{"key": "primary_tags.test_a", "value": "value_b"}]}
+        assert self.extension.get_tags_dimensions(endpoint) == {"primary_tags.test_a": "value_b"}
+
+    def test_entries_without_key_are_skipped(self):
+        endpoint = {"primaryFields": [{"value": "no_key_here"}, {"key": "valid.key", "value": "v"}]}
+        assert self.extension.get_fields_dimensions(endpoint) == {"valid.key": "v"}
+
+    def test_null_lists_treated_as_empty(self):
+        endpoint = {"primaryFields": None, "primaryTags": None}
+        assert self.extension.get_tags_and_fields_dimensions(endpoint) == {}
