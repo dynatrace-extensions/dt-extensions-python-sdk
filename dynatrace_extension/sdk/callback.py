@@ -56,8 +56,6 @@ class WrappedCallback:
 
     def __call__(self):
         self.logger.debug(f"Running scheduled callback {self}")
-        if self.executions_total == 0:
-            self.start_timestamp = self.get_current_time_with_cluster_diff()
         self.running = True
         self.executions_total += 1
         self.executions_per_interval += 1
@@ -135,13 +133,16 @@ class WrappedCallback:
         In this scenario a metric is reported twice in the same minute
         This can also cause minutes where a metric is not reported at all, creating gaps
 
-        The metric timestamp is derived from the callback's start time and its exact
-        iteration count: start_timestamp + (executions_total - 1) * interval.
-        This guarantees each execution gets a unique timestamp spaced exactly one
-        interval apart, and is immune to OS scheduling jitter.
+        The metric timestamp is derived from the callback's start time and the
+        scheduler tick index: start_timestamp + (iterations - 1) * interval.
+
+        We use `iterations` (incremented by the scheduler on every tick) rather
+        than `executions_total` (incremented only when the callback actually
+        runs), so that timestamps stay aligned to wall-clock time even when a
+        tick is skipped because the previous run exceeded the interval.
         """
         return self.start_timestamp + timedelta(
-            seconds=self.interval.total_seconds() * max(self.executions_total - 1, 0)
+            seconds=self.interval.total_seconds() * max(self.iterations - 1, 0)
         )
 
     def clear_sfm_metrics(self):

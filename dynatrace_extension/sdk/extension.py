@@ -870,8 +870,13 @@ class Extension:
                 self._running_callbacks.pop(current_thread_id, None)
 
     def _callback_iteration(self, callback: WrappedCallback):
-        self._callbacks_executor.submit(self._run_callback, callback)
+        if callback.iterations == 0:
+            # Anchor the timestamp clock at the first tick (not at first execution),
+            # so reported metric timestamps stay aligned to scheduler ticks even when
+            # the executor is briefly backlogged at startup.
+            callback.start_timestamp = callback.get_current_time_with_cluster_diff()
         callback.iterations += 1
+        self._callbacks_executor.submit(self._run_callback, callback)
         next_timestamp = callback.get_next_execution_timestamp()
         self._scheduler.enterabs(next_timestamp, 1, self._callback_iteration, (callback,))
 
