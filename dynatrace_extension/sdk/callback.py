@@ -141,9 +141,7 @@ class WrappedCallback:
         runs), so that timestamps stay aligned to wall-clock time even when a
         tick is skipped because the previous run exceeded the interval.
         """
-        return self.start_timestamp + timedelta(
-            seconds=self.interval.total_seconds() * max(self.iterations - 1, 0)
-        )
+        return self.start_timestamp + timedelta(seconds=self.interval.total_seconds() * max(self.iterations - 1, 0))
 
     def clear_sfm_metrics(self):
         self.ok_count = 0
