@@ -39,19 +39,19 @@ class TestCallBack(unittest.TestCase):
         cb = WrappedCallback(timedelta(minutes=1), callback, MagicMock(), running_in_sim=True)
         cb.start_timestamp = datetime(2020, 1, 1, 0, 0, 0)
 
-        # In production, the scheduler increments `iterations` on every tick before
-        # the callback runs. We set it manually here to simulate that state at the
-        # time get_adjusted_metric_timestamp() is called.
-        # 1st tick: metric timestamp should match the callback start timestamp
-        cb.iterations = 1
+        # In production, __call__ snapshots `iterations` into `current_iteration`
+        # at the start of each execution. We set it manually here to simulate
+        # that state at the time get_adjusted_metric_timestamp() is called.
+        # 1st execution: metric timestamp should match the callback start timestamp
+        cb.current_iteration = 1
         self.assertEqual(cb.get_adjusted_metric_timestamp(), datetime(2020, 1, 1, 0, 0, 0))
 
-        # 2nd tick: metric timestamp should be start + 1 interval
-        cb.iterations = 2
+        # 2nd execution: metric timestamp should be start + 1 interval
+        cb.current_iteration = 2
         self.assertEqual(cb.get_adjusted_metric_timestamp(), datetime(2020, 1, 1, 0, 1, 0))
 
-        # 5th tick: metric timestamp should be start + 4 intervals
-        cb.iterations = 5
+        # 5th execution: metric timestamp should be start + 4 intervals
+        cb.current_iteration = 5
         self.assertEqual(cb.get_adjusted_metric_timestamp(), datetime(2020, 1, 1, 0, 4, 0))
 
     def test_metric_timestamp_does_not_drift_when_execution_exceeds_interval(self):

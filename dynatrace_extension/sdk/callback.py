@@ -49,6 +49,7 @@ class WrappedCallback:
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
         self.iterations = 0  # how many times we ran the callback iterator for this callback
+        self.current_iteration = 0  # snapshot of `iterations` taken at the start of each execution
         self.offset_seconds = offset_seconds or self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
@@ -59,6 +60,10 @@ class WrappedCallback:
         self.running = True
         self.executions_total += 1
         self.executions_per_interval += 1
+        # Snapshot the scheduler tick index so all metrics emitted during this
+        # execution share one timestamp bucket, even if the next scheduler tick
+        # fires while we are still running.
+        self.current_iteration = self.iterations
         start_time = timer()
         failed = False
         try:
@@ -134,14 +139,17 @@ class WrappedCallback:
         This can also cause minutes where a metric is not reported at all, creating gaps
 
         The metric timestamp is derived from the callback's start time and the
-        scheduler tick index: start_timestamp + (iterations - 1) * interval.
+        scheduler tick index snapshotted at the start of this execution:
+        start_timestamp + (current_iteration - 1) * interval.
 
-        We use `iterations` (incremented by the scheduler on every tick) rather
-        than `executions_total` (incremented only when the callback actually
-        runs), so that timestamps stay aligned to wall-clock time even when a
-        tick is skipped because the previous run exceeded the interval.
+        We use the snapshot (taken in __call__) rather than the live `iterations`
+        counter so that all metrics emitted during one execution share one
+        timestamp bucket, even if the scheduler fires the next tick (bumping
+        `iterations`) while this run is still in progress.
         """
-        return self.start_timestamp + timedelta(seconds=self.interval.total_seconds() * max(self.iterations - 1, 0))
+        return self.start_timestamp + timedelta(
+            seconds=self.interval.total_seconds() * max(self.current_iteration - 1, 0)
+        )
 
     def clear_sfm_metrics(self):
         self.ok_count = 0
