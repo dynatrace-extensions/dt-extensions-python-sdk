@@ -141,6 +141,61 @@ class TestCallBack(unittest.TestCase):
             self.assertEqual(cb.get_adjusted_metric_timestamp(), anchor + timedelta(seconds=60))
             self.assertEqual(cb.start_timestamp, anchor)
 
+    def test_metric_timestamps_within_one_execution_must_share_bucket(self):
+        """
+        Regression test:
+
+        All metrics reported from a single callback invocation must share one
+        timestamp (one "bucket" per run). Otherwise, when a long-running
+        callback spans a scheduler tick boundary, two metrics emitted within
+        the same `__call__` invocation get different timestamps — one before
+        the tick fires and one after — even though they belong to the same
+        logical execution.
+
+        Simulated sequence with interval=60s, callback runtime=70s:
+          T=0  : scheduler fires tick 1 → iterations=1, callback starts
+          T=10 : callback reports metric A
+          T=60 : scheduler fires tick 2 mid-execution → iterations=2 (run is skipped)
+          T=65 : same callback execution reports metric B
+          T=70 : callback finishes
+        """
+        interval = timedelta(minutes=1)
+        anchor = datetime(2026, 1, 1, 12, 0, 0)
+
+        timestamps: list[datetime] = []
+
+        with freeze_time(anchor) as frozen:
+            def long_running_callback():
+                # T=10: first metric reported within the run
+                frozen.tick(timedelta(seconds=10))
+                timestamps.append(cb.get_adjusted_metric_timestamp())
+
+                # T=60: scheduler fires the next tick mid-execution.
+                # extension._callback_iteration increments `iterations` even
+                # though _run_callback will skip the submission (running=True).
+                frozen.tick(timedelta(seconds=50))
+                cb.iterations += 1
+
+                # T=65: second metric reported within the SAME run
+                frozen.tick(timedelta(seconds=5))
+                timestamps.append(cb.get_adjusted_metric_timestamp())
+
+            cb = WrappedCallback(interval, long_running_callback, MagicMock(), running_in_sim=True)
+            cb.start_timestamp = anchor
+
+            # Scheduler tick 1: anchor + iterations bump, then run.
+            cb.iterations += 1
+            cb()
+
+        # Both metrics were emitted within run #1; they should share one bucket.
+        self.assertEqual(
+            timestamps[0],
+            timestamps[1],
+            f"Metrics from a single execution got different timestamps: "
+            f"A={timestamps[0]}, B={timestamps[1]}, "
+            f"jump = {(timestamps[1] - timestamps[0]).total_seconds()}s",
+        )
+
     def test_metric_timestamp_synchronization_with_cluster_time(self):
         def callback():
             pass
