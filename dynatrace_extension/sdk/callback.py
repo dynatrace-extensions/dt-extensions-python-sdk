@@ -36,7 +36,7 @@ class WrappedCallback:
         self.logger = logger
         self.running: bool = False
         self.status = Status(StatusValue.OK)
-        self.executions_total = 0  # global counter
+        self.executions_total = 0  # global counter, counts actual callback executions
         self.executions_per_interval = 0  # counter per interval = 1 min by default
         self.duration = 0  # global counter
         self.duration_interval_total = 0  # counter per interval = 1 min by default
@@ -49,7 +49,7 @@ class WrappedCallback:
         self.timeouts_count = 0  # counter per interval = 1 min by default
         self.exception_count = 0  # counter per interval = 1 min by default
         self.iterations = 0  # how many times we ran the callback iterator for this callback
-        self.current_iteration = 0  # snapshot of `iterations` taken at the start of each execution
+        self.scheduled_iteration_snapshot = 0  # snapshot of `iterations` taken at the start of each execution
         self.offset_seconds = offset_seconds or self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
@@ -63,7 +63,7 @@ class WrappedCallback:
         # Snapshot the scheduler tick index so all metrics emitted during this
         # execution share one timestamp bucket, even if the next scheduler tick
         # fires while we are still running.
-        self.current_iteration = self.iterations
+        self.scheduled_iteration_snapshot = self.iterations
         start_time = timer()
         failed = False
         try:
@@ -140,7 +140,7 @@ class WrappedCallback:
 
         The metric timestamp is derived from the callback's start time and the
         scheduler tick index snapshotted at the start of this execution:
-        start_timestamp + (current_iteration - 1) * interval.
+        start_timestamp + (scheduled_iteration_snapshot - 1) * interval.
 
         We use the snapshot (taken in __call__) rather than the live `iterations`
         counter so that all metrics emitted during one execution share one
@@ -148,7 +148,7 @@ class WrappedCallback:
         `iterations`) while this run is still in progress.
         """
         return self.start_timestamp + timedelta(
-            seconds=self.interval.total_seconds() * max(self.current_iteration - 1, 0)
+            seconds=self.interval.total_seconds() * max(self.scheduled_iteration_snapshot - 1, 0)
         )
 
     def clear_sfm_metrics(self):
