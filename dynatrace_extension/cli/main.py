@@ -130,6 +130,11 @@ def build(
         "-p",
         help=f"Python versions to download wheels for. Supported: {', '.join(SUPPORTED_PYTHON_VERSIONS)}",
     ),
+    no_index: bool = typer.Option(
+        False,
+        "--no-index",
+        help="Pass --no-index to pip, ignoring the package index (only --find-links sources will be used)",
+    ),
 ):
     """
     Builds and signs an extension using the developer fused key-certificate
@@ -144,6 +149,7 @@ def build(
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
     :param python_versions: Python versions to download wheels for, defaults to ['3.10']
+    :param no_index: If true, pass --no-index to pip so only --find-links sources are used
     """
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
@@ -152,7 +158,7 @@ def build(
         target_directory.mkdir()
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_versions)
+    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_versions, no_index)
 
     console.print("Stage 2 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
@@ -270,6 +276,11 @@ def wheel(
         "-p",
         help=f"Python versions to download wheels for. Supported: {', '.join(SUPPORTED_PYTHON_VERSIONS)}",
     ),
+    no_index: bool = typer.Option(
+        False,
+        "--no-index",
+        help="Pass --no-index to pip, ignoring the package index (only --find-links sources will be used)",
+    ),
 ):
     """
     Builds the extension and it's dependencies into wheel files
@@ -281,12 +292,15 @@ def wheel(
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
     :param python_versions: Python versions to download wheels for, defaults to ['3.10']
+    :param no_index: If true, pass --no-index to pip so only --find-links sources are used
     """
     # Handle OptionInfo objects when called directly (not via CLI)
     if python_versions is None or isinstance(python_versions, typer.models.OptionInfo):
         python_versions = ["3.10"]
     if only_extra_platforms is None or isinstance(only_extra_platforms, typer.models.OptionInfo):
         only_extra_platforms = False
+    if no_index is None or isinstance(no_index, typer.models.OptionInfo):
+        no_index = False
 
     # Validate python versions
     for version in python_versions:
@@ -309,6 +323,8 @@ def wheel(
         command.extend(["--extra-index-url", extra_index_url])
     if find_links is not None:
         command.extend(["--find-links", find_links])
+    if no_index:
+        command.append("--no-index")
     command.append(".")
     run_process(command, cwd=extension_dir)
 
@@ -332,6 +348,8 @@ def wheel(
                 command.extend(["--extra-index-url", extra_index_url])
             if find_links:
                 command.extend(["--find-links", find_links])
+            if no_index:
+                command.append("--no-index")
             command.append(".")
             run_process(command, cwd=extension_dir)
 
@@ -358,6 +376,8 @@ def wheel(
                     command.extend(["--extra-index-url", extra_index_url])
                 if find_links:
                     command.extend(["--find-links", find_links])
+                if no_index:
+                    command.append("--no-index")
                 command.append(".")
 
                 run_process(command, cwd=extension_dir)
@@ -386,6 +406,8 @@ def wheel(
                 command.extend(["--extra-index-url", extra_index_url])
             if find_links:
                 command.extend(["--find-links", find_links])
+            if no_index:
+                command.append("--no-index")
             command.extend(windows_deps)
             run_process(command, cwd=extension_dir)
 

@@ -870,8 +870,13 @@ class Extension:
                 self._running_callbacks.pop(current_thread_id, None)
 
     def _callback_iteration(self, callback: WrappedCallback):
-        self._callbacks_executor.submit(self._run_callback, callback)
+        if callback.iterations == 0:
+            # Anchor the timestamp clock at the first tick (not at first execution),
+            # so reported metric timestamps stay aligned to scheduler ticks even when
+            # the executor is briefly backlogged at startup.
+            callback.start_timestamp = callback.get_current_time_with_cluster_diff()
         callback.iterations += 1
+        self._callbacks_executor.submit(self._run_callback, callback)
         next_timestamp = callback.get_next_execution_timestamp()
         self._scheduler.enterabs(next_timestamp, 1, self._callback_iteration, (callback,))
 
@@ -1183,6 +1188,30 @@ class Extension:
     def get_version(self) -> str:
         """Return the extension version."""
         return self.activation_config.version
+
+    def get_fields_dimensions(self, endpoint: dict) -> dict:
+        """Parse primaryFields from an endpoint dict into a dimensions dictionary.
+
+        Returns:
+            Dictionary mapping each field's 'key' to its 'value', or empty dict if absent.
+        """
+        return {e["key"]: e.get("value") for e in endpoint.get("primaryFields") or [] if "key" in e}
+
+    def get_tags_dimensions(self, endpoint: dict) -> dict:
+        """Parse primaryTags from an endpoint dict into a dimensions dictionary.
+
+        Returns:
+            Dictionary mapping each tag's 'key' to its 'value', or empty dict if absent.
+        """
+        return {e["key"]: e.get("value") for e in endpoint.get("primaryTags") or [] if "key" in e}
+
+    def get_tags_and_fields_dimensions(self, endpoint: dict) -> dict:
+        """Parse primaryFields and primaryTags from an endpoint dict into a merged dimensions dictionary.
+
+        Returns:
+            Merged dictionary from primaryFields and primaryTags entries.
+        """
+        return {**self.get_fields_dimensions(endpoint), **self.get_tags_dimensions(endpoint)}
 
     @property
     def techrule(self) -> str:
