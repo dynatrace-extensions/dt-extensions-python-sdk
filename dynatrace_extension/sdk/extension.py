@@ -426,13 +426,20 @@ class Extension:
         """
         return IgnoreStatus()
 
-    def initialize(self):
+    def initialize(self) -> "Status | None":
         """Callback to be executed when the extension starts.
 
         Called once after the extension starts and the processes arguments are parsed.
         Sometimes there are tasks the user needs to do that must happen before runtime,
         but after the activation config has been received, example: Setting the schedule frequency
-        based on the user input on the monitoring configuration, this can be done on this method
+        based on the user input on the monitoring configuration, this can be done on this method.
+
+        Returns:
+            None or Status(StatusValue.OK) to indicate successful initialization.
+            A Status with any error StatusValue to abort startup — the status is sent to
+            EEC immediately and the extension process exits. During fastcheck the return
+            value is available to the caller of initialize() and should be forwarded as
+            the fastcheck result.
         """
         pass
 
@@ -814,9 +821,10 @@ class Extension:
         self.extension_version = self.activation_config.version
 
         if not self._is_fastcheck:
+            init_status = None
             try:
                 self._heartbeat_iteration()
-                self.initialize()
+                init_status = self.initialize()
                 if not self.is_helper:
                     self.schedule(self.query, timedelta(minutes=1))
             except Exception as e:
@@ -825,6 +833,12 @@ class Extension:
                 self._client.send_status(Status(StatusValue.GENERIC_ERROR, msg))
                 self._initialization_error = msg
                 raise e
+            if isinstance(init_status, Status) and init_status.is_error():
+                api_logger.error(f"self.initialize returned error status for {self}: {init_status}")
+                self._client.send_status(init_status)
+                self._initialization_error = init_status.message
+                msg = f"initialize() returned error status: {init_status.message}"
+                raise RuntimeError(msg)
 
     @property
     def _metadata(self) -> dict:

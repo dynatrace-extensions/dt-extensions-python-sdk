@@ -486,6 +486,41 @@ class TestExtension(unittest.TestCase):
         with pytest.raises(AttributeError):
             MyExtension()
 
+    def test_initialize_returning_error_status_aborts_startup(self):
+        class MyExtension(Extension):
+            def initialize(self):
+                return Status(StatusValue.DEVICE_CONNECTION_ERROR, "cannot reach host")
+
+        with pytest.raises(RuntimeError, match="initialize\\(\\) returned error status"):
+            MyExtension()
+
+    def test_initialize_returning_error_status_sends_status_to_eec(self):
+        class MyExtension(Extension):
+            def initialize(self):
+                return Status(StatusValue.INVALID_CONFIG_ERROR, "bad config")
+
+        sent: list[Status] = []
+        with patch("dynatrace_extension.sdk.communication.DebugClient.send_status", side_effect=sent.append):
+            with pytest.raises(RuntimeError):
+                MyExtension()
+        assert any(s.status == StatusValue.INVALID_CONFIG_ERROR and "bad config" in s.message for s in sent)
+
+    def test_initialize_returning_none_starts_normally(self):
+        class MyExtension(Extension):
+            def initialize(self):
+                return None
+
+        ext = MyExtension()
+        assert ext._initialization_error == ""
+
+    def test_initialize_returning_ok_status_starts_normally(self):
+        class MyExtension(Extension):
+            def initialize(self):
+                return Status(StatusValue.OK)
+
+        ext = MyExtension()
+        assert ext._initialization_error == ""
+
     def test_report_mint_and_log_sending_failure(self):
         extension = get_helper_extension()
         extension.extension_logger = MagicMock()
