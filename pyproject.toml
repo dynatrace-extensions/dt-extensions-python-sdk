@@ -166,6 +166,8 @@ ignore = [
     "TID252",
     # Allow datetime.now without tz
     "DTZ005", "DTZ001",
+    # Too many arguments
+    "PLR0917"
 
 ]
 unfixable = [
