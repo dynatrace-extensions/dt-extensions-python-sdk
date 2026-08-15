@@ -144,7 +144,12 @@ class Snapshot:
         """Returns a process snapshot object like EF1.0 used to do"""
 
         if snapshot_file is None:
-            snapshot_file = find_log_dir() / "plugin" / "oneagent_latest_snapshot.log"
+            try:
+                # Newer OneAgent versions store the snapshot in the extensions runtime directory
+                snapshot_file = find_extensions_snapshot_file()
+            except Exception:
+                # Fall back to the legacy location inside the log directory
+                snapshot_file = find_log_dir() / "plugin" / "oneagent_latest_snapshot.log"
 
         with open(snapshot_file) as f:
             snapshot_json = json.load(f)
@@ -184,6 +189,22 @@ def find_config_directory() -> Path:
 
     msg = "Could not find the OneAgent config directory"
     raise Exception(msg)
+
+
+def find_extensions_snapshot_file() -> Path:
+    """
+    Attempt to find the snapshot file in the extensions runtime directory.
+    Newer OneAgent versions store it at:
+        <agent>/runtime/extensions/oneagent_latest_snapshot.log
+    Returns: the Path to the snapshot file
+    """
+    # find_config_directory returns <agent>/config, so the agent dir is its parent
+    agent_dir = find_config_directory().parent
+    snapshot_file = agent_dir / "runtime" / "extensions" / "oneagent_latest_snapshot.log"
+    if not snapshot_file.exists():
+        msg = f"Could not find snapshot file at {snapshot_file}"
+        raise Exception(msg)
+    return snapshot_file
 
 
 def find_log_dir() -> Path:
