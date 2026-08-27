@@ -24,4 +24,5 @@ from .sdk.helper import (
     schedule_function,
 )
 from .sdk.metric import Metric, MetricType, SummaryStat
+from .sdk.smartscape_id import smartscape_id
 from .sdk.status import EndpointStatus, EndpointStatuses, IgnoreStatus, MultiStatus, Status, StatusValue

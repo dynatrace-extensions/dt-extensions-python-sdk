@@ -9,7 +9,7 @@ import sys
 import threading
 import time
 from argparse import ArgumentParser
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -24,6 +24,7 @@ from .communication import CommunicationClient, DebugClient, HttpClient
 from .event import Severity
 from .metric import Metric, MetricType, SfmMetric, SummaryStat
 from .runtime import RuntimeProperties
+from .smartscape_id import smartscape_id
 from .snapshot import Snapshot
 from .status import EndpointStatuses, EndpointStatusesMap, IgnoreStatus, Status, StatusValue
 from .throttled_logger import StrictThrottledHandler, ThrottledHandler
@@ -1226,6 +1227,27 @@ class Extension:
             Merged dictionary from primaryFields and primaryTags entries.
         """
         return {**self.get_fields_dimensions(endpoint), **self.get_tags_dimensions(endpoint)}
+
+    def get_smartscape_id(self, node_type: str, id_components: Mapping[str, str]) -> str:
+        """Compute the full Smartscape entity ID (``TYPE-<16 hex>``) for a node.
+
+        Args:
+            node_type: The node type string (i.e., ``HOST``, ``EXT_NETWORK_DEVICE``).
+            id_components: Ordered ``slot name -> value`` id components; the mapping
+                order must match the rule's predefined component order.
+
+        Example:
+
+            ``self.get_smartscape_id("TYPE", {"key1": "A", "key2": "B"})``  -> ``TYPE-8B775215A352336E``
+
+        Note:
+            A ``dict`` (insertion-ordered) is the natural carrier for those pairs; the order
+            you insert them in is the order they are hashed, so it is significant.
+
+        Returns:
+            The Smartscape entity ID as rendered in the tenant.
+        """
+        return smartscape_id(node_type, id_components)
 
     @property
     def techrule(self) -> str:
