@@ -205,4 +205,6 @@ class TestCallBack(unittest.TestCase):
         callback.cluster_time_diff = 10000
         callback.start_timestamp = callback.get_current_time_with_cluster_diff()
 
-        self.assertGreater(callback.get_adjusted_metric_timestamp(), datetime.now(timezone.utc) + timedelta(milliseconds=9000))
+        self.assertGreater(
+            callback.get_adjusted_metric_timestamp(), datetime.now(timezone.utc) + timedelta(milliseconds=9000)
+        )
