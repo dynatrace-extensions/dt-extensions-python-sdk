@@ -298,5 +298,6 @@ Documentation
    api/extension
    api/events/index
    api/metrics/index
+   api/smartscape_id
 
 .. _certificates: https://docs.dynatrace.com/docs/extend-dynatrace/extensions20/sign-extension
