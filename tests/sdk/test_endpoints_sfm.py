@@ -1,6 +1,6 @@
 import time as _real_time
 import unittest
-from datetime import datetime, time, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 from freezegun import freeze_time
