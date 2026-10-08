@@ -1,5 +1,5 @@
-from pathlib import Path
 import stat
+from pathlib import Path
 
 #Extension file system related constants
 DIST_DIR = "dist"

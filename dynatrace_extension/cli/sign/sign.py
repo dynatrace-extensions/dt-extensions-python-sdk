@@ -1,17 +1,15 @@
 import datetime
-import os
-import typer
+from pathlib import Path
 
-from asn1crypto import cms, util, x509, core, pem
+import typer
+from asn1crypto import cms, core, pem, util, x509
 from cryptography import x509 as crypto_x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, utils
-from pathlib import Path
 from rich.console import Console
 
-from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PRIVATE_KEY_PERMISSIONS 
-from ..utils import _generate_x509_name
+from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PRIVATE_KEY_PERMISSIONS
 
 CHUNK_SIZE = 1024 * 1024
 
@@ -38,7 +36,7 @@ def generate_ca(console: Console, cert_dir: Path, subject: crypto_x509.Name, not
     builder = crypto_x509.CertificateBuilder()
     builder = builder.subject_name(subject)
     builder = builder.issuer_name(subject)
-    builder = builder.not_valid_before(datetime.datetime.today() - datetime.timedelta(days=1))
+    builder = builder.not_valid_before(datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1))
     builder = builder.not_valid_after(not_valid_after)
     builder = builder.serial_number(crypto_x509.random_serial_number())
     builder = builder.public_key(public_key)
@@ -120,7 +118,7 @@ def generate_dev_cert(
     builder = crypto_x509.CertificateBuilder()
     builder = builder.subject_name(subject)
     builder = builder.issuer_name(ca_cert.issuer)
-    builder = builder.not_valid_before(datetime.datetime.today() - datetime.timedelta(days=1))
+    builder = builder.not_valid_before(datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1))
     builder = builder.not_valid_after(not_valid_after)
     builder = builder.serial_number(crypto_x509.random_serial_number())
     builder = builder.public_key(public_key)
@@ -182,11 +180,11 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
         password=dev_passphrase.encode() if dev_passphrase else None,
         backend=default_backend()
     )
-    
+
     sha256 = hashes.SHA256()
     hasher = hashes.Hash(sha256)
-    
-    with file_path.open('rb') as fp:
+
+    with file_path.open("rb") as fp:
         while buf := fp.read(CHUNK_SIZE):
             hasher.update(buf)
 
@@ -204,7 +202,7 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
 
     der_bytes = certificate_file_path.read_bytes()
     if pem.detect(der_bytes):
-        type_name, headers, der_bytes = pem.unarmor(der_bytes)
+        _type_name, _headers, der_bytes = pem.unarmor(der_bytes)
     else:
         console.print("Wrong certificate format, expected PEM, aborting!", style="bold red")
         raise typer.Exit(1)
@@ -228,12 +226,12 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
         )
     except ValueError as e:
         # Error returned by asn1crypto if the fused cert/key has key before cert
-        if "Error parsing asn1crypto.x509.TbsCertificate - method should have been constructed," \
-           " but primitive was found" in e.args[0]:
+        if ("Error parsing asn1crypto.x509.TbsCertificate - method should have been constructed,"
+           " but primitive was found") in e.args[0]:
 
-            console.print("Error: Malformed fused certkey, certificate should be first;"
-                  " please regenerate the certificate or reorder manually", style="bold red")
-            raise typer.Exit(1)
+            console.print(("Error: Malformed fused certkey, certificate should be first;"
+                           " please regenerate the certificate or reorder manually"), style="bold red")
+            raise typer.Exit(1) from None
         else:
             raise
 

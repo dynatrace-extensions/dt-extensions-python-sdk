@@ -1,25 +1,18 @@
 import os
 import shutil
-import stat
 import subprocess
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import typer
 from dtcli.server_api import upload as dt_cli_upload  # type: ignore
 from dtcli.server_api import validate as dt_cli_validate
-from datetime import datetime, timedelta
 from rich.console import Console
 
 from ..__about__ import __version__
 from .assemble import assemble_extension
 from .building import build_signed_bundle
-from .create import generate_extension, is_pep8_compliant
-from .hub.hub_cli import hub_app
-from .schema import ExtensionYaml
-from .sign import generate_ca, generate_dev_cert, sign_file
-from .utils import _version_to_pip_version, _get_windows_dependencies, _generate_x509_name, _parse_x509_subject
-
 from .constants import (
     CA_KEY,
     CA_PEM,
@@ -33,8 +26,13 @@ from .constants import (
     EXTENSION_DIR,
     EXTENSION_YAML,
     EXTENSION_ZIP,
-    SUPPORTED_PYTHON_VERSIONS
+    SUPPORTED_PYTHON_VERSIONS,
 )
+from .create import generate_extension, is_pep8_compliant
+from .hub.hub_cli import hub_app
+from .schema import ExtensionYaml
+from .sign import generate_ca, generate_dev_cert, sign_file
+from .utils import _generate_x509_name, _get_windows_dependencies, _parse_x509_subject, _version_to_pip_version
 
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 version_app = typer.Typer(help="Version commands", invoke_without_command=True)
@@ -222,7 +220,7 @@ def assemble(
         output = output / EXTENSION_ZIP
 
     if output.exists and not force:
-        console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", 
+        console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.",
                       style="bold red")
         raise typer.Exit(1)
 
@@ -503,7 +501,7 @@ def gencerts(
     :params days_valid: The Certificate validity period in days
     :params force: Force overwriting the certificates
     """
-    
+
     ca_sub = _generate_x509_name(_parse_x509_subject(ca_subject))
     dev_sub = _generate_x509_name(_parse_x509_subject(dev_subject))
 
@@ -520,13 +518,13 @@ def gencerts(
                 console.print(f"Attempting to remove existing CA certificate {ca_pem} to prepare for new ca certificate file.", style="yellow")
                 ca_pem.unlink(missing_ok=True)
             if developer_pem.exists():
-                console.print(f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.", style="yellow")
+                console.print(f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.",
+                              style="yellow")
                 developer_pem.unlink(missing_ok=True)
-        else:
-            if ca_key.exists() or ca_pem.exists() or developer_pem.exists():
-                console.print("Certificates were NOT generated! The CA certificate, CA key, or Developer " \
-                "certificate already exist. Use --force option to overwrite the certificates", style="bold red")
-                raise typer.Exit(1)
+        elif ca_key.exists() or ca_pem.exists() or developer_pem.exists():
+            console.print(("Certificates were NOT generated! The CA certificate, CA key, or Developer "
+            "certificate already exist. Use --force option to overwrite the certificates"), style="bold red")
+            raise typer.Exit(1)
     else:
         output.mkdir(parents=True)
 

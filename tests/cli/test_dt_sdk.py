@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import NonCallableMock, call, mock_open, patch
+from unittest.mock import mock_open, patch
 
 import dynatrace_extension.cli.main as dt_sdk
 

@@ -1,10 +1,10 @@
 import ast
 import re
-import typer
+from pathlib import Path
 
+import typer
 from cryptography import x509
 from cryptography.x509.oid import NameOID
-from pathlib import Path
 from rich.console import Console
 
 X509NameAttributes = {
@@ -19,7 +19,7 @@ X509NameAttributes = {
 def _generate_x509_name(attributes: dict) -> x509.Name:
     names_attributes = []
     for name, oid in X509NameAttributes.items():
-        if name in attributes and attributes[name]:
+        if attributes.get(name):
             names_attributes.append(x509.NameAttribute(oid, attributes[name]))
 
     return x509.Name(names_attributes)
@@ -42,9 +42,9 @@ def _parse_x509_subject(subject: str) -> dict[str, str]:
         if key == "ST":
             key = "S"
         if not sep or key not in X509NameAttributes:
-            raise typer.BadParameter(
-                f"Invalid subject component '{part}'. Expected /key=value with key in {', '.join(X509NameAttributes)}."
-            )
+            msg = ("Invalid subject component '{part}'. Expected /key=value with key in"
+            f"{', '.join(X509NameAttributes)}.")
+            raise typer.BadParameter(msg)
         attributes[key] = value.strip().replace("\\/", "/")
     return attributes
 
