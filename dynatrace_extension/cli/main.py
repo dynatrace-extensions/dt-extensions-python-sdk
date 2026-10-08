@@ -220,14 +220,14 @@ def assemble(
         output = output / EXTENSION_ZIP
 
     if output.exists and not force:
-        console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.",
-                      style="bold red")
+        console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", style="bold red")
         raise typer.Exit(1)
 
-    assemble_extension(console, extension_dir/EXTENSION_DIR, output)
+    assemble_extension(console, extension_dir / EXTENSION_DIR, output)
 
     console.print(f"Built the extension zip file to {output}", style="bold green")
     return output
+
 
 @app.command(help="Downloads the dependencies of the extension to the lib folder")
 def wheel(
@@ -484,11 +484,19 @@ def upload(
         console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
 
 
-@app.command(help="Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate")
+@app.command(
+    help="Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate"
+)
 def gencerts(
     output: Path = typer.Option(CERTIFICATE_DEFAULT_PATH, "--output", "-o", help="Path to the output directory"),
-    ca_subject: str = typer.Option(DEFAULT_CA_SUBJECT, "--ca_subject", help="Subject of the CA certificate in /key0=value0/key1=value1 format"),
-    dev_subject: str = typer.Option(DEFAULT_DEV_SUBJECT, "--dev_subject", help="Subject of the developer certificate in /key0=value0/key1=value1 format"),
+    ca_subject: str = typer.Option(
+        DEFAULT_CA_SUBJECT, "--ca_subject", help="Subject of the CA certificate in /key0=value0/key1=value1 format"
+    ),
+    dev_subject: str = typer.Option(
+        DEFAULT_DEV_SUBJECT,
+        "--dev_subject",
+        help="Subject of the developer certificate in /key0=value0/key1=value1 format",
+    ),
     days_valid: int = typer.Option(DEFAULT_VALIDITY_PERIOD, "--days_valid", help="Certificate validity period in days"),
     force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the certificates"),
 ):
@@ -506,24 +514,36 @@ def gencerts(
     dev_sub = _generate_x509_name(_parse_x509_subject(dev_subject))
 
     if output.exists():
-        developer_pem = output/DEV_PEM
-        ca_key = output/CA_KEY
-        ca_pem = output/CA_PEM
+        developer_pem = output / DEV_PEM
+        ca_key = output / CA_KEY
+        ca_pem = output / CA_PEM
 
         if force:
             if ca_key.exists():
-                console.print(f"Attempting to remove existing CA key {ca_key} to prepare for new ca key file.", style="yellow")
+                console.print(
+                    f"Attempting to remove existing CA key {ca_key} to prepare for new ca key file.", style="yellow"
+                )
                 ca_key.unlink(missing_ok=True)
             if ca_pem.exists():
-                console.print(f"Attempting to remove existing CA certificate {ca_pem} to prepare for new ca certificate file.", style="yellow")
+                console.print(
+                    f"Attempting to remove existing CA certificate {ca_pem} to prepare for new ca certificate file.",
+                    style="yellow",
+                )
                 ca_pem.unlink(missing_ok=True)
             if developer_pem.exists():
-                console.print(f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.",
-                              style="yellow")
+                console.print(
+                    f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.",
+                    style="yellow",
+                )
                 developer_pem.unlink(missing_ok=True)
         elif ca_key.exists() or ca_pem.exists() or developer_pem.exists():
-            console.print(("Certificates were NOT generated! The CA certificate, CA key, or Developer "
-            "certificate already exist. Use --force option to overwrite the certificates"), style="bold red")
+            console.print(
+                (
+                    "Certificates were NOT generated! The CA certificate, CA key, or Developer "
+                    "certificate already exist. Use --force option to overwrite the certificates"
+                ),
+                style="bold red",
+            )
             raise typer.Exit(1)
     else:
         output.mkdir(parents=True)

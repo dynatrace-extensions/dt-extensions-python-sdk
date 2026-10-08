@@ -16,6 +16,7 @@ X509NameAttributes = {
     "C": NameOID.COUNTRY_NAME,
 }
 
+
 def _generate_x509_name(attributes: dict) -> x509.Name:
     names_attributes = []
     for name, oid in X509NameAttributes.items():
@@ -24,9 +25,11 @@ def _generate_x509_name(attributes: dict) -> x509.Name:
 
     return x509.Name(names_attributes)
 
+
 def _version_to_pip_version(version: str) -> str:
     """Convert a version string like '3.10' to pip format '310'."""
     return version.replace(".", "")
+
 
 def _parse_x509_subject(subject: str) -> dict[str, str]:
     """Parse a subject like '/CN=name/O=org/OU=unit' into a dict for _generate_x509_name.
@@ -42,11 +45,14 @@ def _parse_x509_subject(subject: str) -> dict[str, str]:
         if key == "ST":
             key = "S"
         if not sep or key not in X509NameAttributes:
-            msg = ("Invalid subject component '{part}'. Expected /key=value with key in"
-            f"{', '.join(X509NameAttributes)}.")
+            msg = (
+                "Invalid subject component '{part}'. Expected /key=value with key in"
+                f"{', '.join(X509NameAttributes)}."
+            )
             raise typer.BadParameter(msg)
         attributes[key] = value.strip().replace("\\/", "/")
     return attributes
+
 
 def _get_windows_dependencies(extension_dir: Path) -> list[str]:
     """Parse setup.py and return package names that are Windows-only (platform_system=='Windows')."""
@@ -79,10 +85,12 @@ def _get_windows_dependencies(extension_dir: Path) -> list[str]:
             return windows_deps
     return []
 
+
 def require_file_existence(console: Console, file: Path):
     if not file.exists():
         console.print(f"{file.as_posix()} doesn't exist, aborting!", style="bold red")
         raise typer.Exit(1)
+
 
 def check_file_existence(console: Console, file: Path):
     if file.exists():

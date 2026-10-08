@@ -1,14 +1,14 @@
 import stat
 from pathlib import Path
 
-#Extension file system related constants
+# Extension file system related constants
 DIST_DIR = "dist"
 EXTENSION_DIR = "extension"
 EXTENSION_YAML = "extension.yaml"
 EXTENSION_ZIP = "extension.zip"
 EXTENSION_ZIP_SIG = "extension.zip.sig"
 
-#Certificate related constants
+# Certificate related constants
 CA_KEY = "ca.key"
 CA_PEM = "ca.pem"
 DEFAULT_CA_SUBJECT = "/CN=Extension CA/O=Some Company/OU=Extension CA"
@@ -19,5 +19,5 @@ CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
 CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
 REQUIRED_PRIVATE_KEY_PERMISSIONS = stat.S_IREAD
 
-#Python related constants
+# Python related constants
 SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]

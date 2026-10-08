@@ -36,7 +36,7 @@ class TestDtSdk(TestCase):
             output,
             ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
             dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
-            days_valid=1095
+            days_valid=1095,
         )
 
     def test_dt_sdk_workflow(self):
@@ -46,7 +46,7 @@ class TestDtSdk(TestCase):
             ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
             dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
             days_valid=1095,
-            force=True
+            force=True,
         )
 
         # Check that the certificate files were created

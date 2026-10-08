@@ -13,9 +13,12 @@ from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PRIVATE_KEY_PERMISSION
 
 CHUNK_SIZE = 1024 * 1024
 
-def generate_ca(console: Console, cert_dir: Path, subject: crypto_x509.Name, not_valid_after: datetime, passphrase=None):
-    ca_key_file_path = cert_dir/CA_KEY
-    ca_cert_file_path = cert_dir/CA_PEM
+
+def generate_ca(
+    console: Console, cert_dir: Path, subject: crypto_x509.Name, not_valid_after: datetime, passphrase=None
+):
+    ca_key_file_path = cert_dir / CA_KEY
+    ca_cert_file_path = cert_dir / CA_PEM
 
     console.print("Generating CA...", style="bold blue")
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=4096)
@@ -27,7 +30,7 @@ def generate_ca(console: Console, cert_dir: Path, subject: crypto_x509.Name, not
         private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=private_key_encryption
+            encryption_algorithm=private_key_encryption,
         )
     )
 
@@ -72,11 +75,10 @@ def generate_ca(console: Console, cert_dir: Path, subject: crypto_x509.Name, not
         algorithm=hashes.SHA256(),
     )
 
-    ca_cert_file_path.write_bytes(
-        certificate.public_bytes(serialization.Encoding.PEM)
-    )
+    ca_cert_file_path.write_bytes(certificate.public_bytes(serialization.Encoding.PEM))
 
     console.print(f"Wrote CA certificate: {ca_cert_file_path}", style="bold green")
+
 
 def generate_dev_cert(
     console: Console,
@@ -84,19 +86,18 @@ def generate_dev_cert(
     subject: crypto_x509.Name,
     not_valid_after: datetime,
     ca_passphrase=None,
-    dev_passphrase=None
+    dev_passphrase=None,
 ):
-    ca_key_file_path = cert_dir/CA_KEY
-    ca_cert_file_path = cert_dir/CA_PEM
-    dev_cert_file_path = cert_dir/DEV_PEM
+    ca_key_file_path = cert_dir / CA_KEY
+    ca_cert_file_path = cert_dir / CA_PEM
+    dev_cert_file_path = cert_dir / DEV_PEM
 
     console.print(f"Loading CA private key {ca_key_file_path.as_posix()}", style="bold blue")
     ca_private_key = serialization.load_pem_private_key(
         ca_key_file_path.read_bytes(),
         password=ca_passphrase.encode() if ca_passphrase else None,
-        backend=default_backend
+        backend=default_backend,
     )
-
 
     console.print(f"Loading CA certificate {ca_cert_file_path.as_posix()}", style="bold blue")
     ca_cert = crypto_x509.load_pem_x509_certificate(ca_cert_file_path.read_bytes())
@@ -162,7 +163,7 @@ def generate_dev_cert(
             private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=private_key_encryption
+                encryption_algorithm=private_key_encryption,
             )
         )
 
@@ -178,7 +179,7 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
     private_key = serialization.load_pem_private_key(
         certificate_file_path.read_bytes(),
         password=dev_passphrase.encode() if dev_passphrase else None,
-        backend=default_backend()
+        backend=default_backend(),
     )
 
     sha256 = hashes.SHA256()
@@ -226,11 +227,18 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
         )
     except ValueError as e:
         # Error returned by asn1crypto if the fused cert/key has key before cert
-        if ("Error parsing asn1crypto.x509.TbsCertificate - method should have been constructed,"
-           " but primitive was found") in e.args[0]:
+        if (
+            "Error parsing asn1crypto.x509.TbsCertificate - method should have been constructed,"
+            " but primitive was found"
+        ) in e.args[0]:
 
-            console.print(("Error: Malformed fused certkey, certificate should be first;"
-                           " please regenerate the certificate or reorder manually"), style="bold red")
+            console.print(
+                (
+                    "Error: Malformed fused certkey, certificate should be first;"
+                    " please regenerate the certificate or reorder manually"
+                ),
+                style="bold red",
+            )
             raise typer.Exit(1) from None
         else:
             raise
