@@ -1,12 +1,13 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import typer
-from asn1crypto import cms, core, pem, util, x509
+from asn1crypto import cms, core, pem, util, x509  # type: ignore
 from cryptography import x509 as crypto_x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, utils
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from rich.console import Console
 
 from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PRIVATE_KEY_PERMISSIONS
@@ -39,7 +40,7 @@ def generate_ca(
     builder = crypto_x509.CertificateBuilder()
     builder = builder.subject_name(subject)
     builder = builder.issuer_name(subject)
-    builder = builder.not_valid_before(datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1))
+    builder = builder.not_valid_before(datetime.now(tz=timezone.utc) - timedelta(days=1))
     builder = builder.not_valid_after(not_valid_after)
     builder = builder.serial_number(crypto_x509.random_serial_number())
     builder = builder.public_key(public_key)
@@ -119,7 +120,7 @@ def generate_dev_cert(
     builder = crypto_x509.CertificateBuilder()
     builder = builder.subject_name(subject)
     builder = builder.issuer_name(ca_cert.issuer)
-    builder = builder.not_valid_before(datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1))
+    builder = builder.not_valid_before(datetime.now(tz=timezone.utc) - timedelta(days=1))
     builder = builder.not_valid_after(not_valid_after)
     builder = builder.serial_number(crypto_x509.random_serial_number())
     builder = builder.public_key(public_key)
@@ -149,10 +150,15 @@ def generate_dev_cert(
         ),
         critical=False,
     )
-    certificate = builder.sign(
-        private_key=ca_private_key,
-        algorithm=hashes.SHA256(),
-    )
+    # Required to pass mypy checks
+    if isinstance(ca_private_key, RSAPrivateKey):
+        certificate = builder.sign(
+            private_key=ca_private_key,
+            algorithm=hashes.SHA256(),
+        )
+    else:
+        console.print("Private key is not RSA, the CA private key must be an RSA private key.", style="bold red")
+        raise typer.Exit(1)
 
     dev_cert_file_path.write_bytes(certificate.public_bytes(serialization.Encoding.PEM))
 
@@ -189,7 +195,12 @@ def sign_file(console: Console, file_path: Path, certificate_file_path: Path, de
         while buf := fp.read(CHUNK_SIZE):
             hasher.update(buf)
 
-    signature = private_key.sign(hasher.finalize(), padding.PKCS1v15(), utils.Prehashed(sha256))
+    # Required to pass mypy checks
+    if isinstance(private_key, RSAPrivateKey):
+        signature = private_key.sign(hasher.finalize(), padding.PKCS1v15(), utils.Prehashed(sha256))
+    else:
+        console.print("Private key is not RSA, the developer private key must be an RSA private key.", style="bold red")
+        raise typer.Exit(1)
     signed_data = cms.SignedData()
     signed_data["version"] = "v1"
     signed_data["encap_content_info"] = util.OrderedDict([("content_type", "data"), ("content", None)])

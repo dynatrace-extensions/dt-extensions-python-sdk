@@ -219,7 +219,7 @@ def assemble(
     elif output.exists() and output.is_dir():
         output = output / EXTENSION_ZIP
 
-    if output.exists and not force:
+    if output.exists() and not force:
         console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", style="bold red")
         raise typer.Exit(1)
 
