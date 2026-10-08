@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 from freezegun import freeze_time
@@ -119,7 +119,7 @@ class TestCallBack(unittest.TestCase):
           T=30 (between): worker finally picks up #1 and runs the callback
         """
         interval = timedelta(minutes=1)
-        anchor = datetime(2026, 1, 1, 12, 0, 0)
+        anchor = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
         with freeze_time(anchor) as frozen:
             cb = WrappedCallback(interval, lambda: None, MagicMock(), running_in_sim=True)
@@ -205,4 +205,6 @@ class TestCallBack(unittest.TestCase):
         callback.cluster_time_diff = 10000
         callback.start_timestamp = callback.get_current_time_with_cluster_diff()
 
-        self.assertGreater(callback.get_adjusted_metric_timestamp(), datetime.now() + timedelta(milliseconds=9000))
+        self.assertGreater(
+            callback.get_adjusted_metric_timestamp(), datetime.now(timezone.utc) + timedelta(milliseconds=9000)
+        )

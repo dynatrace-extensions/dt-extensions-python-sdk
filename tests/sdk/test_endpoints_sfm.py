@@ -1,6 +1,6 @@
 import time as _real_time
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 from freezegun import freeze_time
@@ -64,7 +64,7 @@ class TestSfmPerEndpont(unittest.TestCase):
             self.single_test_iteration(case)
 
         if self.time_machine_idx:
-            with freeze_time(datetime.now() + timedelta(hours=2), tick=True):
+            with freeze_time(datetime.now(timezone.utc) + timedelta(hours=2), tick=True):
                 for case in self.test_cases[self.time_machine_idx :]:
                     self.single_test_iteration(case)
 
@@ -316,14 +316,14 @@ class TestSfmPerEndpont(unittest.TestCase):
 
         self.single_test_iteration(self.test_cases[0])
 
-        with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
+        with freeze_time(datetime.now(timezone.utc) + timedelta(hours=1), tick=True):
             self.single_test_iteration(self.test_cases[1])
 
-            with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
+            with freeze_time(datetime.now(timezone.utc) + timedelta(hours=1), tick=True):
                 self.single_test_iteration(self.test_cases[2])
 
-                with freeze_time(datetime.now() + timedelta(hours=1), tick=True):
+                with freeze_time(datetime.now(timezone.utc) + timedelta(hours=1), tick=True):
                     self.single_test_iteration(self.test_cases[3])
 
-                    with freeze_time(datetime.now() + timedelta(hours=2), tick=True):
+                    with freeze_time(datetime.now(timezone.utc) + timedelta(hours=2), tick=True):
                         self.single_test_iteration(self.test_cases[4])

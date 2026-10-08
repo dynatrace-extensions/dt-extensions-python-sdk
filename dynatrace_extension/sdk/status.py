@@ -1,7 +1,7 @@
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from threading import Lock
 
@@ -190,7 +190,7 @@ class EndpointStatusesMap:
                             ep_record.ep_status.message,
                         )
                     )
-                    ep_record.last_sent = datetime.now()
+                    ep_record.last_sent = datetime.now(timezone.utc)
                     ep_record.state = StatusState.ONGOING
 
         if logs_to_send:
@@ -202,7 +202,7 @@ class EndpointStatusesMap:
         elif ep_record.state in (StatusState.INITIAL, StatusState.NEW):
             return True
         elif ep_record.state == StatusState.ONGOING and (
-            ep_record.last_sent is None or datetime.now() - ep_record.last_sent >= self.RESENDING_INTERVAL
+            ep_record.last_sent is None or datetime.now(timezone.utc) - ep_record.last_sent >= self.RESENDING_INTERVAL
         ):
             return True
         else:

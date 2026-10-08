@@ -6,7 +6,7 @@ import logging
 import random
 import time
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from timeit import default_timer as timer
 
 from .activation import ActivationType
@@ -53,7 +53,7 @@ class WrappedCallback:
         self.offset_seconds = offset_seconds or self.calculate_initial_wait_time()
 
     def get_current_time_with_cluster_diff(self):
-        return datetime.now() + timedelta(milliseconds=self.cluster_time_diff)
+        return datetime.now(timezone.utc) + timedelta(milliseconds=self.cluster_time_diff)
 
     def __call__(self):
         self.logger.debug(f"Running scheduled callback {self}")
@@ -110,7 +110,7 @@ class WrappedCallback:
 
         now = self.get_current_time_with_cluster_diff()
         random_second = random.randint(5, 55)  # noqa: S311
-        next_execution = datetime.now().replace(second=random_second, microsecond=0)
+        next_execution = now.replace(second=random_second, microsecond=0)
         if next_execution <= now:
             # The random chosen second already passed this minute
             next_execution += timedelta(minutes=1)
