@@ -18,19 +18,15 @@ from .create import generate_extension, is_pep8_compliant
 from .hub.hub_cli import hub_app
 from .schema import ExtensionYaml
 from .sign import generate_ca, generate_dev_cert, sign_file
-from .utils import _version_to_pip_version, _get_windows_dependencies, _generate_x509_name
+from .utils import _version_to_pip_version, _get_windows_dependencies, _generate_x509_name, _parse_x509_subject
 
 from .constants import (
     CA_KEY,
     CA_PEM,
     CERT_DIR_ENVIRONMENT_VAR,
     CERTIFICATE_DEFAULT_PATH,
-    DEFAULT_CA_NAME,
-    DEFAULT_CA_ORG,
-    DEFAULT_CA_OU,
-    DEFAULT_DEV_NAME,
-    DEFAULT_DEV_ORG,
-    DEFAULT_DEV_OU,
+    DEFAULT_CA_SUBJECT,
+    DEFAULT_DEV_SUBJECT,
     DEFAULT_VALIDITY_PERIOD,
     DEV_PEM,
     DIST_DIR,
@@ -490,28 +486,26 @@ def upload(
         console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
 
 
-@app.command(help="Generate root and developer certificates and key")
+@app.command(help="Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate")
 def gencerts(
     output: Path = typer.Option(CERTIFICATE_DEFAULT_PATH, "--output", "-o", help="Path to the output directory"),
-    ca_name: str = typer.Option(DEFAULT_CA_NAME, "--ca_name", help="CN section of the CA certificate subject"),
-    ca_org: str = typer.Option(DEFAULT_CA_ORG, "--ca_org", help="O section of the CA certificate subject"),
-    ca_ou: str = typer.Option(DEFAULT_CA_OU, "--ca_ou", help="OU section of the CA certificate subject"),
-    dev_name: str = typer.Option(DEFAULT_DEV_NAME, "--dev_name", help="CN section of the developer certificate subject"),
-    dev_org: str = typer.Option(DEFAULT_DEV_ORG, "--dev_org", help="O section of the developer certificate subject"),
-    dev_ou: str = typer.Option(DEFAULT_DEV_OU, "--dev_ou", help="OU section of the developer certificate subject"),
+    ca_subject: str = typer.Option(DEFAULT_CA_SUBJECT, "--ca_subject", help="Subject of the CA certificate in /key0=value0/key1=value1 format"),
+    dev_subject: str = typer.Option(DEFAULT_DEV_SUBJECT, "--dev_subject", help="Subject of the developer certificate in /key0=value0/key1=value1 format"),
     days_valid: int = typer.Option(DEFAULT_VALIDITY_PERIOD, "--days_valid", help="Certificate validity period in days"),
     force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the certificates"),
 ):
-    ca_subject = _generate_x509_name({
-        "CN": ca_name,
-        "O": ca_org,
-        "OU": ca_ou
-    })
-    dev_subject = _generate_x509_name({
-        "CN": dev_name,
-        "O": dev_org,
-        "OU": dev_ou
-    })
+    """
+    Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate
+
+    :param output: The path where the certificates and keys are written
+    :param ca_subject: Subject of the CA certificate in /key0=value0/key1=value1 format
+    :param dev_subject: Subject of the developer certificate in /key0=value0/key1=value1 format
+    :params days_valid: The Certificate validity period in days
+    :params force: Force overwriting the certificates
+    """
+    
+    ca_sub = _generate_x509_name(_parse_x509_subject(ca_subject))
+    dev_sub = _generate_x509_name(_parse_x509_subject(dev_subject))
 
     if output.exists():
         developer_pem = output/DEV_PEM
@@ -520,13 +514,13 @@ def gencerts(
 
         if force:
             if ca_key.exists():
-                console.print(f"Attempting to remove existing ca.key {ca_key} to prepare for new ca key file.", style="yellow")
+                console.print(f"Attempting to remove existing CA key {ca_key} to prepare for new ca key file.", style="yellow")
                 ca_key.unlink(missing_ok=True)
             if ca_pem.exists():
-                console.print(f"Attempting to remove existing ca.pem {ca_pem} to prepare for new ca certificate file.", style="yellow")
+                console.print(f"Attempting to remove existing CA certificate {ca_pem} to prepare for new ca certificate file.", style="yellow")
                 ca_pem.unlink(missing_ok=True)
             if developer_pem.exists():
-                console.print(f"Attempting to remove existing developer.pem {developer_pem} to prepare for new developer certificate file.", style="yellow")
+                console.print(f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.", style="yellow")
                 developer_pem.unlink(missing_ok=True)
         else:
             if ca_key.exists() or ca_pem.exists() or developer_pem.exists():
@@ -538,8 +532,8 @@ def gencerts(
 
     validity_end = datetime.now() + timedelta(days=days_valid)
 
-    generate_ca(console, output, ca_subject, validity_end)
-    generate_dev_cert(console, output, dev_subject, validity_end)
+    generate_ca(console, output, ca_sub, validity_end)
+    generate_dev_cert(console, output, dev_sub, validity_end)
 
 
 @app.command(help="Creates a new python extension")

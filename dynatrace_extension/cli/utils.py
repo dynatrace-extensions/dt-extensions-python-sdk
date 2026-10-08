@@ -1,4 +1,5 @@
 import ast
+import re
 import typer
 
 from cryptography import x509
@@ -26,6 +27,26 @@ def _generate_x509_name(attributes: dict) -> x509.Name:
 def _version_to_pip_version(version: str) -> str:
     """Convert a version string like '3.10' to pip format '310'."""
     return version.replace(".", "")
+
+def _parse_x509_subject(subject: str) -> dict[str, str]:
+    """Parse a subject like '/CN=name/O=org/OU=unit' into a dict for _generate_x509_name.
+
+    A literal '/' inside a value can be escaped as '\\/'. 'ST' is accepted as an alias for 'S'.
+    """
+    attributes: dict[str, str] = {}
+    for part in re.split(r"(?<!\\)/", subject.strip()):
+        if not part:
+            continue
+        key, sep, value = part.partition("=")
+        key = key.strip().upper()
+        if key == "ST":
+            key = "S"
+        if not sep or key not in X509NameAttributes:
+            raise typer.BadParameter(
+                f"Invalid subject component '{part}'. Expected /key=value with key in {', '.join(X509NameAttributes)}."
+            )
+        attributes[key] = value.strip().replace("\\/", "/")
+    return attributes
 
 def _get_windows_dependencies(extension_dir: Path) -> list[str]:
     """Parse setup.py and return package names that are Windows-only (platform_system=='Windows')."""
