@@ -49,7 +49,9 @@ dependencies = [
     "typer",
     "pyyaml",
     "dt-cli>=1.6.13",
-    "freezegun"
+    "freezegun",
+    "cryptography>3",
+    "asn1crypto>=1.4"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -76,7 +78,9 @@ dependencies = [
     "typer",
     "pyyaml",
     "pytest",    
-    "freezegun"
+    "freezegun",
+    "cryptography>3",
+    "asn1crypto>=1.4"
 ]
 
 [tool.hatch.envs.lint.scripts]

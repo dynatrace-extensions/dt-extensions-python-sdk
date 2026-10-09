@@ -1,9 +1,8 @@
-import ast
 import os
 import shutil
-import stat
 import subprocess
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import typer
@@ -12,21 +11,34 @@ from dtcli.server_api import validate as dt_cli_validate
 from rich.console import Console
 
 from ..__about__ import __version__
+from .assemble import assemble_extension
+from .building import build_signed_bundle
+from .constants import (
+    CA_KEY,
+    CA_PEM,
+    CERT_DIR_ENVIRONMENT_VAR,
+    CERTIFICATE_DEFAULT_PATH,
+    DEFAULT_CA_SUBJECT,
+    DEFAULT_DEV_SUBJECT,
+    DEFAULT_VALIDITY_PERIOD,
+    DEV_PEM,
+    DIST_DIR,
+    EXTENSION_DIR,
+    EXTENSION_YAML,
+    EXTENSION_ZIP,
+    SUPPORTED_PYTHON_VERSIONS,
+)
 from .create import generate_extension, is_pep8_compliant
 from .hub.hub_cli import hub_app
 from .schema import ExtensionYaml
+from .sign import generate_ca, generate_dev_cert, sign_file
+from .utils import _generate_x509_name, _get_windows_dependencies, _parse_x509_subject, _version_to_pip_version
 
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 version_app = typer.Typer(help="Version commands", invoke_without_command=True)
 app.add_typer(version_app, name="version")
 app.add_typer(hub_app, name="hub", hidden=True)
 console = Console()
-
-SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]
-
-
-CERT_DIR_ENVIRONMENT_VAR = "DT_CERTIFICATES_FOLDER"
-CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
 
 
 @version_app.callback()
@@ -176,7 +188,7 @@ def build(
 def assemble(
     extension_dir: Path = typer.Argument(".", help="Path to the python extension"),
     output: Path = typer.Option(None, "--output", "-o"),
-    force: bool = typer.Option(True, "--force", "-f", help="Force overwriting the output zip file"),
+    force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the output zip file"),
 ) -> Path:
     """
     Creates the extension zip file (not yet signed)
@@ -187,69 +199,34 @@ def assemble(
     """
 
     # This checks if the yaml is valid, because it parses it
-    # Also validates that the schema files are valid and exist
-    extension_yaml = ExtensionYaml(Path(extension_dir) / "extension" / "extension.yaml")
+    # Also validates that the activation schema files are valid and exist
+    extension_yaml = ExtensionYaml(extension_dir / EXTENSION_DIR / EXTENSION_YAML)
     extension_yaml.validate()
 
     # Checks that the module name is valid and exists in the filesystem
-    module_folder = Path(extension_dir) / extension_yaml.python.runtime.module
+    module_folder = extension_dir / extension_yaml.python.runtime.module
     src_module_folder = Path("src") / module_folder
     if not module_folder.exists() and not src_module_folder.exists():
-        msg = f"Extension module folder {module_folder} not found"
-        raise FileNotFoundError(msg)
+        console.print(f"Extension module folder {module_folder} not found", style="bold red")
+        raise typer.Exit(1)
 
     # This is the zip file that will contain the extension
     if output is None:
-        dist_dir = Path(extension_dir) / "dist"
+        dist_dir = extension_dir / DIST_DIR
         if not dist_dir.exists():
             dist_dir.mkdir()
-        output = dist_dir / "extension.zip"
+        output = dist_dir / EXTENSION_ZIP
     elif output.exists() and output.is_dir():
-        output = output / "extension.zip"
+        output = output / EXTENSION_ZIP
 
-    command = ["dt", "ext", "assemble", "--source", f"{Path(extension_dir) / 'extension'}", "--output", f"{output}"]
-    if force:
-        command.append("--force")
-    run_process(command)
+    if output.exists() and not force:
+        console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", style="bold red")
+        raise typer.Exit(1)
+
+    assemble_extension(console, extension_dir / EXTENSION_DIR, output)
+
     console.print(f"Built the extension zip file to {output}", style="bold green")
     return output
-
-
-def _version_to_pip_version(version: str) -> str:
-    """Convert a version string like '3.10' to pip format '310'."""
-    return version.replace(".", "")
-
-
-def _get_windows_dependencies(extension_dir: Path) -> list[str]:
-    """Parse setup.py and return package names that are Windows-only (platform_system=='Windows')."""
-    setup_py = extension_dir / "setup.py"
-    if not setup_py.exists():
-        return []
-
-    tree = ast.parse(setup_py.read_text())
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        func = node.func
-        is_setup_call = (isinstance(func, ast.Name) and func.id == "setup") or (
-            isinstance(func, ast.Attribute) and func.attr == "setup"
-        )
-        if not is_setup_call:
-            continue
-        for keyword in node.keywords:
-            if keyword.arg != "install_requires":
-                continue
-            if not isinstance(keyword.value, ast.List):
-                continue
-            windows_deps = []
-            for elt in keyword.value.elts:
-                if not isinstance(elt, ast.Constant) or not isinstance(elt.value, str):
-                    continue
-                dep = elt.value
-                if "platform_system=='Windows'" in dep or 'platform_system=="Windows"' in dep:
-                    windows_deps.append(dep.split(";")[0].strip())
-            return windows_deps
-    return []
 
 
 @app.command(help="Downloads the dependencies of the extension to the lib folder")
@@ -424,7 +401,7 @@ def sign(
         help="Path to the dev fused key-certificate",
     ),
     output: Path = typer.Option(None, "--output", "-o"),
-    force: bool = typer.Option(True, "--force", "-f", help="Force overwriting the output zip file"),
+    force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the output zip file"),
 ):
     """
     Signs the extension zip file using the provided fused key-certificate
@@ -451,22 +428,13 @@ def sign(
     if output is None:
         output = zip_file.parent / f"signed_{zip_file.name}"
 
-    console.print(f"Signing file {zip_file} to {output} with certificate {certificate}", style="cyan")
-    command = [
-        "dt",
-        "ext",
-        "sign",
-        "--src",
-        f"{zip_file}",
-        "--output",
-        f"{output}",
-        "--key",
-        f"{combined_cert_and_key}",
-    ]
+    pem_bytes = sign_file(console, zip_file, combined_cert_and_key)
 
     if force:
-        command.append("--force")
-    run_process(command)
+        build_signed_bundle(console, zip_file, pem_bytes, output, True)
+    else:
+        build_signed_bundle(console, zip_file, pem_bytes, output)
+
     console.print(f"Created signed extension file {output}", style="bold green")
 
 
@@ -502,12 +470,12 @@ def upload(
 
     if not api_url:
         console.print("Set the --tenant-url parameter or the DT_API_URL environment variable", style="bold red")
-        sys.exit(1)
+        raise typer.Exit(1)
 
     api_token = api_token or os.environ.get("DT_API_TOKEN", "")
     if not api_token:
         console.print("Set the --api-token parameter or the DT_API_TOKEN environment variable", style="bold red")
-        sys.exit(1)
+        raise typer.Exit(1)
 
     if validate:
         dt_cli_validate(f"{zip_file_path}", api_url, api_token)
@@ -516,51 +484,74 @@ def upload(
         console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
 
 
-@app.command(help="Generate root and developer certificates and key")
+@app.command(
+    help="Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate"
+)
 def gencerts(
     output: Path = typer.Option(CERTIFICATE_DEFAULT_PATH, "--output", "-o", help="Path to the output directory"),
+    ca_subject: str = typer.Option(
+        DEFAULT_CA_SUBJECT, "--ca_subject", help="Subject of the CA certificate in /key0=value0/key1=value1 format"
+    ),
+    dev_subject: str = typer.Option(
+        DEFAULT_DEV_SUBJECT,
+        "--dev_subject",
+        help="Subject of the developer certificate in /key0=value0/key1=value1 format",
+    ),
+    days_valid: int = typer.Option(DEFAULT_VALIDITY_PERIOD, "--days_valid", help="Certificate validity period in days"),
     force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the certificates"),
 ):
-    developer_pem = output / "developer.pem"
-    command_gen_ca = [
-        "dt",
-        "ext",
-        "genca",
-        "--ca-cert",
-        f"{output / 'ca.pem'}",
-        "--ca-key",
-        f"{output / 'ca.key'}",
-        "--no-ca-passphrase",
-    ]
+    """
+    Generates the Certificate Authority key, Certificate Authority certificate, and developer fused-key certificate
 
-    command_gen_dev_pem = [
-        "dt",
-        "ext",
-        "generate-developer-pem",
-        "--output",
-        f"{developer_pem}",
-        "--name",
-        "Acme",
-        "--ca-crt",
-        f"{output / 'ca.pem'}",
-        "--ca-key",
-        f"{output / 'ca.key'}",
-    ]
+    :param output: The path where the certificates and keys are written
+    :param ca_subject: Subject of the CA certificate in /key0=value0/key1=value1 format
+    :param dev_subject: Subject of the developer certificate in /key0=value0/key1=value1 format
+    :params days_valid: The Certificate validity period in days
+    :params force: Force overwriting the certificates
+    """
+
+    ca_sub = _generate_x509_name(_parse_x509_subject(ca_subject))
+    dev_sub = _generate_x509_name(_parse_x509_subject(dev_subject))
 
     if output.exists():
-        if developer_pem.exists() and force:
-            command_gen_ca.append("--force")
-            developer_pem.chmod(stat.S_IREAD | stat.S_IWRITE)
-            developer_pem.unlink(missing_ok=True)
-        elif developer_pem.exists() and not force:
-            msg = f"Certificates were NOT generated! {developer_pem} already exists. Use --force option to overwrite the certificates"
-            console.print(msg, style="bold red")
-            sys.exit(1)
+        developer_pem = output / DEV_PEM
+        ca_key = output / CA_KEY
+        ca_pem = output / CA_PEM
+
+        if force:
+            if ca_key.exists():
+                console.print(
+                    f"Attempting to remove existing CA key {ca_key} to prepare for new ca key file.", style="yellow"
+                )
+                ca_key.unlink(missing_ok=True)
+            if ca_pem.exists():
+                console.print(
+                    f"Attempting to remove existing CA certificate {ca_pem} to prepare for new ca certificate file.",
+                    style="yellow",
+                )
+                ca_pem.unlink(missing_ok=True)
+            if developer_pem.exists():
+                console.print(
+                    f"Attempting to remove existing developer certificate {developer_pem} to prepare for new developer certificate file.",
+                    style="yellow",
+                )
+                developer_pem.unlink(missing_ok=True)
+        elif ca_key.exists() or ca_pem.exists() or developer_pem.exists():
+            console.print(
+                (
+                    "Certificates were NOT generated! The CA certificate, CA key, or Developer "
+                    "certificate already exist. Use --force option to overwrite the certificates"
+                ),
+                style="bold red",
+            )
+            raise typer.Exit(1)
     else:
         output.mkdir(parents=True)
 
-    run_process(command_gen_ca)
-    run_process(command_gen_dev_pem)
+    validity_end = datetime.now() + timedelta(days=days_valid)
+
+    generate_ca(console, output, ca_sub, validity_end)
+    generate_dev_cert(console, output, dev_sub, validity_end)
 
 
 @app.command(help="Creates a new python extension")

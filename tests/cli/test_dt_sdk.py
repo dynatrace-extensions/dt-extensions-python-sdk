@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import NonCallableMock, call, mock_open, patch
+from unittest.mock import mock_open, patch
 
 import dynatrace_extension.cli.main as dt_sdk
 
@@ -29,52 +29,25 @@ class TestDtSdk(TestCase):
 
         dt_sdk.upload(extension_path, tenant_url, api_token, validate=False)
 
-    @patch("dynatrace_extension.cli.main.subprocess.run")
-    def test_dt_sdk_gen_certs(self, mock_subprocess_run: NonCallableMock):
+    def test_dt_sdk_gen_certs(self):
         output = Path("certificates")
 
-        dt_sdk.gencerts(output, force=True)
-        mock_subprocess_run.assert_has_calls(
-            [
-                call(
-                    [
-                        "dt",
-                        "ext",
-                        "genca",
-                        "--ca-cert",
-                        f"{output / 'ca.pem'}",
-                        "--ca-key",
-                        f"{output / 'ca.key'}",
-                        "--no-ca-passphrase",
-                    ],
-                    cwd=None,
-                    env=None,
-                    check=True,
-                ),
-                call(
-                    [
-                        "dt",
-                        "ext",
-                        "generate-developer-pem",
-                        "--output",
-                        f"{output / 'developer.pem'}",
-                        "--name",
-                        "Acme",
-                        "--ca-crt",
-                        f"{output / 'ca.pem'}",
-                        "--ca-key",
-                        f"{output / 'ca.key'}",
-                    ],
-                    cwd=None,
-                    env=None,
-                    check=True,
-                ),
-            ]
+        dt_sdk.gencerts(
+            output,
+            ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
+            dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
+            days_valid=1095,
         )
 
     def test_dt_sdk_workflow(self):
         # Generate real certificates
-        dt_sdk.gencerts(self.temp_dir / "certificates", force=True)
+        dt_sdk.gencerts(
+            self.temp_dir / "certificates",
+            ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
+            dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
+            days_valid=1095,
+            force=True,
+        )
 
         # Check that the certificate files were created
         self.assertTrue((self.temp_dir / "certificates" / "ca.key").exists())
