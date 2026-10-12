@@ -50,7 +50,8 @@ dependencies = [
     "pyyaml",
     "freezegun",
     "cryptography>3",
-    "asn1crypto>=1.4"
+    "asn1crypto>=1.4",
+    "requests"
 ]
 
 [tool.hatch.envs.default.scripts]
