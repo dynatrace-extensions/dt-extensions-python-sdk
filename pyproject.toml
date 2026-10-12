@@ -24,7 +24,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-cli = [ "typer", "pyyaml", "ruff", "requests"]
+cli = ["typer", "pyyaml", "ruff", "requests", "cryptography>3", "asn1crypto>=1.4"]
 
 [project.urls]
 Documentation = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk#readme"
