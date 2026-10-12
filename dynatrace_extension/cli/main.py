@@ -6,11 +6,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import typer
-from dtcli.server_api import upload as dt_cli_upload  # type: ignore
-from dtcli.server_api import validate as dt_cli_validate
 from rich.console import Console
 
 from ..__about__ import __version__
+from .api import set_active_version, upload_extension, validate_extension
 from .assemble import assemble_extension
 from .building import build_signed_bundle
 from .constants import (
@@ -23,6 +22,9 @@ from .constants import (
     DEFAULT_VALIDITY_PERIOD,
     DEV_PEM,
     DIST_DIR,
+    DT_API_TOKEN,
+    DT_API_URL,
+    DT_PLATFORM_TOKEN,
     EXTENSION_DIR,
     EXTENSION_YAML,
     EXTENSION_ZIP,
@@ -32,7 +34,15 @@ from .create import generate_extension, is_pep8_compliant
 from .hub.hub_cli import hub_app
 from .schema import ExtensionYaml
 from .sign import generate_ca, generate_dev_cert, sign_file
-from .utils import _generate_x509_name, _get_windows_dependencies, _parse_x509_subject, _version_to_pip_version
+from .utils import (
+    _generate_x509_name,
+    _get_windows_dependencies,
+    _parse_name_and_version,
+    _parse_x509_subject,
+    _version_to_pip_version,
+    detect_dt_platform,
+    locate_extension_yaml,
+)
 
 app = typer.Typer(pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
 version_app = typer.Typer(help="Version commands", invoke_without_command=True)
@@ -425,8 +435,13 @@ def sign(
 
     combined_cert_and_key = certificate
 
-    if output is None:
+    extension_yaml_path = locate_extension_yaml(Path().cwd())
+
+    if output is None and extension_yaml_path is None:
         output = zip_file.parent / f"signed_{zip_file.name}"
+    elif output is None and extension_yaml_path is not None:
+        extension_yaml = ExtensionYaml(extension_yaml_path)
+        output = zip_file.parent / extension_yaml.zip_file_name()
 
     pem_bytes = sign_file(console, zip_file, combined_cert_and_key)
 
@@ -443,6 +458,8 @@ def upload(
     extension_path: Path = typer.Argument(None, help="Path to the extension folder or built zip file"),
     tenant_url: str = typer.Option(None, "--tenant-url", "-u", help="Dynatrace tenant URL"),
     api_token: str = typer.Option(None, "--api-token", "-t", help="Dynatrace API token"),
+    platform_token: str = typer.Option(None, "--platform-token", "-p", help="Dynatrace Platform Token"),
+    set_active: bool = typer.Option(None, "--active", "-a", help="Make uploaded version the active version"),
     validate: bool = typer.Option(None, "--validate", "-v", help="Validate only"),
 ):
     """
@@ -451,6 +468,7 @@ def upload(
     :param extension_path: The path to the extension folder or built zip file
     :param tenant_url: The Dynatrace tenant URL
     :param api_token: The Dynatrace API token
+    :param platform_token: The Dynatrace Platform API token
     :param validate: If true, only validate the extension and exit
     """
 
@@ -460,28 +478,89 @@ def upload(
     else:
         extension_path = Path(extension_path)
     if extension_path.is_dir():
-        yaml_path = Path(extension_path, "extension", "extension.yaml")
+        yaml_path = Path(extension_path, EXTENSION_DIR, EXTENSION_YAML)
         extension_yaml = ExtensionYaml(yaml_path)
         zip_file_name = extension_yaml.zip_file_name()
-        zip_file_path = Path(extension_path, "dist", zip_file_name)
+        zip_file_path = Path(extension_path, DIST_DIR, zip_file_name)
 
-    api_url = tenant_url or os.environ.get("DT_API_URL", "")
+        if not zip_file_path.exists():
+            console.print(
+                f"Unable to find the built zip file {zip_file_path.as_posix()} in {extension_path.as_posix()}"
+                "try again specifying the built zip file directly",
+                style="bold red",
+            )
+            raise typer.Exit(1)
+
+    api_url = tenant_url or os.environ.get(DT_API_URL, "")
     api_url = api_url.rstrip("/")
 
     if not api_url:
         console.print("Set the --tenant-url parameter or the DT_API_URL environment variable", style="bold red")
         raise typer.Exit(1)
 
-    api_token = api_token or os.environ.get("DT_API_TOKEN", "")
-    if not api_token:
-        console.print("Set the --api-token parameter or the DT_API_TOKEN environment variable", style="bold red")
+    platform = detect_dt_platform(api_url)
+    api_token = api_token or os.environ.get(DT_API_TOKEN, "")
+    platform_token = platform_token or os.environ.get(DT_PLATFORM_TOKEN, "")
+
+    if platform:
+        if not platform_token and api_token:
+            console.print(
+                "API tokens are not compatible with platform APIs, set the --platform-token parameter or"
+                "DT_PLATFORM_TOKEN environment variable",
+                style="bold red",
+            )
+            raise typer.Exit(1)
+        elif not platform_token and not api_token:
+            console.print(
+                "Set the --platform-token parameter or the DT_PLATFORM_TOKEN environment variable",
+                style="bold red",
+            )
+            raise typer.Exit(1)
+    elif not api_token and platform_token:
+        console.print(
+            "Platform tokens are not compatible with non-platform APIs, set the --api-token parameter or"
+            "DT_API_TOKEN environment variable",
+            style="bold red",
+        )
+        raise typer.Exit(1)
+    elif not api_token and not platform_token:
+        console.print(
+            "Set the --api-token parameter or the DT_API_TOKEN environment variable",
+            style="bold red",
+        )
         raise typer.Exit(1)
 
     if validate:
-        dt_cli_validate(f"{zip_file_path}", api_url, api_token)
+        validate_extension(console, api_url, zip_file_path, platform_token if platform else api_token)
     else:
-        dt_cli_upload(f"{zip_file_path}", api_url, api_token)
+        console.print(f"Uploading extension {zip_file_path}...", style="bold blue")
+        upload_extension(console, api_url, zip_file_path, platform_token if platform else api_token)
         console.print(f"Extension {zip_file_path} uploaded to {api_url}", style="bold green")
+
+        if set_active:
+            name, version = _parse_name_and_version(zip_file_path.name)
+            if name is None or version is None:
+                console.print(
+                    f"Unable to determine extension ID and version from {zip_file_path.name}", style="bold red"
+                )
+                console.print(
+                    "Attempting to locate extension.yaml to extract extension name and version...", style="yellow"
+                )
+                extension_yaml_path = locate_extension_yaml(Path().cwd())
+                if extension_yaml_path is None:
+                    console.print(
+                        f"Unable to locate extension.yaml file in {Path().cwd()} or its sub-directories."
+                        "Either change the name of the extension package to the <extension-ID>-<version>.zip"
+                        "and try again, or run the command from the directory containing the extension.yaml",
+                        style="bold red",
+                    )
+                    raise typer.Exit(1)
+
+                extension_yaml = ExtensionYaml(extension_yaml_path)
+                name = extension_yaml.name
+                version = extension_yaml.version
+
+            set_active_version(console, api_url, name, version, platform_token if platform else api_token)
 
 
 @app.command(

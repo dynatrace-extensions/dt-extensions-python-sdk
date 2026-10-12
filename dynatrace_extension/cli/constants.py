@@ -21,3 +21,16 @@ REQUIRED_PRIVATE_KEY_PERMISSIONS = stat.S_IREAD
 
 # Python related constants
 SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]
+
+# Environment related constants
+DT_API_TOKEN = "DT_API_TOKEN"
+DT_API_URL = "DT_API_URL"
+DT_PLATFORM_TOKEN = "DT_PLATFORM_TOKEN"
+
+# API related constants
+CLASSIC_ENV_CONFIG_ENDPOINT = "/api/v2/extensions/{extension_id}/environmentConfiguration"
+CLASSIC_UPLOAD_ENDPOINT = "/api/v2/extensions"
+CLASSIC_VALIDATE_ENDPOINT = "/api/v2/extensions?validateOnly=true"
+PLATFORM_ENV_CONFIG_ENDPOINT = "/platform/extensions/v2/extensions/{extension_id}/environment-configuration"
+PLATFORM_UPLOAD_ENDPOINT = "/platform/extensions/v2/extensions"
+PLATFORM_VALIDATE_ENDPOINT = "/platform/extensions/v2/extensions:validate"

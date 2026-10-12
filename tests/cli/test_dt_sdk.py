@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import mock_open, patch
+from unittest.mock import patch
 
 import dynatrace_extension.cli.main as dt_sdk
 
@@ -19,15 +19,18 @@ class TestDtSdk(TestCase):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
         pass
 
-    @patch("dynatrace_extension.cli.main.dt_cli_upload")
-    @patch("dynatrace_extension.cli.main.dt_cli_validate")
-    @patch("builtins.open", mock_open(read_data=SAMPLE_EXTENSION_DATA))
-    def test_dt_sdk_upload(self, mock_upload, mock_validate):
-        extension_path = Path("test_extension_dir")
-        tenant_url = "test_tenant_url"
+    @patch("dynatrace_extension.cli.api.upload.requests.post")
+    @patch("dynatrace_extension.cli.api.upload.requests.put")
+    @patch("pathlib.Path.read_bytes")
+    def test_dt_sdk_upload(self, mock_requests_post, mock_requests_put, mock_pathlib_read):
+        extension_path = Path("test_extension_dir/custom_test-extension-0.0.1.zip")
+        classic_tenant_url = "https://test_tenant_url.live.dynatrace.com"
+        platform_tenant_url = "https://test_tenant_url.apps.dynatrace.com"
         api_token = "test_api_token"
+        platform_token = "test_platform_token"
 
-        dt_sdk.upload(extension_path, tenant_url, api_token, validate=False)
+        dt_sdk.upload(extension_path, classic_tenant_url, api_token, None, True, False)
+        dt_sdk.upload(extension_path, platform_tenant_url, None, platform_token, True, False)
 
     def test_dt_sdk_gen_certs(self):
         output = Path("certificates")
