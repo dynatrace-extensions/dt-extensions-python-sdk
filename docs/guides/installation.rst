@@ -29,7 +29,7 @@ Once installed, the ``dt-sdk`` binary will become available in the ``PATH``.
    When installing ``dt-extensions-sdk[cli]`` with the optional set of
    dependecies called ``[cli]``, multiple additional packages which are required
    to make command line tools work will be installed.
-   For example, such packages as ``typer[all]``, ``pyyaml``, and ``dt-cli``.
+   For example, such packages as ``typer[all]`` and ``pyyaml``.
 
    When extension is being built, these additional packages are ignored,
    because the core dependecy of every extension is just the ``dt-extensions-sdk``
