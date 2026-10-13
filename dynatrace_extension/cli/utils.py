@@ -7,6 +7,10 @@ from cryptography import x509
 from cryptography.x509.oid import NameOID
 from rich.console import Console
 
+from .constants import EXTENSION_YAML
+
+_NAME_VERSION_RE = re.compile(r"^(?P<name>.+?)-(?P<version>\d+(?:\.\d+)*)(?:\.[A-Za-z]+)*$")
+
 X509NameAttributes = {
     "CN": NameOID.COMMON_NAME,
     "O": NameOID.ORGANIZATION_NAME,
@@ -29,6 +33,15 @@ def _generate_x509_name(attributes: dict) -> x509.Name:
 def _version_to_pip_version(version: str) -> str:
     """Convert a version string like '3.10' to pip format '310'."""
     return version.replace(".", "")
+
+
+def _parse_name_and_version(filename: str) -> tuple[str, str] | tuple[None, None]:
+    """Parse '<name>-<version>.zip' into (name, version)."""
+    match = _NAME_VERSION_RE.match(Path(filename).name)
+    if match:
+        return match["name"].replace("custom_", "custom:"), match["version"]
+
+    return None, None
 
 
 def _parse_x509_subject(subject: str) -> dict[str, str]:
@@ -97,3 +110,22 @@ def check_file_existence(console: Console, file: Path):
         console.print(f"{file} already exists, it will be overwritten!", style="yellow")
         return True
     return False
+
+
+def locate_extension_yaml(extension_dir: Path) -> Path | None:
+    for entry in extension_dir.rglob(EXTENSION_YAML):
+        if entry.name == EXTENSION_YAML:
+            return entry
+
+    return None
+
+
+def detect_dt_platform(url: str) -> bool:
+    platform_re = re.compile(r"\.apps\.dynatrace")
+
+    match = platform_re.search(url)
+
+    if match is None:
+        return False
+
+    return True

@@ -24,7 +24,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-cli = [ "dt-cli>=1.6.13", "typer", "pyyaml", "ruff", "requests"]
+cli = ["typer", "pyyaml", "ruff", "requests", "cryptography>3", "asn1crypto>=1.4"]
 
 [project.urls]
 Documentation = "https://github.com/dynatrace-extensions/dt-extensions-python-sdk#readme"
@@ -48,10 +48,10 @@ dependencies = [
     "pytest",
     "typer",
     "pyyaml",
-    "dt-cli>=1.6.13",
     "freezegun",
     "cryptography>3",
-    "asn1crypto>=1.4"
+    "asn1crypto>=1.4",
+    "requests"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -105,7 +105,6 @@ dependencies = [
     "sphinx-wagtail-theme",
     "sphinxcontrib-programoutput",
     "wutch",
-    "dt-cli",
     "typer",
     "pyyaml",
     "tomli"
