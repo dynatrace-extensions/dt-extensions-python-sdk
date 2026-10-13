@@ -130,6 +130,7 @@ def build(
         "-k",
         help="Path to the dev fused key-certificate",
     ),
+    passphrase: str = typer.Option("", "--passphrase", "-s", help="Passphrase for encrypted dev fused key-certificate"),
     target_directory: Path | None = typer.Option(None, "--target-directory", "-t"),
     extra_platforms: list[str] | None = typer.Option(
         None, "--extra-platform", "-e", help="Download wheels for an extra platform"
@@ -164,6 +165,7 @@ def build(
     :param extension_dir: The directory of the extension, by default this is the current directory
     :param private_key: The path to the developer fused key-certificate, if not specified, we try to locate the file developer.pem under the environment
     variable DT_CERTIFICATES_FOLDER
+    :param passphrase: The passphrase for developer fused key-certificate, if encrypted
     :param target_directory: The directory to put the extension zip file in, if not specified, we put it in the dist
     folder
     :param extra_platforms: Attempt to also download wheels for an extra platform (e.g. manylinux1_x86_64 or win_amd64)
@@ -188,7 +190,7 @@ def build(
     console.print("Stage 3 - Sign the extension", style="bold blue")
     extension_yaml = ExtensionYaml(Path(extension_dir) / "extension" / "extension.yaml")
     output = target_directory / extension_yaml.zip_file_name()
-    sign(built_zip, private_key, output)
+    sign(built_zip, private_key, passphrase, output)
 
     console.print(f"Stage 4 - Delete {built_zip}", style="bold blue")
     built_zip.unlink()
@@ -410,6 +412,7 @@ def sign(
         "-c",
         help="Path to the dev fused key-certificate",
     ),
+    passphrase: str = typer.Option("", "--pass", "-p", help="Passphrase for encrypted developer fused key-certificate"),
     output: Path = typer.Option(None, "--output", "-o"),
     force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the output zip file"),
 ):
@@ -443,7 +446,7 @@ def sign(
         extension_yaml = ExtensionYaml(extension_yaml_path)
         output = zip_file.parent / extension_yaml.zip_file_name()
 
-    pem_bytes = sign_file(console, zip_file, combined_cert_and_key)
+    pem_bytes = sign_file(console, zip_file, combined_cert_and_key, passphrase)
 
     if force:
         build_signed_bundle(console, zip_file, pem_bytes, output, True)
@@ -571,11 +574,13 @@ def gencerts(
     ca_subject: str = typer.Option(
         DEFAULT_CA_SUBJECT, "--ca_subject", help="Subject of the CA certificate in /key0=value0/key1=value1 format"
     ),
+    ca_passphrase: str = typer.Option("", "--ca_pass", help="Passphrase for encrypting CA private key", prompt=True),
     dev_subject: str = typer.Option(
         DEFAULT_DEV_SUBJECT,
         "--dev_subject",
         help="Subject of the developer certificate in /key0=value0/key1=value1 format",
     ),
+    dev_passphrase: str = typer.Option("", "--dev_pass", help="Passphrase for encrypting dev private key", prompt=True),
     days_valid: int = typer.Option(DEFAULT_VALIDITY_PERIOD, "--days_valid", help="Certificate validity period in days"),
     force: bool = typer.Option(False, "--force", "-f", help="Force overwriting the certificates"),
 ):
@@ -629,8 +634,8 @@ def gencerts(
 
     validity_end = datetime.now() + timedelta(days=days_valid)
 
-    generate_ca(console, output, ca_sub, validity_end)
-    generate_dev_cert(console, output, dev_sub, validity_end)
+    generate_ca(console, output, ca_sub, validity_end, ca_passphrase)
+    generate_dev_cert(console, output, dev_sub, validity_end, ca_passphrase, dev_passphrase)
 
 
 @app.command(help="Creates a new python extension")
