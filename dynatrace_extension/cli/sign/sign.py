@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa, utils
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from rich.console import Console
 
-from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PRIVATE_KEY_PERMISSIONS
+from ..constants import CA_KEY, CA_PEM, DEV_PEM, REQUIRED_PERMISSIONS
 
 CHUNK_SIZE = 1024 * 1024
 
@@ -27,6 +27,7 @@ def generate_ca(
         serialization.BestAvailableEncryption(passphrase.encode()) if passphrase else serialization.NoEncryption()
     )
 
+    ca_key_file_path.touch(REQUIRED_PERMISSIONS)
     ca_key_file_path.write_bytes(
         private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -160,6 +161,7 @@ def generate_dev_cert(
         console.print("Private key is not RSA, the CA private key must be an RSA private key.", style="bold red")
         raise typer.Exit(1)
 
+    dev_cert_file_path.touch(REQUIRED_PERMISSIONS)
     dev_cert_file_path.write_bytes(certificate.public_bytes(serialization.Encoding.PEM))
 
     console.print(f"Wrote developer certificate: {dev_cert_file_path.as_posix()}", style="bold green")
@@ -174,8 +176,6 @@ def generate_dev_cert(
         )
 
     console.print(f"Wrote developer private key: {dev_cert_file_path}", style="bold green")
-
-    dev_cert_file_path.chmod(REQUIRED_PRIVATE_KEY_PERMISSIONS)
 
 
 def sign_file(console: Console, file_path: Path, certificate_file_path: Path, dev_passphrase=None):

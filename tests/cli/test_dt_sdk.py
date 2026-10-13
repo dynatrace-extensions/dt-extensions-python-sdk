@@ -1,4 +1,5 @@
 import shutil
+import stat
 from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
@@ -38,7 +39,9 @@ class TestDtSdk(TestCase):
         dt_sdk.gencerts(
             output,
             ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
+            ca_passphrase="",
             dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
+            dev_passphrase="",
             days_valid=1095,
         )
 
@@ -47,7 +50,9 @@ class TestDtSdk(TestCase):
         dt_sdk.gencerts(
             self.temp_dir / "certificates",
             ca_subject="/CN=Extension CA/O=Some Company/OU=Extension CA",
+            ca_passphrase="",
             dev_subject="/CN=Some Developer/O=Some Company/OU=Extension Development",
+            dev_passphrase="",
             days_valid=1095,
             force=True,
         )
@@ -56,6 +61,15 @@ class TestDtSdk(TestCase):
         self.assertTrue((self.temp_dir / "certificates" / "ca.key").exists())
         self.assertTrue((self.temp_dir / "certificates" / "ca.pem").exists())
         self.assertTrue((self.temp_dir / "certificates" / "developer.pem").exists())
+
+        # Check that the key files have proper permissions
+        self.assertTrue(
+            stat.S_IMODE((self.temp_dir / "certificates" / "ca.key").stat().st_mode) == (stat.S_IREAD + stat.S_IWRITE)
+        )
+        self.assertTrue(
+            stat.S_IMODE((self.temp_dir / "certificates" / "developer.pem").stat().st_mode)
+            == (stat.S_IREAD + stat.S_IWRITE)
+        )
 
         # Create a real extension
         dt_sdk.create("test_extension", self.temp_dir)
@@ -70,6 +84,7 @@ class TestDtSdk(TestCase):
         dt_sdk.build(
             self.temp_dir / "test_extension",
             self.temp_dir / "certificates" / "developer.pem",
+            passphrase="",
             target_directory=None,
             extra_platforms=None,
             extra_index_url=None,
