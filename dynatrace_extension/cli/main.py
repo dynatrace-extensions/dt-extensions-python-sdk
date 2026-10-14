@@ -172,7 +172,7 @@ def build(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
-    :param python_versions: Python versions to download wheels for, defaults to ['3.10']
+    :param python_versions: Python versions to download wheels for, defaults to ['3.14']
     :param no_index: If true, pass --no-index to pip so only --find-links sources are used
     """
     if target_directory is None:
@@ -288,12 +288,12 @@ def wheel(
     :param extra_index_url: Extra index url to use when downloading dependencies
     :param find_links: Extra index url to use when downloading dependencies
     :param only_extra_platforms: If true, only build for the extra platforms, useful when building from arm64
-    :param python_versions: Python versions to download wheels for, defaults to ['3.10']
+    :param python_versions: Python versions to download wheels for, defaults to ['3.14']
     :param no_index: If true, pass --no-index to pip so only --find-links sources are used
     """
     # Handle OptionInfo objects when called directly (not via CLI)
     if python_versions is None or isinstance(python_versions, typer.models.OptionInfo):
-        python_versions = ["3.10"]
+        python_versions = ["3.14"]
     if only_extra_platforms is None or isinstance(only_extra_platforms, typer.models.OptionInfo):
         only_extra_platforms = False
     if no_index is None or isinstance(no_index, typer.models.OptionInfo):

@@ -27,8 +27,8 @@ Native dependencies
 | Your extension will run on a Dynatrace **Activegate** or **OneAgent**, which is a Linux or Windows machine, and it has a specific version of python.
 | This means that your extension must be built on a machine that has the same version of python as the Activegate.
 |
-| Dynatrace extensions support **python 3.10** and **python 3.14**.
-| We plan to `end support for python 3.10 soon`_, and suggest you migrate to **python 3.14**.
+| Dynatrace extensions support **python 3.14**.
+| We have `ended support for python 3.10`_, and you must migrate to **python 3.14**.
 |
 | When you build the extension with **dt-sdk build**, it downloads the dependencies **whl** files and places them in the lib folder of the extension.
 | To obtain whl files for different a operating system than what the build machine is, the SDK provides the **--extra-platform** flag.
@@ -45,13 +45,6 @@ Native dependencies
 | To get the correct extra wheel files for linux. Note, **manylinux2014_x86_64** works for several packages, but not all of them.
 | You need to investigate the dependencies of your extension to find the correct extra platform if that is the case.
 |
-
-| To build for multiple Python versions:
-|
-
-.. code-block:: bash
-
-    dt-sdk build --python-version 3.10 --python-version 3.14
 
 | When building from Linux, you should use:
 |
