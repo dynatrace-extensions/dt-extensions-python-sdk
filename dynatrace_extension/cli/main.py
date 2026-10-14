@@ -25,7 +25,6 @@ from .constants import (
     DT_API_TOKEN,
     DT_API_URL,
     DT_PLATFORM_TOKEN,
-    EXTENSION_DIR,
     EXTENSION_YAML,
     EXTENSION_ZIP,
     SUPPORTED_PYTHON_VERSIONS,
@@ -181,7 +180,12 @@ def build(
         target_directory.mkdir()
     console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
 
-    extension_yaml = ExtensionYaml(Path(extension_dir) / EXTENSION_DIR / EXTENSION_YAML)
+    extension_yaml_path = locate_extension_yaml(extension_dir)
+    if extension_yaml_path:
+        extension_yaml = ExtensionYaml(extension_yaml_path)
+    else:
+        console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_dir}")
+        raise typer.Exit(1)
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
     if extension_yaml.is_python():
@@ -217,7 +221,12 @@ def assemble(
     """
 
     # This checks if the yaml is valid, because it parses it
-    extension_yaml = ExtensionYaml(extension_dir / EXTENSION_DIR / EXTENSION_YAML)
+    extension_yaml_path = locate_extension_yaml(extension_dir)
+    if extension_yaml_path:
+        extension_yaml = ExtensionYaml(extension_yaml_path)
+    else:
+        console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_dir}")
+        raise typer.Exit(1)
 
     if extension_yaml.is_python():
         # Validates that the activation schema files are valid and exist
@@ -243,7 +252,7 @@ def assemble(
         console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", style="bold red")
         raise typer.Exit(1)
 
-    assemble_extension(console, extension_dir / EXTENSION_DIR, output)
+    assemble_extension(console, extension_yaml_path.parent, output)
 
     console.print(f"Built the extension zip file to {output}", style="bold green")
     return output
@@ -489,8 +498,12 @@ def upload(
     else:
         extension_path = Path(extension_path)
     if extension_path.is_dir():
-        yaml_path = Path(extension_path, EXTENSION_DIR, EXTENSION_YAML)
-        extension_yaml = ExtensionYaml(yaml_path)
+        yaml_path = locate_extension_yaml(extension_path)
+        if yaml_path:
+            extension_yaml = ExtensionYaml(yaml_path)
+        else:
+            console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_path}")
+            raise typer.Exit(1)
         zip_file_name = extension_yaml.zip_file_name()
         zip_file_path = Path(extension_path, DIST_DIR, zip_file_name)
 
