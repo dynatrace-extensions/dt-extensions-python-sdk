@@ -61,6 +61,14 @@ class ExtensionYaml:
     def zip_file_name(self) -> str:
         return f"{self.name.replace(':', '_')}-{self.version}.zip"
 
+    def is_python(self) -> bool:
+        python = self._data.get("python", {})
+
+        if python == {}:
+            return False
+
+        return True
+
 
 class Python:
     def __init__(self, data: dict):

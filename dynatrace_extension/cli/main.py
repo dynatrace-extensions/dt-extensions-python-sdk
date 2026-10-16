@@ -25,7 +25,6 @@ from .constants import (
     DT_API_TOKEN,
     DT_API_URL,
     DT_PLATFORM_TOKEN,
-    EXTENSION_DIR,
     EXTENSION_YAML,
     EXTENSION_ZIP,
     SUPPORTED_PYTHON_VERSIONS,
@@ -175,20 +174,31 @@ def build(
     :param python_versions: Python versions to download wheels for, defaults to ['3.10']
     :param no_index: If true, pass --no-index to pip so only --find-links sources are used
     """
-    console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
     if target_directory is None:
         target_directory = extension_dir / "dist"
     if not target_directory.exists():
         target_directory.mkdir()
+    console.print(f"Building and signing extension from {extension_dir} to {target_directory}", style="cyan")
+
+    extension_yaml_path = locate_extension_yaml(extension_dir)
+    if extension_yaml_path:
+        extension_yaml = ExtensionYaml(extension_yaml_path)
+    else:
+        console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_dir}")
+        raise typer.Exit(1)
 
     console.print("Stage 1 - Download and build dependencies", style="bold blue")
-    wheel(extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_versions, no_index)
+    if extension_yaml.is_python():
+        wheel(
+            extension_dir, extra_platforms, extra_index_url, find_links, only_extra_platforms, python_versions, no_index
+        )
+    else:
+        console.print("Detected a non-Python extension, skipping Stage 1", style="yellow")
 
     console.print("Stage 2 - Create the extension zip file", style="bold blue")
     built_zip = assemble(extension_dir, target_directory)
 
     console.print("Stage 3 - Sign the extension", style="bold blue")
-    extension_yaml = ExtensionYaml(Path(extension_dir) / "extension" / "extension.yaml")
     output = target_directory / extension_yaml.zip_file_name()
     sign(built_zip, private_key, passphrase, output)
 
@@ -211,16 +221,23 @@ def assemble(
     """
 
     # This checks if the yaml is valid, because it parses it
-    # Also validates that the activation schema files are valid and exist
-    extension_yaml = ExtensionYaml(extension_dir / EXTENSION_DIR / EXTENSION_YAML)
-    extension_yaml.validate()
-
-    # Checks that the module name is valid and exists in the filesystem
-    module_folder = extension_dir / extension_yaml.python.runtime.module
-    src_module_folder = Path("src") / module_folder
-    if not module_folder.exists() and not src_module_folder.exists():
-        console.print(f"Extension module folder {module_folder} not found", style="bold red")
+    extension_yaml_path = locate_extension_yaml(extension_dir)
+    if extension_yaml_path:
+        extension_yaml = ExtensionYaml(extension_yaml_path)
+    else:
+        console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_dir}")
         raise typer.Exit(1)
+
+    if extension_yaml.is_python():
+        # Validates that the activation schema files are valid and exist
+        extension_yaml.validate()
+
+        # Checks that the module name is valid and exists in the filesystem
+        module_folder = extension_dir / extension_yaml.python.runtime.module
+        src_module_folder = Path("src") / module_folder
+        if not module_folder.exists() and not src_module_folder.exists():
+            console.print(f"Extension module folder {module_folder} not found", style="bold red")
+            raise typer.Exit(1)
 
     # This is the zip file that will contain the extension
     if output is None:
@@ -235,7 +252,7 @@ def assemble(
         console.print(f"{output.as_posix()} already exists, use the --force option to overwrite it.", style="bold red")
         raise typer.Exit(1)
 
-    assemble_extension(console, extension_dir / EXTENSION_DIR, output)
+    assemble_extension(console, extension_yaml_path.parent, output)
 
     console.print(f"Built the extension zip file to {output}", style="bold green")
     return output
@@ -481,8 +498,12 @@ def upload(
     else:
         extension_path = Path(extension_path)
     if extension_path.is_dir():
-        yaml_path = Path(extension_path, EXTENSION_DIR, EXTENSION_YAML)
-        extension_yaml = ExtensionYaml(yaml_path)
+        yaml_path = locate_extension_yaml(extension_path)
+        if yaml_path:
+            extension_yaml = ExtensionYaml(yaml_path)
+        else:
+            console.print(f"Unable to locate {EXTENSION_YAML} in sub-directories of {extension_path}")
+            raise typer.Exit(1)
         zip_file_name = extension_yaml.zip_file_name()
         zip_file_path = Path(extension_path, DIST_DIR, zip_file_name)
 
