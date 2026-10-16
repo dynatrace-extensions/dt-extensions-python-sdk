@@ -20,7 +20,7 @@ CERTIFICATE_DEFAULT_PATH = Path.home() / ".dynatrace" / "certificates"
 REQUIRED_PERMISSIONS = stat.S_IREAD + stat.S_IWRITE
 
 # Python related constants
-SUPPORTED_PYTHON_VERSIONS = ["3.10", "3.14"]
+SUPPORTED_PYTHON_VERSIONS = ["3.14"]
 
 # Environment related constants
 DT_API_TOKEN = "DT_API_TOKEN"
