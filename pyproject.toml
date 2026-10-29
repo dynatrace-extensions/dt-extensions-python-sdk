@@ -118,7 +118,9 @@ dependencies = [
     "wutch",
     "typer",
     "pyyaml",
-    "tomli"
+    "tomli",
+    "cryptography>3",
+    "asn1crypto>=1.4"
 ]
 
 [tool.hatch.envs.docs.env-vars]
